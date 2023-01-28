@@ -1,0 +1,164 @@
+﻿@model IEnumerable<URLEntryMVC.ViewModels.UrlVM>
+
+@{
+    ViewData["Title"] = "ListOfLinks";
+}
+<style>
+    .error {
+color:red !important;
+}
+</style>
+<button type="button" class="btn btn-primary mb-2" id="btnAddNewUrl">
+  Add New URL
+</button>
+<table  class="table table-striped table-bordered" id="linksTbl">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UrlLink)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DomainLink)
+            </th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.HiddenFor(modelItem => item.Id)
+                <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.UrlLink)</a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DomainLink)
+            </td>
+            <td>
+                <button type="button" class="btn btn-primary" id="btnEditUrl" onclick="EditUrl(@item.Id)">
+                   <i class="fa fa-edit"></i>
+                </button>
+                <button type="button" class="btn btn-primary" id="btnEditUrl" onclick="DeleteUrl(@item.Id)">
+                   <i class="fa fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<!-- modal -->
+<div class="modal fade" id="AppModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add New URL</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="ModalBody">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="EditAppModal" tabindex="-1" aria-labelledby="EditexampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="EditexampleModalLabel">Edit URL</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="EditModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateBtn">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="DeleteAppModal" tabindex="-1" aria-labelledby="DeleteExampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeleteExampleModalLabel">Delete URL</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="DeleteModalBody">
+                Are you sure you want to delete the URL?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="deleteBtn">Confirm Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+ <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+ <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap4.min.js"></script>
+    
+<script>
+    $(document).ready(function () {
+        $('#linksTbl').DataTable();
+        var selectedUrlId = 0;
+
+    });
+    $("#btnAddNewUrl").click(function () {
+            $.ajax({
+                url: "@Url.Action("SaveLink", "URL")",
+                type: 'GET',
+                contentType: 'application/json',
+                beforeSend: function () {
+                $("#logoLoader").fadeIn();
+                },
+                success: function (obj) {
+                    $("#logoLoader").fadeOut();
+                    $('#ModalBody').html(obj);
+                    $('#AppModal').modal('show');
+                },
+            });
+        });
+        function EditUrl(id){
+            $.ajax({
+                type: 'GET',
+                url: "@Url.Action("UpdateLink", "URL")",
+                data: {id: id},
+                beforeSend: function () {
+                $("#logoLoader").fadeIn();
+                },
+                success: function (obj) {
+                    $("#logoLoader").fadeOut();
+                    $('#EditModalBody').html(obj);
+                    $('#EditAppModal').modal('show');
+                },
+                error: (error) => {
+                     console.log(JSON.stringify(error));
+                }
+            });
+        }
+        function DeleteUrl(id){
+            selectedUrlId = id;
+            $('#DeleteAppModal').modal('show');
+        }
+        $("#deleteBtn").click(function () {
+            $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("DeletLink", "URL")',
+                    data: {Id:selectedUrlId},
+                    beforeSend: function () {
+                    $("#logoLoader").fadeIn();
+                    },
+                    success: function(data) {
+                        $("#logoLoader").fadeOut();
+                        if (data == 1) {
+                            location.reload(true);
+                        }
+                    }
+                })
+        });
+</script>
