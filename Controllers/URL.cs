@@ -1,27 +1,30 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http.Extensions;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using URLEntryMVC.Data;
 using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModels;
+using URLEntryMVC.Data;
 
 namespace URLEntryMVC.Controllers
 {
+
+    [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+
     public class URL : Controller
     {
         private readonly IUrlRepository urlRepositoryObj;
         private readonly DataContext _db;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private string domainLink = "http://tapthat.online/";
+        private string domainLink = "http://tapthat.online/_";
 
-        public URL(IUrlRepository urlRepository,DataContext db, IHttpContextAccessor contextAccessor)
+        public URL(IUrlRepository urlRepository, DataContext db, IHttpContextAccessor contextAccessor)
         {
             
             urlRepositoryObj = urlRepository;
             _db = db;
-            _contextAccessor = contextAccessor;
         }
+        
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<List<UrlVM>>> ListOfLinks()
         {
@@ -35,12 +38,14 @@ namespace URLEntryMVC.Controllers
             }).ToList();
             return View(UrlList);
         }
+        [Authorize]
         [HttpGet]
         public ActionResult SaveLink()
         {
             SaveUrlVM saveUrlVM = new SaveUrlVM();
             return PartialView("~/Views/PartialViews/_AddUrlModal.cshtml", saveUrlVM);
         }
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<SaveUrlVM>> SaveLink(SaveUrlVM urlVM)
         {
@@ -60,6 +65,7 @@ namespace URLEntryMVC.Controllers
                 return Json(1);
             }
         }
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<UrlVM>> UpdateLink(int id)
         {
@@ -70,6 +76,7 @@ namespace URLEntryMVC.Controllers
             EditObj.DomainLink = obj.DomainLink;
             return PartialView("~/Views/PartialViews/_EditUrlModal.cshtml", EditObj);
         }
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<UrlVM>> UpdateLink(UrlVM urlVM)
         {
@@ -90,20 +97,21 @@ namespace URLEntryMVC.Controllers
                 return Json(1);
             }
         }
+        [Authorize]
         public ActionResult DeletLink(int Id)
         {
             urlRepositoryObj.DeleteUrl(Id);
             return Json(1);
         }
+        [AllowAnonymous]
         public IActionResult checkRawUrl()
         {
             var statusCode = HttpContext.Response.StatusCode;
-            //ViewData["statusCode"] = statusCode;
             var feauter = Request.HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
             var path = feauter?.OriginalPath.ToString().Remove(0,1);
             var url = domainLink + path;
 
-            var domainLinkObj = _db.UrlTbl.Where(x => x.UrlLink == url.Trim()).Select(x => x.DomainLink).FirstOrDefault();
+            var domainLinkObj = _db.UrlTbls.Where(x => x.UrlLink == url.Trim()).Select(x => x.DomainLink).FirstOrDefault();
             if (domainLinkObj != null)
             {
                 return Redirect(domainLinkObj);

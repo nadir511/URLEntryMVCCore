@@ -15,38 +15,94 @@ namespace URLEntryMVC.RepositoryClasses
         }
         public void UpdateLink(UrlTbl UrlInfo)
         {
-             _db.Entry(UrlInfo).State = EntityState.Modified;
-            _db.SaveChanges();
+            try
+            {
+                _db.Entry(UrlInfo).State = EntityState.Modified;
+                _db.SaveChanges();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         public async Task<bool> IsLinkExist(string url)
         {
-            var result = await _db.UrlTbl.Where(x => x.UrlLink == url.Trim()).FirstOrDefaultAsync();
-            return result ==null ? false : true;
+            try
+            {
+                var result = await _db.UrlTbls.Where(x => x.UrlLink == url.Trim()).FirstOrDefaultAsync();
+                return result == null ? false : true;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         public async Task<bool> IsLinkExistOnEdit(string url, int Id)
         {
-            var result = await _db.UrlTbl.Where(x => x.UrlLink == url.Trim() && x.Id!= Id).FirstOrDefaultAsync();
-            return result == null ? false : true;
+            try
+            {
+                var result = await _db.UrlTbls.Where(x => x.UrlLink == url.Trim() && x.Id != Id).FirstOrDefaultAsync();
+                return result == null ? false : true;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         public void SaveLink(UrlTbl UrlInfo)
         {
-            _db.Entry(UrlInfo).State = EntityState.Added;
-            _db.SaveChanges();
+            try
+            {
+                _db.Entry(UrlInfo).State = EntityState.Added;
+                _db.SaveChanges();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         public async Task<List<UrlTbl>> ListOfLinks()
         {
-            return await _db.UrlTbl.ToListAsync();
+            try
+            {
+                return await _db.UrlTbls.ToListAsync();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         public async Task<UrlTbl> GetUrlById(int Id)
         {
-            return await _db.UrlTbl.Where(x => x.Id == Id).FirstOrDefaultAsync();
+            try
+            {
+                return await _db.UrlTbls.Where(x => x.Id == Id).FirstOrDefaultAsync();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         public void DeleteUrl(int Id)
         {
-            var UrlInfo =_db.UrlTbl.Where(x => x.Id == Id).FirstOrDefault();
-            if (UrlInfo != null)
-                _db.UrlTbl.Remove(UrlInfo);
-            _db.SaveChanges();
+            try
+            {
+                var UrlInfo = _db.UrlTbls.Where(x => x.Id == Id).FirstOrDefault();
+                if (UrlInfo != null)
+                    _db.UrlTbls.Remove(UrlInfo);
+                _db.SaveChanges();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

@@ -1,14 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
-namespace URLEntryMVC.Entities
+namespace URLEntryMVC.Entities;
+
+public partial class UrlTbl
 {
-    public class UrlTbl
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        public string? UrlLink { get; set; }
-        public string? DomainLink { get; set; }
-    }
+    public int Id { get; set; }
+
+    public string? UrlLink { get; set; }
+
+    public string? DomainLink { get; set; }
+
+    public int? TotalClicks { get; set; }
+
+    public int? CustomerIdFk { get; set; }
+
+    public virtual CustomerTbl? CustomerIdFkNavigation { get; set; }
 }

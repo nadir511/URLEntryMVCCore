@@ -19,24 +19,14 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseRouting();
-
-app.UseAuthorization();
-//var EnteredPath ="";
-//app.Use(async (context, next) =>
-//{
-//    EnteredPath = context.Request.HttpContext.Request.Path.ToString().Remove(0, 1);
-//    await next();
-//    if (context.Response.StatusCode == 404)
-//    {
-//        //context.Request.Path = "/URL/checkRawUrl" + EnteredPath;
-//        context.Response.Redirect("URL/checkRawUrl?enterdPath=" + EnteredPath);
-//        await next();
-//    }
-//});
 app.UseStatusCodePagesWithReExecute("/URL/checkRawUrl", "?statusCode={0}");
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=URL}/{action=ListOfLinks}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();

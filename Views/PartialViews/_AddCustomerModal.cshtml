@@ -1,0 +1,67 @@
+﻿@model URLEntryMVC.ViewModel.CustomerVM
+<div class="col-xl">
+    <div class="card mb-4">
+        <div class="card-body">
+            <form id="addCustomerForm">
+                <div class="mb-3">
+                    <label class="form-label" for="CustomerName">Customer Name</label><span style="color:red"> *</span>
+                    <input type="text" asp-for="CustomerName" class="form-control" id="CustomerName" placeholder="ACME Inc." required>
+                    <span asp-validation-for="CustomerName" class="text-danger" id="CustomerError"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="ContactNumber">Phone No</label>
+                    <input type="text" asp-for="ContactNumber" id="ContactNumber" class="form-control phone-mask" placeholder="658 799 8941">
+                    <span asp-validation-for="ContactNumber" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="Address">Address</label><span style="color:red"> *</span>
+                    <textarea id="Address" asp-for="Address" class="form-control" placeholder="2425 Wilkinson Court" required></textarea>
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="File_Upload">Upload Logo</label><span style="color:red"> *</span>
+                    <input type="file" class="form-control" id="File_Upload" name="CustomerLogo" accept="image/png" required />
+                    <span asp-validation-for="CustomerLogo" class="text-danger"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    var uploadField = document.getElementById("File_Upload");
+    uploadField.onchange = function() {
+        if (this.files[0].size > 500000) {
+            alert("File should not be greater then 500kb");
+            this.value = "";
+        };
+    };
+    $("#saveBtn").click(function() {
+        if ($("#addCustomerForm").valid()) {
+            var fileData = new FormData();
+            // Adding one more key to FormData object
+            fileData.append("CustomerLogo", $("#File_Upload")[0].files[0]);
+            fileData.append('CustomerName', $("#CustomerName").val());
+            fileData.append('Address', $("#Address").val());
+            fileData.append('ContactNumber', $("#ContactNumber").val());
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveCustomer", "Customers")',
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                data: fileData,
+                beforeSend: function() {
+                    $("#logoLoader").fadeIn();
+                },
+                success: function(data) {
+                    $("#logoLoader").fadeOut();
+                    if (data == 0) {
+                        $('#CustomerError').text('Customer already exist');
+                    }
+                    else if (data == 1) {
+                        location.reload(true);
+                    }
+                }
+            })
+        }
+    });
+</script>

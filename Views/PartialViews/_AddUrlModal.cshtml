@@ -11,7 +11,19 @@
       @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@required="required",@type="url" } })
       @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
   </div>
-<div/>
+</div>
+<div class="row">
+  <div class="col-sm-6">
+      <label>Customer URL</label><span style="color:red"> *</span>
+      @Html.EditorFor(m => m.UrlLink, new { htmlAttributes = new { @class = "form-control",@required="required"} })
+      @Html.ValidationMessageFor(model => model.UrlLink, "", new { @class = "text-danger",id="urlError" })
+  </div>
+  <div class="col-sm-6">
+      <label>Select Customer</label><span style="color:red"> *</span>
+      @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@required="required",@type="url" } })
+      @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
+  </div>
+</div>
 </form>
 <script>
     $("#saveBtn").click(function () {

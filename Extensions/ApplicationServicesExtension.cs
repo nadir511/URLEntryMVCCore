@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using URLEntryMVC.Data;
 using URLEntryMVC.Interfaces;
+using URLEntryMVC.Models;
 using URLEntryMVC.RepositoryClasses;
 
 namespace URLEntryMVC.Extensions;
@@ -12,10 +13,12 @@ public static class ApplicationServicesExtension
     {
         _services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         _services.AddScoped<IUrlRepository, UrlRepository>();
+        _services.AddScoped<ICustomerRepository, CustomerRepository>();
         _services.AddDbContext<DataContext>(options =>
         {
-            options.UseSqlite(_config.GetConnectionString("DefaultConnection"));
+            options.UseSqlServer(_config.GetConnectionString("DefaultConnection"));
         });
+        _services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<DataContext>();
         return _services;
     }
 }
