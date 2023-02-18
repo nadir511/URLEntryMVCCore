@@ -56,11 +56,11 @@ namespace URLEntryMVC.RepositoryClasses
             }
         }
 
-        public async Task<bool> IsCustomerExistOnEdit(string CustomerName, int Id)
+        public async Task<bool> IsCustomerExistOnEdit(string CustomerName, int CustomerId)
         {
             try
             {
-                var result = await _db.CustomerTbls.Where(x => x.CustomerName == CustomerName.Trim() && x.Id!=Id).FirstOrDefaultAsync();
+                var result = await _db.CustomerTbls.Where(x => x.CustomerName == CustomerName.Trim() && x.Id!= CustomerId).FirstOrDefaultAsync();
                 return result == null ? false : true;
             }
             catch (Exception)

@@ -8,7 +8,7 @@ public partial class UrlTbl
     public int Id { get; set; }
 
     public string? UrlLink { get; set; }
-    public string? UrlLinkForCustomer { get; set; }
+    public string? CustomerPointName { get; set; }
 
     public string? DomainLink { get; set; }
 

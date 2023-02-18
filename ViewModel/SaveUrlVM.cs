@@ -4,10 +4,11 @@ namespace URLEntryMVC.ViewModels
 {
     public class SaveUrlVM
     {
+        public int Id { get; set; }
         [Required]
         [Display(Name = "URL Link")]
         public string? UrlLink { get; set; }
-        public string? UrlLinkForCustomer { get; set; }
+        public string? CustomerPointName { get; set; }
         [Required]
         [Display(Name = "Domain Link")]
         public string? DomainLink { get; set; }

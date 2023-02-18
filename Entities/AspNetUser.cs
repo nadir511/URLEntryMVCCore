@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace URLEntryMVC.Entities;
 
@@ -34,14 +36,17 @@ public partial class AspNetUser
     public bool LockoutEnabled { get; set; }
 
     public int AccessFailedCount { get; set; }
-
+    public int CustomerIdFk { get; set; }
+    [NotMapped]
     public virtual ICollection<AspNetUserClaim> AspNetUserClaims { get; } = new List<AspNetUserClaim>();
+    [NotMapped]
 
     public virtual ICollection<AspNetUserLogin> AspNetUserLogins { get; } = new List<AspNetUserLogin>();
+    [NotMapped]
 
     public virtual ICollection<AspNetUserToken> AspNetUserTokens { get; } = new List<AspNetUserToken>();
+    [NotMapped]
     public virtual ICollection<AspNetUserRole> FK_AspNetUserRole { get; } = new List<AspNetUserRole>();
-
-
+    [NotMapped]
     public virtual ICollection<AspNetRole> Roles { get; } = new List<AspNetRole>();
 }

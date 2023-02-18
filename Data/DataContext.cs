@@ -36,8 +36,7 @@ public partial class DataContext : IdentityDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
-        
+        base.OnModelCreating(modelBuilder);
         //modelBuilder.Entity<AspNetRole>(entity =>
         //{
         //    entity.HasIndex(e => e.NormalizedName, "RoleNameIndex")
@@ -55,30 +54,32 @@ public partial class DataContext : IdentityDbContext
         //    entity.HasOne(d => d.Role).WithMany(p => p.AspNetRoleClaims).HasForeignKey(d => d.RoleId);
         //});
 
-        //modelBuilder.Entity<AspNetUser>(entity =>
-        //{
-        //    entity.HasIndex(e => e.NormalizedEmail, "EmailIndex");
+        modelBuilder.Entity<AspNetUser>(entity =>
+        {
+            entity.ToTable("AspNetUser");
+            entity.HasNoKey();
+            //entity.HasIndex(e => e.NormalizedEmail, "EmailIndex");
 
-        //    entity.HasIndex(e => e.NormalizedUserName, "UserNameIndex")
-        //        .IsUnique()
-        //        .HasFilter("([NormalizedUserName] IS NOT NULL)");
+            //entity.HasIndex(e => e.NormalizedUserName, "UserNameIndex")
+            //    .IsUnique()
+            //    .HasFilter("([NormalizedUserName] IS NOT NULL)");
 
-        //    entity.Property(e => e.Email).HasMaxLength(256);
-        //    entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
-        //    entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
-        //    entity.Property(e => e.UserName).HasMaxLength(256);
+            //entity.Property(e => e.Email).HasMaxLength(256);
+            //entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+            //entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
+            //entity.Property(e => e.UserName).HasMaxLength(256);
 
-        //    entity.HasMany(d => d.Roles).WithMany(p => p.Users)
-        //        .UsingEntity<Dictionary<string, object>>(
-        //            "AspNetUserRole",
-        //            r => r.HasOne<AspNetRole>().WithMany().HasForeignKey("RoleId"),
-        //            l => l.HasOne<AspNetUser>().WithMany().HasForeignKey("UserId"),
-        //            j =>
-        //            {
-        //                j.HasKey("UserId", "RoleId");
-        //                j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
-        //            });
-        //});
+            //entity.HasMany(d => d.Roles).WithMany(p => p.Users)
+            //    .UsingEntity<Dictionary<string, object>>(
+            //        "AspNetUserRole",
+            //        r => r.HasOne<AspNetRole>().WithMany().HasForeignKey("RoleId"),
+            //        l => l.HasOne<AspNetUser>().WithMany().HasForeignKey("UserId"),
+            //        j =>
+            //        {
+            //            j.HasKey("UserId", "RoleId");
+            //            j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
+            //        });
+        });
 
         //modelBuilder.Entity<AspNetUserClaim>(entity =>
         //{
@@ -123,9 +124,6 @@ public partial class DataContext : IdentityDbContext
                 .HasForeignKey(d => d.CustomerIdFk)
                 .HasConstraintName("FK_UrlTbl_CustomerTbl");
         });
-
-        
-        base.OnModelCreating(modelBuilder);
         //OnModelCreatingPartial(modelBuilder);
     }
 

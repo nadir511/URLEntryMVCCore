@@ -23,8 +23,8 @@
         </div>
         <div class="col-sm-6">
             <label>Customer Point</label><span style="color:red"> *</span>
-            @Html.EditorFor(m => m.UrlLinkForCustomer, new { htmlAttributes = new { @class = "form-control",@required="required"} })
-            @Html.ValidationMessageFor(model => model.UrlLinkForCustomer, "", new { @class = "text-danger",id="customerPointError" })
+            @Html.EditorFor(m => m.CustomerPointName, new { htmlAttributes = new { @class = "form-control",@required="required"} })
+            @Html.ValidationMessageFor(model => model.CustomerPointName, "", new { @class = "text-danger",id="customerPointError" })
         </div>
     </div>
 </form>

@@ -18,9 +18,8 @@ namespace URLEntryMVC.Controllers
         private readonly ICustomerRepository _customerRepository;
         private string domainLink = "http://tapthat.online/_";
 
-        public URL(IUrlRepository urlRepository, DataContext db, IHttpContextAccessor contextAccessor,ICustomerRepository customerRepository)
+        public URL(IUrlRepository urlRepository, DataContext db,ICustomerRepository customerRepository)
         {
-            
             urlRepositoryObj = urlRepository;
             _db = db;
             _customerRepository = customerRepository;
@@ -31,12 +30,15 @@ namespace URLEntryMVC.Controllers
         public async Task<ActionResult<List<UrlVM>>> ListOfLinks()
         {
             var Links = await urlRepositoryObj.ListOfLinks();
-
+            ViewBag.TotalPoints = _db.UrlTbls.ToList().Count();
+            ViewBag.TotalCustomers = _db.CustomerTbls.ToList().Count();
             List<UrlVM> UrlList = Links.Select(x => new UrlVM
             {
                 Id = x.Id,
                 UrlLink = x.UrlLink??string.Empty,
-                DomainLink = x.DomainLink ?? string.Empty
+                DomainLink = x.DomainLink ?? string.Empty,
+                CustomerName=_db.CustomerTbls.Where(y=>y.Id==x.CustomerIdFk).Select(x=>x.CustomerName).FirstOrDefault(),
+                CustomerPointName=x.CustomerPointName
             }).ToList();
             return View(UrlList);
         }
@@ -57,7 +59,7 @@ namespace URLEntryMVC.Controllers
         [HttpPost]
         public async Task<ActionResult<SaveUrlVM>> SaveLink(SaveUrlVM urlVM)
         {
-            bool isLinkExistForCustomer= await urlRepositoryObj.IsLinkExist(urlVM.UrlLinkForCustomer??String.Empty);
+            bool isLinkExistForCustomer= await urlRepositoryObj.IsPointExistForCustomer(urlVM.CustomerPointName??String.Empty, urlVM.CustomerId);
             if (isLinkExistForCustomer)
                 return Json(-1);
             bool isLinkExist = await urlRepositoryObj.IsLinkExist(domainLink + urlVM.UrlLink);
@@ -72,7 +74,7 @@ namespace URLEntryMVC.Controllers
                     UrlLink = domainLink + urlVM.UrlLink,
                     DomainLink = urlVM.DomainLink,
                     CustomerIdFk= urlVM.CustomerId,
-                    UrlLinkForCustomer= urlVM.UrlLinkForCustomer
+                    CustomerPointName = urlVM.CustomerPointName
                 };
                 urlRepositoryObj.SaveLink(urlTbl);
                 return Json(1);
@@ -80,19 +82,30 @@ namespace URLEntryMVC.Controllers
         }
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<UrlVM>> UpdateLink(int id)
+        public async Task<ActionResult<SaveUrlVM>> UpdateLink(int id)
         {
             var obj =await urlRepositoryObj.GetUrlById(id);
-            UrlVM EditObj = new UrlVM();
-            EditObj.Id = obj.Id;
-            EditObj.UrlLink = obj.UrlLink;
-            EditObj.DomainLink = obj.DomainLink;
-            return PartialView("~/Views/PartialViews/_EditUrlModal.cshtml", EditObj);
+            var customer = await _customerRepository.ListOfCustomers();
+            SaveUrlVM editUrlVM = new SaveUrlVM();
+            editUrlVM.CustomerList = customer.Select(x => new CustomerInfo
+            {
+                CustomerId = x.Id,
+                CustomerName = x.CustomerName
+            }).ToList();
+            editUrlVM.Id = obj.Id;
+            editUrlVM.UrlLink = obj.UrlLink;
+            editUrlVM.DomainLink = obj.DomainLink;
+            editUrlVM.CustomerPointName = obj.CustomerPointName;
+            editUrlVM.CustomerId = obj.CustomerIdFk??0;
+            return PartialView("~/Views/PartialViews/_EditUrlModal.cshtml", editUrlVM);
         }
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<UrlVM>> UpdateLink(UrlVM urlVM)
+        public async Task<ActionResult> UpdateLink(SaveUrlVM urlVM)
         {
+            bool isLinkExistForCustomerOnEdit = await urlRepositoryObj.IsPointExistForCustomerOnEdit(urlVM.CustomerPointName ?? String.Empty, urlVM.CustomerId, urlVM.Id);
+            if (isLinkExistForCustomerOnEdit)
+                return Json(-1);
             bool isLinkExist = await urlRepositoryObj.IsLinkExistOnEdit(domainLink + urlVM.UrlLink, urlVM.Id);
             if (isLinkExist == true)
             {
@@ -105,6 +118,8 @@ namespace URLEntryMVC.Controllers
                     Id = urlVM.Id,
                     UrlLink = domainLink + urlVM.UrlLink,
                     DomainLink = urlVM.DomainLink,
+                    CustomerIdFk = urlVM.CustomerId,
+                    CustomerPointName = urlVM.CustomerPointName
                 };
                 urlRepositoryObj.UpdateLink(urlTbl);
                 return Json(1);

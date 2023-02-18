@@ -113,6 +113,7 @@ namespace URLEntryMVC.Controllers
                 }
                 var customer = new CustomerTbl()
                 {
+                    Id = customerVM.Id,
                     CustomerName = customerVM.CustomerName,
                     ContactNumber = customerVM.ContactNumber,
                     Address = customerVM.Address,

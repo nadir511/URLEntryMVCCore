@@ -52,11 +52,24 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
-        public async Task<bool> IsUrlExistForCustomer(string customerUrl,int customerId)
+        public async Task<bool> IsPointExistForCustomer(string customerPoint,int customerId)
         {
             try
             {
-                var result = await _db.UrlTbls.Where(x => x.UrlLinkForCustomer == customerUrl.Trim() && x.CustomerIdFk == customerId).FirstOrDefaultAsync();
+                var result = await _db.UrlTbls.Where(x => x.CustomerPointName == customerPoint.Trim() && x.CustomerIdFk == customerId).FirstOrDefaultAsync();
+                return (result == null ? false : true);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public async Task<bool> IsPointExistForCustomerOnEdit(string customerPoint, int customerId,int PointId)
+        {
+            try
+            {
+                var result = await _db.UrlTbls.Where(x => x.CustomerPointName == customerPoint.Trim() && x.CustomerIdFk == customerId &&x.Id!= PointId).FirstOrDefaultAsync();
                 return (result == null ? false : true);
             }
             catch (Exception)
