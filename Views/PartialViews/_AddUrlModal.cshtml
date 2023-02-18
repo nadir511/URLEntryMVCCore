@@ -1,51 +1,57 @@
 ﻿@model URLEntryMVC.ViewModels.SaveUrlVM
 <form id="addUrlForm">
-<div class="row">
-  <div class="col-sm-6">
-      <label>URL</label><span style="color:red"> *</span>
-      @Html.EditorFor(m => m.UrlLink, new { htmlAttributes = new { @class = "form-control",@required="required"} })
-      @Html.ValidationMessageFor(model => model.UrlLink, "", new { @class = "text-danger",id="urlError" })
-  </div>
-  <div class="col-sm-6">
-      <label>Domain Link</label><span style="color:red"> *</span>
-      @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@required="required",@type="url" } })
-      @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
-  </div>
-</div>
-<div class="row">
-  <div class="col-sm-6">
-      <label>Customer URL</label><span style="color:red"> *</span>
-      @Html.EditorFor(m => m.UrlLink, new { htmlAttributes = new { @class = "form-control",@required="required"} })
-      @Html.ValidationMessageFor(model => model.UrlLink, "", new { @class = "text-danger",id="urlError" })
-  </div>
-  <div class="col-sm-6">
-      <label>Select Customer</label><span style="color:red"> *</span>
-      @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@required="required",@type="url" } })
-      @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
-  </div>
-</div>
+    <div class="row">
+        <div class="col-sm-6">
+            <label>URL</label><span style="color:red"> *</span>
+            @Html.EditorFor(m => m.UrlLink, new { htmlAttributes = new { @class = "form-control",@required="required"} })
+            @Html.ValidationMessageFor(model => model.UrlLink, "", new { @class = "text-danger",id="urlError" })
+        </div>
+        <div class="col-sm-6">
+            <label>Domain Link</label><span style="color:red"> *</span>
+            @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@required="required",@type="url" } })
+            @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <label>Select Customer</label><span style="color:red"> *</span>
+            <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName"))" required>
+                <option value="">--Select Customer--</option>
+            </select>
+            <input type="hidden" asp-for="CustomerId" />
+            @Html.ValidationMessageFor(m => m.CustomerId, "", new { @class = "text-danger", id="selectCustomerError" })
+        </div>
+        <div class="col-sm-6">
+            <label>Customer Point</label><span style="color:red"> *</span>
+            @Html.EditorFor(m => m.UrlLinkForCustomer, new { htmlAttributes = new { @class = "form-control",@required="required"} })
+            @Html.ValidationMessageFor(model => model.UrlLinkForCustomer, "", new { @class = "text-danger",id="customerPointError" })
+        </div>
+    </div>
 </form>
 <script>
-    $("#saveBtn").click(function () {
-            if ($("#addUrlForm").valid()) {
-                $.ajax({
-                    type: "POST",
-                    url: '@Url.Action("SaveLink", "URL")',
-                    dataType: 'json',
-                    data: $("#addUrlForm").serializeArray(),
-                    beforeSend: function () {
-                          $("#logoLoader").fadeIn();
-                    },
-                    success: function(data) {
-                        $("#logoLoader").fadeOut();
-                        if (data == 0) {
-                            $('#urlError').text('URL already exist');
-                        }
-                        else if (data == 1) {
-                            location.reload(true);
-                        }
+    $("#saveBtn").click(function() {
+        if ($("#addUrlForm").valid()) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveLink", "URL")',
+                dataType: 'json',
+                data: $("#addUrlForm").serializeArray(),
+                beforeSend: function() {
+                    $("#logoLoader").fadeIn();
+                },
+                success: function(data) {
+                    $("#logoLoader").fadeOut();
+                    if (data == 0) {
+                        $('#urlError').text('URL already exist');
                     }
-                })
-            }
-        });
+                    else if(data == -1){
+                        $('#customerPointError').text('Customer point already exist');
+                    }
+                    else if (data == 1) {
+                        location.reload(true);
+                    }
+                }
+            })
+        }
+    });
 </script>

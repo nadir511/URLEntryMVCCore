@@ -52,6 +52,19 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
+        public async Task<bool> IsUrlExistForCustomer(string customerUrl,int customerId)
+        {
+            try
+            {
+                var result = await _db.UrlTbls.Where(x => x.UrlLinkForCustomer == customerUrl.Trim() && x.CustomerIdFk == customerId).FirstOrDefaultAsync();
+                return (result == null ? false : true);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         public void SaveLink(UrlTbl UrlInfo)
         {
             try

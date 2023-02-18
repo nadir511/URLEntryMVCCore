@@ -56,7 +56,7 @@ namespace URLEntryMVC.RepositoryClasses
             }
         }
 
-        public async Task<bool> IsLinkCustomerOnEdit(string CustomerName, int Id)
+        public async Task<bool> IsCustomerExistOnEdit(string CustomerName, int Id)
         {
             try
             {

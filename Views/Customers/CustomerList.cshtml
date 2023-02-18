@@ -59,6 +59,24 @@
         </div>
     </div>
 </div>
+@*Delet Modal*@
+<div class="modal fade" id="DeleteAppModal" tabindex="-1" aria-labelledby="DeleteExampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeleteExampleModalLabel">Delete Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="DeleteModalBody">
+                Are you sure you want to delete the Customer?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="deleteBtn">Confirm Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap4.min.js"></script>
@@ -79,21 +97,36 @@
             success: function(obj) {
                 $("#logoLoader").fadeOut();
                 $('#MainModalLabel').html('Add Customer');
+                $('#saveBtn').html('Update');
                 $('#MainModalBody').html(obj);
                 $('#MainAppModal').modal('show');
             },
         });
     });
+    function EditCustomer(id) {
+        $.ajax({
+            type: 'GET',
+            url: "@Url.Action("EditCustomer", "Customers")",
+            data: { Id: id },
+            beforeSend: function() {
+                $("#logoLoader").fadeIn();
+            },
+            success: function(obj) {
+                $("#logoLoader").fadeOut();
+                $('#MainModalLabel').html('Update Customer');
+                $('#MainModalBody').html(obj);
+                $('#MainAppModal').modal('show');
+            },
+            error: (error) => {
+                console.log(JSON.stringify(error));
+            }
+        });
+    }
     function DeleteCustomer(id) {
         selectedCustomerId = id;
-        $('#MainModalLabel').html('Delete Customer');
-        $('#MainModalBody').html('Are you sure you want to delete the Customer?');
-        $('#saveBtn').html('Confirm Delete');
-        $("#saveBtn").attr("id", "deleteMainBtn");
-        $('#MainAppModal').modal('show');
+        $('#DeleteAppModal').modal('show');
     }
-    $("#deleteMainBtn").click(function() {
-        debugger;
+    $("#deleteBtn").click(function() {
         $.ajax({
             type: "POST",
             url: '@Url.Action("DeleteCustomer", "Customers")',

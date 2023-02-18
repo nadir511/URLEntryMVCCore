@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using URLEntryMVC.Data;
 using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModel;
@@ -8,10 +9,12 @@ namespace URLEntryMVC.Controllers
     public class CustomersController : Controller
     {
         private readonly ICustomerRepository _customerRepository;
+        private readonly DataContext _db;
 
-        public CustomersController(ICustomerRepository customerRepository)
+        public CustomersController(ICustomerRepository customerRepository,DataContext dataContext)
         {
             _customerRepository = customerRepository;
+            _db = dataContext;
         }
         public async Task<ActionResult<List<CustomerVM>>> CustomerList()
         {
@@ -32,19 +35,7 @@ namespace URLEntryMVC.Controllers
                 throw;
             }
         }
-        public async Task<ActionResult> DeleteCustomer(int Id)
-        {
-            try
-            {
-                await _customerRepository.DeleteCustomer(Id);
-                return Json(1);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            
-        }
+        
         [HttpGet]
         public ActionResult SaveCustomer()
         {
@@ -79,6 +70,75 @@ namespace URLEntryMVC.Controllers
                 throw;
             }
             
+        }
+        [HttpGet]
+        public async Task<ActionResult> EditCustomer(int Id)
+        {
+            try
+            {
+                var customerInfo = await _customerRepository.GetCustomerById(Id);
+                CustomerVM customerVM = new CustomerVM();
+                customerVM.Id = customerInfo.Id;
+                customerVM.CustomerName = customerInfo.CustomerName;
+                customerVM.ContactNumber = customerInfo.ContactNumber;
+                customerVM.Address = customerInfo.Address;
+                customerVM.CustomerPic = customerInfo.CustomerPic;
+                return PartialView("~/Views/Customers/_EditCustomer.cshtml", customerVM);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        [HttpPost]
+        public async Task<ActionResult> EditCustomer(CustomerVM customerVM)
+        {
+            try
+            {
+                var fileBytes=new byte[] { };
+                bool IsCustomerExist = await _customerRepository.IsCustomerExistOnEdit(customerVM.CustomerName, customerVM.Id);
+                if (IsCustomerExist)
+                    return Json(0);
+                var ms = new MemoryStream();
+                if (customerVM.CustomerLogo != null)
+                {
+                    customerVM.CustomerLogo.CopyTo(ms);
+                    fileBytes = ms.ToArray();
+                }
+                else
+                {
+                    var picByte = _db.CustomerTbls.Where(x => x.Id == customerVM.Id).Select(x => x.CustomerPic).FirstOrDefault();
+                    fileBytes = picByte;
+                }
+                var customer = new CustomerTbl()
+                {
+                    CustomerName = customerVM.CustomerName,
+                    ContactNumber = customerVM.ContactNumber,
+                    Address = customerVM.Address,
+                    CustomerPic = fileBytes,
+                };
+                bool IsCustomerSave = _customerRepository.UpdateCustomer(customer);
+                return Json(1);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public async Task<ActionResult> DeleteCustomer(int Id)
+        {
+            try
+            {
+                await _customerRepository.DeleteCustomer(Id);
+                return Json(1);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
         }
     }
 }

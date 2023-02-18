@@ -11,5 +11,7 @@ namespace URLEntryMVC.ViewModels
         [Required]
         [Display(Name = "Domain Link")]
         public string DomainLink { get; set; }
+        
     }
+    
 }

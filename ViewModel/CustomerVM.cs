@@ -11,7 +11,7 @@ namespace URLEntryMVC.ViewModel
         public string? Address { get; set; }
 
         public string? ContactNumber { get; set; }
-        [Required]
+        
         public IFormFile? CustomerLogo { get; set; }
         public byte[] CustomerPic { get; set; } = null!;
     }

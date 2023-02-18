@@ -1,8 +1,13 @@
 ﻿@model URLEntryMVC.ViewModel.CustomerVM
+@{
+    var base64Image = Convert.ToBase64String(Model.CustomerPic);
+    var source = String.Format("data:image/png;base64,{0}", base64Image);
+}
 <div class="col-xl">
     <div class="card mb-4">
         <div class="card-body">
-            <form id="addCustomerForm">
+            <form id="editCustomerForm">
+                @Html.HiddenFor(x=>x.Id)
                 <div class="mb-3">
                     <label class="form-label" for="CustomerName">Customer Name</label><span style="color:red"> *</span>
                     <input type="text" asp-for="CustomerName" class="form-control" id="CustomerName" placeholder="ACME Inc." required>
@@ -20,8 +25,11 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="File_Upload">Upload Logo</label>
-                    <input type="file" class="form-control" id="File_Upload" name="CustomerLogo" accept="image/png"  />
+                    <input type="file" class="form-control" id="File_Upload" name="CustomerLogo" accept="image/png"/>
                     <span asp-validation-for="CustomerLogo" class="text-danger"></span>
+                </div>
+                <div class="mb-3 card">
+                    <img alt="Logo" src="@source" height="50" width="100"/>
                 </div>
             </form>
         </div>
@@ -36,16 +44,17 @@
         };
     };
     $("#saveBtn").click(function() {
-        if ($("#addCustomerForm").valid()) {
+        if ($("#editCustomerForm").valid()) {
             var fileData = new FormData();
             // Adding one more key to FormData object
             fileData.append("CustomerLogo", $("#File_Upload")[0].files[0]);
             fileData.append('CustomerName', $("#CustomerName").val());
             fileData.append('Address', $("#Address").val());
             fileData.append('ContactNumber', $("#ContactNumber").val());
+            fileData.append('Id', @Model.Id);
             $.ajax({
                 type: "POST",
-                url: '@Url.Action("SaveCustomer", "Customers")',
+                url: '@Url.Action("EditCustomer", "Customers")',
                 contentType: false, // Not to set any content header
                 processData: false, // Not to process data
                 data: fileData,
