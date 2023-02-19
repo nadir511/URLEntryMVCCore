@@ -1,42 +1,79 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using URLEntryMVC.Data;
+using URLEntryMVC.Extensions;
+using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModel;
 
 namespace URLEntryMVC.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUserExtension> _userManager;
+        private readonly SignInManager<ApplicationUserExtension> _signInManager;
         private readonly DataContext _db;
+        private readonly ICustomerRepository _customerRepository;
 
-        public AccountController(UserManager<IdentityUser> userManager,
-                                      SignInManager<IdentityUser> signInManager,DataContext dataContext)
+        public AccountController(UserManager<ApplicationUserExtension> userManager,
+                                      SignInManager<ApplicationUserExtension> signInManager,
+                                      DataContext dataContext,
+                                      ICustomerRepository customerRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _db = dataContext;
+            _customerRepository = customerRepository;
         }
         public async Task<ActionResult> UsersList()
         {
-            return View();
+            List<UsersVM> UsersList = _userManager.Users.Select(x => new UsersVM
+            {
+                Id = x.Id,
+                UserName = x.UserName,
+                Email=x.Email
+            }).ToList();
+            return View(UsersList);
         }
         //[Authorize]
+        [HttpGet]
         public IActionResult Register()
         {
-            return View();
+            RegisterViewModel registerVMObj = new RegisterViewModel();
+            var customer = _customerRepository.ListOfCustomers();
+            registerVMObj.CustomerList = customer.Select(x => new CustomerInfo
+            {
+                CustomerId = x.Id,
+                CustomerName = x.CustomerName
+            }).ToList();
+            return PartialView("~/Views/Account/Register.cshtml", registerVMObj);
         }
         //[Authorize]
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            JsonReturnModel jsonReturnModelObj = new JsonReturnModel();
+            if (!ModelState.IsValid)
+            {
+                List<string> errors = new List<string>();
+                foreach (var modelState in ModelState.Values)
+                {
+                    foreach (var modelError in modelState.Errors)
+                    {
+                        errors.Add(modelError.ErrorMessage);
+                    }
+                }
+                jsonReturnModelObj.isSuccessfull = 0;
+                jsonReturnModelObj.errors.AddRange(errors);
+                string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                return Json(jsonObj);
+            }
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser
+                var user = new ApplicationUserExtension
                 {
-                    UserName = model.Email,
+                    UserName = model.UserName,
                     Email = model.Email,
                 };
 
@@ -45,17 +82,19 @@ namespace URLEntryMVC.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
-
-                    return RedirectToAction("Logout", "Account");
+                    jsonReturnModelObj.isSuccessfull = 1;
+                    string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                    return Json(jsonObj);
                 }
-
-                foreach (var error in result.Errors)
+                
+                if (result.Errors.Count() > 0)
                 {
-                    ModelState.AddModelError("", error.Description);
+                    var errors = result.Errors.Select(x => x.Description).ToList();
+                    jsonReturnModelObj.errors.AddRange(errors);
+                    jsonReturnModelObj.isSuccessfull = 0;
+                    string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                    return Json(jsonObj);
                 }
-
-                ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
-
             }
             return View(model);
         }
@@ -90,5 +129,10 @@ namespace URLEntryMVC.Controllers
 
             return RedirectToAction("Login");
         }
+    }
+    public class JsonReturnModel
+    {
+        public List<string> errors = new List<string>();
+        public int isSuccessfull { get; set; }
     }
 }

@@ -18,7 +18,7 @@ public static class ApplicationServicesExtension
         {
             options.UseSqlServer(_config.GetConnectionString("DefaultConnection"));
         });
-        _services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<DataContext>();
+        _services.AddIdentity<ApplicationUserExtension, IdentityRole>().AddEntityFrameworkStores<DataContext>();
         return _services;
     }
 }
