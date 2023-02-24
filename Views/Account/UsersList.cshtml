@@ -1,4 +1,4 @@
-﻿@model IEnumerable<URLEntryMVC.ViewModel.UsersVM>
+﻿@model IEnumerable<URLEntryMVC.ViewModel.AccountVM.UsersVM>
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="card">
         <h5 class="card-header d-flex justify-content-between align-items-center">
@@ -18,9 +18,6 @@
                         <th>
                             Email
                         </th>
-                        <th>
-                            Email
-                        </th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -36,13 +33,10 @@
                                 @Html.DisplayFor(modelItem => item.Email)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Email)
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-primary" id="btnEditCustomer" onclick="EditUser(@item.Id)">
+                                <button type="button" class="btn btn-primary" id="btnEditCustomer" onclick="EditUser('@item.Id')">
                                     <i class="bx bxs-edit"></i>
                                 </button>
-                                <button type="button" class="btn btn-primary" id="btnDeleteCustomer" onclick="DeleteUser(@item.Id)">
+                                <button type="button" class="btn btn-primary" id="btnDeleteCustomer" onclick="DeleteUser('@item.Id')">
                                     <i class="bx bxs-trash"></i>
                                 </button>
                             </td>
@@ -50,6 +44,24 @@
                     }
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+@*Delet Modal*@
+<div class="modal fade" id="DeleteAppModal" tabindex="-1" aria-labelledby="DeleteExampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeleteExampleModalLabel">Delete User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="DeleteModalBody">
+                Are you sure you want to delete the User?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="deleteBtn">Confirm Delete</button>
+            </div>
         </div>
     </div>
 </div>
@@ -76,6 +88,51 @@
                 $('#MainModalBody').html(obj);
                 $('#MainAppModal').modal('show');
             },
+            error: (error) => {
+                console.log(JSON.stringify(error));
+            }
         });
+    });
+    function EditUser(id) {
+        $.ajax({
+            type: 'GET',
+            url: "@Url.Action("EditRegister", "Account")",
+            data: { userId: id },
+            beforeSend: function() {
+                $("#logoLoader").fadeIn();
+            },
+            success: function(obj) {
+                $("#logoLoader").fadeOut();
+                $('#MainModalLabel').html('Update User');
+                $('#MainModalBody').html(obj);
+                $('#MainAppModal').modal('show');
+            },
+            error: (error) => {
+                console.log(JSON.stringify(error));
+            }
+        });
+    }
+    function DeleteUser(id) {
+        selectedUserId = id;
+        $('#DeleteAppModal').modal('show');
+    }
+    $("#deleteBtn").click(function() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("DeleteUser", "Account")',
+            data: { userId: selectedUserId },
+            beforeSend: function() {
+                $("#logoLoader").fadeIn();
+            },
+            success: function(data) {
+                $("#logoLoader").fadeOut();
+                if (data == 1) {
+                    location.reload(true);
+                }
+                else if (data == 1){
+                    alert('Some error has been occured while deleting the user')
+                }
+            }
+        })
     });
 </script>

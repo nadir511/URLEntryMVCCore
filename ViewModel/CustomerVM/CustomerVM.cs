@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace URLEntryMVC.ViewModel
+namespace URLEntryMVC.ViewModel.CustomerVM
 {
     public class CustomerVM
     {
@@ -11,7 +11,7 @@ namespace URLEntryMVC.ViewModel
         public string? Address { get; set; }
 
         public string? ContactNumber { get; set; }
-        
+
         public IFormFile? CustomerLogo { get; set; }
         public byte[] CustomerPic { get; set; } = null!;
     }

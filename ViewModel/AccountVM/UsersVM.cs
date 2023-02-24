@@ -1,4 +1,4 @@
-﻿namespace URLEntryMVC.ViewModel
+﻿namespace URLEntryMVC.ViewModel.AccountVM
 {
     public class UsersVM
     {

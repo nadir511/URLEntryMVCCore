@@ -1,12 +1,13 @@
-﻿@model URLEntryMVC.ViewModel.AccountVM.RegisterViewModel
+﻿@model URLEntryMVC.ViewModel.AccountVM.EditRegisterViewModel
 <div class="col-xl">
     <div class="card mb-4">
         <div class="card-body">
             <ul style="display:none" id="errorUl">
                 <li id="errorMsg" class="text-danger"></li>
             </ul>
-            <form id="addUserForm">
+            <form id="updateUserForm">
                 <div asp-validation-summary="All" class="text-danger"></div>
+                @Html.HiddenFor(m=>m.UserId)
                 <div class="form-group">
                     <label asp-for="UserName"></label><span style="color:red"> *</span>
                     <input asp-for="UserName" class="form-control" required />
@@ -18,18 +19,8 @@
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Password"></label><span style="color:red"> *</span>
-                    <input asp-for="Password" class="form-control" autocomplete="false" required />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="ConfirmPassword"></label><span style="color:red"> *</span>
-                    <input asp-for="ConfirmPassword" class="form-control" required />
-                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                </div>
-                <div class="form-group">
                     <label>Select Role</label><span style="color:red"> *</span>
-                    <select id="roleList" class="form-control" asp-for="RoleName" asp-items="@(new SelectList(Model.RolesList, "RoleName", "RoleName"))" onchange="ChangeRole(this)" required>
+                    <select id="roleList" class="form-control" asp-for="RoleName" asp-items="@(new SelectList(Model.RolesList, "RoleName", "RoleName",Model.RoleName))" onchange="ChangeRole()" required>
                         <option value="">Select Role</option>
                     </select>
                     <input type="hidden" asp-for="RoleName" />
@@ -37,7 +28,7 @@
                 </div>
                 <div class="form-group" style="display:none" id="customerDiv">
                     <label>Select Customer</label><span style="color:red"> *</span>
-                    <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName"))">
+                    <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName",Model.CustomerId))">
                         <option value="">Select Customer</option>
                     </select>
                     <input type="hidden" asp-for="CustomerId" />
@@ -48,7 +39,10 @@
     </div>
 </div>
 <script>
-    function ChangeRole(obj) {
+    $(document).ready(function() {
+        ChangeRole();
+    });
+    function ChangeRole() {
         var selectedRole = $("#roleList").val();
         if (selectedRole == "Customer") {
             $("#customerDiv").show();
@@ -63,12 +57,12 @@
     $("#saveBtn").click(function() {
         $('#errorUl').hide();
         $('#errorMsg').html('');
-        if ($("#addUserForm").valid()) {
+        if ($("#updateUserForm").valid()) {
             $.ajax({
                 type: "POST",
-                url: '@Url.Action("Register", "Account")',
+                url: '@Url.Action("EditRegister", "Account")',
                 dataType: 'json',
-                data: $("#addUserForm").serializeArray(),
+                data: $("#updateUserForm").serializeArray(),
                 beforeSend: function() {
                     $("#logoLoader").fadeIn();
                 },

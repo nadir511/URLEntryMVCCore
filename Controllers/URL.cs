@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
-using URLEntryMVC.ViewModels;
 using URLEntryMVC.Data;
+using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.Controllers
 {

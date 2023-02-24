@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace URLEntryMVC.ViewModels
+namespace URLEntryMVC.ViewModel.UrlVM
 {
     public class SaveUrlVM
     {

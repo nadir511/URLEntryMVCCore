@@ -2,7 +2,7 @@
 using URLEntryMVC.Data;
 using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
-using URLEntryMVC.ViewModel;
+using URLEntryMVC.ViewModel.CustomerVM;
 
 namespace URLEntryMVC.Controllers
 {
