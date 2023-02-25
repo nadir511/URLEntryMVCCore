@@ -1,17 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using URLEntryMVC.Data;
 using URLEntryMVC.Entities;
+using URLEntryMVC.Extensions;
 using URLEntryMVC.Interfaces;
+using URLEntryMVC.ViewModel.AccountVM;
 
 namespace URLEntryMVC.RepositoryClasses
 {
     public class CustomerRepository : ICustomerRepository
     {
         private readonly DataContext _db;
+        private readonly UserManager<ApplicationUserExtension> _userManager;
 
-        public CustomerRepository(DataContext dataContext)
+        public CustomerRepository(DataContext dataContext, UserManager<ApplicationUserExtension> userManager)
         {
             _db = dataContext;
+            _userManager = userManager;
         }
         public async Task<bool> DeleteCustomer(int Id)
         {
@@ -106,6 +111,23 @@ namespace URLEntryMVC.RepositoryClasses
             catch (Exception)
             {
                 return false;
+            }
+        }
+        public async Task<List<UsersVM>> GetUsersByCustomerId(int CustomerId)
+        {
+            try
+            {
+                List<UsersVM> usersListByCustomer = await _userManager.Users.Where(x => x.CustomerIdFk == CustomerId).Select(x => new UsersVM
+                {
+                    Id = x.Id,
+                    UserName = x.UserName,
+                    Email = x.Email
+                }).ToListAsync();
+                return usersListByCustomer;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
     }

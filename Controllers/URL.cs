@@ -17,7 +17,7 @@ namespace URLEntryMVC.Controllers
         private readonly IUrlRepository urlRepositoryObj;
         private readonly DataContext _db;
         private readonly ICustomerRepository _customerRepository;
-        private string domainLink = "https://localhost:7043/";
+        private string domainLink = "http://tapthat.online/";
 
         public URL(IUrlRepository urlRepository, DataContext db,ICustomerRepository customerRepository)
         {
@@ -127,6 +127,35 @@ namespace URLEntryMVC.Controllers
                 };
                 urlRepositoryObj.UpdateLink(urlTbl);
                 return Json(1);
+            }
+        }
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult> UpdateDomainLink(int id)
+        {
+            var obj = await urlRepositoryObj.GetUrlById(id);
+            SaveUrlVM editUrlVM = new SaveUrlVM();
+            editUrlVM.Id = obj.Id;
+            editUrlVM.DomainLink = obj.DomainLink;
+            return PartialView("~/Views/PartialViews/_EditDomain.cshtml", editUrlVM);
+        }
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult> UpdateDomainLink(SaveUrlVM urlVM)
+        {
+            try
+            {
+                var domainLinkObj = await _db.UrlTbls.Where(x => x.Id == urlVM.Id).FirstOrDefaultAsync();
+                if (domainLinkObj != null)
+                {
+                    domainLinkObj.DomainLink = urlVM.DomainLink;
+                    urlRepositoryObj.UpdateLink(domainLinkObj);
+                }
+                return Json(1);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
         [Authorize]

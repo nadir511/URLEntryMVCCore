@@ -21,7 +21,7 @@ namespace URLEntryMVC.ViewModel.AccountVM
         public string? ConfirmPassword { get; set; }
         public UsersVM? UsersInfo { get; set; }
         public List<CustomerInfo>? CustomerList { get; set; }
-        public int CustomerId { get; set; }
+        public int? CustomerId { get; set; }
         public List<CreateRoleViewModel>? RolesList { get; set; }
         public string? RoleName { get; set; }
     }

@@ -1,4 +1,5 @@
 ﻿using URLEntryMVC.Entities;
+using URLEntryMVC.ViewModel.AccountVM;
 
 namespace URLEntryMVC.Interfaces
 {
@@ -11,5 +12,6 @@ namespace URLEntryMVC.Interfaces
         Task<List<CustomerTbl>> ListOfCustomers();
         Task<CustomerTbl> GetCustomerById(int id);
         Task<bool> DeleteCustomer(int Id);
+        Task<List<UsersVM>> GetUsersByCustomerId(int CustomerId);
     }
 }

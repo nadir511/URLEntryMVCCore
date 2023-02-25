@@ -3,8 +3,8 @@
     public class AppConstant
     {
         public const string loggedInUserRole = "loggedInUserRole";
-        public const string AdminRole = "AdminRole";
-        public const string CustomerRole = "CustomerRole";
+        public const string AdminRole = "Admin";
+        public const string CustomerRole = "Customer";
         public const string CustomerLogoStr = "CustomerLogoStr";
     }
 }

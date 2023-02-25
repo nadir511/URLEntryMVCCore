@@ -2,6 +2,7 @@
 using URLEntryMVC.Data;
 using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
+using URLEntryMVC.ViewModel.AccountVM;
 using URLEntryMVC.ViewModel.CustomerVM;
 
 namespace URLEntryMVC.Controllers
@@ -140,6 +141,21 @@ namespace URLEntryMVC.Controllers
                 throw;
             }
 
+        }
+        [HttpGet]
+        public async Task<ActionResult> ShowCustomerUsers(int Id)
+        {
+            try
+            {
+                List<UsersVM> usersList = await _customerRepository.GetUsersByCustomerId(Id);
+                return PartialView("~/Views/Customers/CustomerUsersList.cshtml", usersList);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return View();
         }
     }
 }

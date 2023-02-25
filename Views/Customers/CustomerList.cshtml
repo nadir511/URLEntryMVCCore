@@ -36,7 +36,10 @@
                         <tr>
                             <td>
                                 @Html.HiddenFor(modelItem => item.Id)
-                                @Html.DisplayFor(modelItem => item.CustomerName)
+                                <a onclick="showCustomerUsers(@item.Id)" href="#" class="link-primary">
+                                    @Html.DisplayFor(modelItem => item.CustomerName)
+                                </a>
+
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.ContactNumber)
@@ -142,5 +145,25 @@
             }
         })
     });
+    function showCustomerUsers(id) {
+        $.ajax({
+            type: 'GET',
+            url: "@Url.Action("ShowCustomerUsers", "Customers")",
+            data: { Id: id },
+            beforeSend: function() {
+                $("#logoLoader").fadeIn();
+            },
+            success: function(obj) {
+                $("#logoLoader").fadeOut();
+                $('#MainModalLabel').html('Customer Users');
+                $('#MainModalBody').html(obj);
+                $('#saveBtn').hide();
+                $('#MainAppModal').modal('show');
+            },
+            error: (error) => {
+                console.log(JSON.stringify(error));
+            }
+        });
+    }
 </script>
 
