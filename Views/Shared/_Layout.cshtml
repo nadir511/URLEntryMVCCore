@@ -114,20 +114,23 @@
                             <div data-i18n="Analytics">Dashboard</div>
                         </a>
                     </li>
-                    <!-- Customers -->
-                    <li class="menu-item @Html.IsActive("Customers","CustomerList")">
-                        <a href="@Url.Action("CustomerList","Customers")" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-info-circle"></i>
-                            <div data-i18n="Analytics">Customers</div>
-                        </a>
-                    </li>
-                    <!-- User-Managment -->
-                    <li class="menu-item @Html.IsActive("Account","UsersList")">
-                        <a href="@Url.Action("UsersList","Account")" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-user-circle"></i>
-                            <div data-i18n="Analytics">User Management</div>
-                        </a>
-                    </li>
+                    @if (User.IsInRole(AppConstant.AdminRole))
+                    {
+                        <!-- Customers -->
+                        <li class="menu-item @Html.IsActive("Customers","CustomerList")">
+                            <a href="@Url.Action("CustomerList","Customers")" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-info-circle"></i>
+                                <div data-i18n="Analytics">Customers</div>
+                            </a>
+                        </li>
+                        <!-- User-Managment -->
+                        <li class="menu-item @Html.IsActive("Account","UsersList")">
+                            <a href="@Url.Action("UsersList","Account")" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-user-circle"></i>
+                                <div data-i18n="Analytics">User Management</div>
+                            </a>
+                        </li>
+                    }
                 </ul>
             </aside>
             <!-- / Menu -->

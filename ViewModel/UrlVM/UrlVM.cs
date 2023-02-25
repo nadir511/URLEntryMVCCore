@@ -6,7 +6,7 @@ namespace URLEntryMVC.ViewModel.UrlVM
     {
         public int Id { get; set; }
         [Required]
-        [Display(Name = "URL")]
+        [Display(Name = "Point")]
         public string? UrlLink { get; set; }
         [Required]
         [Display(Name = "Domain Link")]

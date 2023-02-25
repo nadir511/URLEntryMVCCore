@@ -1,4 +1,5 @@
-﻿@model IEnumerable<URLEntryMVC.ViewModel.UrlVM.UrlVM>
+﻿@using URLEntryMVC.ApplicationConstants
+@model IEnumerable<URLEntryMVC.ViewModel.UrlVM.UrlVM>
 
 @{
     ViewData["Title"] = "ListOfLinks";
@@ -17,7 +18,7 @@
                         <div class="card-body">
                             <h5 class="card-title text-primary">Smart Contact Points Powered By Tap-That</h5>
                             <p class="mb-4">
-                                Using the latest in NFC technology we are connecting businesses to their current and potential 
+                                Using the latest in NFC technology we are connecting businesses to their current and potential
                                 customers in new and exciting ways with bespoke solutions to drive towards achieving their goals.
                             </p>
 
@@ -37,21 +38,24 @@
         </div>
         <div class="col-lg-4 col-md-4 order-1">
             <div class="row">
-                <div class="col-lg-6 col-md-12 col-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="card-title d-flex align-items-start justify-content-between">
-                                <div class="avatar flex-shrink-0">
-                                    <img src="../TemplateFiles/assets/img/icons/unicons/chart-success.png"
+                @if (User.IsInRole(AppConstant.AdminRole))
+                {
+                    <div class="col-lg-6 col-md-12 col-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="card-title d-flex align-items-start justify-content-between">
+                                    <div class="avatar flex-shrink-0">
+                                        <img src="../TemplateFiles/assets/img/icons/unicons/chart-success.png"
                                          alt="chart success"
                                          class="rounded" />
+                                    </div>
                                 </div>
+                                <span class="fw-semibold d-block mb-1">Total Customers</span>
+                                <h3 class="card-title mb-2">@ViewBag.TotalCustomers</h3>
                             </div>
-                            <span class="fw-semibold d-block mb-1">Total Customers</span>
-                            <h3 class="card-title mb-2">@ViewBag.TotalCustomers</h3>
                         </div>
                     </div>
-                </div>
+                }
                 <div class="col-lg-6 col-md-12 col-6 mb-4">
                     <div class="card">
                         <div class="card-body">
@@ -75,10 +79,13 @@
     <div class="card">
         <h5 class="card-header d-flex justify-content-between align-items-center">
             NFC POINTS
-            <button type="button" class="btn btn-primary mb-2" id="btnAddNewUrl">
-                <i class="menu-icon tf-icons bx bx-plus-circle"></i>
-                Add New URL
-            </button>
+            @if (User.IsInRole(AppConstant.AdminRole))
+            {
+                <button type="button" class="btn btn-primary mb-2" id="btnAddNewUrl">
+                    <i class="menu-icon tf-icons bx bx-plus-circle"></i>
+                    Add New URL
+                </button>
+            }
         </h5>
         <div class="table-responsive text-nowrap p-2">
             <table class="table table-striped table-bordered" id="linksTbl">
@@ -90,12 +97,12 @@
                         <th>
                             @Html.DisplayNameFor(model => model.DomainLink)
                         </th>
-                        @*<th>
-                            Customer Name
-                        </th>*@
-                        <th>
-                            Total Clicks
-                        </th>
+                        @if (User.IsInRole(AppConstant.AdminRole))
+                        {
+                            <th>
+                                Total Clicks
+                            </th>
+                        }
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -105,24 +112,34 @@
                         <tr>
                             <td>
                                 @Html.HiddenFor(modelItem => item.Id)
-                                <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.UrlLink)</a>
+                                @if (User.IsInRole(AppConstant.AdminRole))
+                                {
+                                    <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.UrlLink)</a>
+                                }
+                                else
+                                {
+                                    <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.CustomerPointName)</a>
+                                }
                             </td>
                             <td>
                                 @item.DomainLink
                             </td>
-                            @*<td>
-                                @Html.DisplayFor(modelItem => item.CustomerName)
-                            </td>*@
+                            @if (User.IsInRole(AppConstant.AdminRole))
+                            {
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TotalClicks)
+                                </td>
+                            }
                             <td>
-                                @Html.DisplayFor(modelItem => item.TotalClicks)
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-primary" id="btnEditUrl" onclick="EditUrl(@item.Id)">
-                                    <i class="bx bxs-edit"></i>
-                                </button>
-                                <button type="button" class="btn btn-primary" id="btnEditUrl" onclick="DeleteUrl(@item.Id)">
-                                    <i class="bx bxs-trash"></i>
-                                </button>
+                                @if (User.IsInRole(AppConstant.AdminRole))
+                                {
+                                    <button type="button" class="btn btn-primary" id="btnEditUrl" onclick="EditUrl(@item.Id)">
+                                        <i class="bx bxs-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="btnEditUrl" onclick="DeleteUrl(@item.Id)">
+                                        <i class="bx bxs-trash"></i>
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
