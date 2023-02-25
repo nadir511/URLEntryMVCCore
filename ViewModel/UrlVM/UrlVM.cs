@@ -13,6 +13,7 @@ namespace URLEntryMVC.ViewModel.UrlVM
         public string? DomainLink { get; set; }
         public string? CustomerName { get; set; }
         public string? CustomerPointName { get; set; }
+        public int? TotalClicks { get; set; }
 
     }
 

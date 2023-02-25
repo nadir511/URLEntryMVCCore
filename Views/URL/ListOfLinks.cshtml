@@ -15,10 +15,10 @@
                 <div class="d-flex align-items-end row">
                     <div class="col-sm-7">
                         <div class="card-body">
-                            <h5 class="card-title text-primary">Congratulations John! 🎉</h5>
+                            <h5 class="card-title text-primary">Smart Contact Points Powered By Tap-That</h5>
                             <p class="mb-4">
-                                You have done <span class="fw-bold">72%</span> more sales today. Check your new badge in
-                                your profile.
+                                Using the latest in NFC technology we are connecting businesses to their current and potential 
+                                customers in new and exciting ways with bespoke solutions to drive towards achieving their goals.
                             </p>
 
                         </div>
@@ -90,11 +90,11 @@
                         <th>
                             @Html.DisplayNameFor(model => model.DomainLink)
                         </th>
-                        <th>
+                        @*<th>
                             Customer Name
-                        </th>
+                        </th>*@
                         <th>
-                            Customer Point
+                            Total Clicks
                         </th>
                         <th>Action</th>
                     </tr>
@@ -110,11 +110,11 @@
                             <td>
                                 @item.DomainLink
                             </td>
-                            <td>
+                            @*<td>
                                 @Html.DisplayFor(modelItem => item.CustomerName)
-                            </td>
+                            </td>*@
                             <td>
-                                @Html.DisplayFor(modelItem => item.CustomerPointName)
+                                @Html.DisplayFor(modelItem => item.TotalClicks)
                             </td>
                             <td>
                                 <button type="button" class="btn btn-primary" id="btnEditUrl" onclick="EditUrl(@item.Id)">

@@ -5,6 +5,7 @@ using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
 using URLEntryMVC.Data;
 using URLEntryMVC.ViewModel.UrlVM;
+using Microsoft.EntityFrameworkCore;
 
 namespace URLEntryMVC.Controllers
 {
@@ -16,7 +17,7 @@ namespace URLEntryMVC.Controllers
         private readonly IUrlRepository urlRepositoryObj;
         private readonly DataContext _db;
         private readonly ICustomerRepository _customerRepository;
-        private string domainLink = "http://tapthat.online/_";
+        private string domainLink = "https://localhost:7043/";
 
         public URL(IUrlRepository urlRepository, DataContext db,ICustomerRepository customerRepository)
         {
@@ -38,7 +39,8 @@ namespace URLEntryMVC.Controllers
                 UrlLink = x.UrlLink??string.Empty,
                 DomainLink = x.DomainLink ?? string.Empty,
                 CustomerName=_db.CustomerTbls.Where(y=>y.Id==x.CustomerIdFk).Select(x=>x.CustomerName).FirstOrDefault(),
-                CustomerPointName=x.CustomerPointName
+                CustomerPointName=x.CustomerPointName,
+                TotalClicks=x.TotalClicks
             }).ToList();
             return View(UrlList);
         }
@@ -59,19 +61,20 @@ namespace URLEntryMVC.Controllers
         [HttpPost]
         public async Task<ActionResult<SaveUrlVM>> SaveLink(SaveUrlVM urlVM)
         {
+            var customerInfo =await _customerRepository.GetCustomerById(urlVM.CustomerId);
             bool isLinkExistForCustomer= await urlRepositoryObj.IsPointExistForCustomer(urlVM.CustomerPointName??String.Empty, urlVM.CustomerId);
             if (isLinkExistForCustomer)
                 return Json(-1);
-            bool isLinkExist = await urlRepositoryObj.IsLinkExist(domainLink + urlVM.UrlLink);
-            if (isLinkExist == true)
-            {
-                return Json(0);
-            }
+            //bool isLinkExist = await urlRepositoryObj.IsLinkExist(domainLink + urlVM.UrlLink);
+            //if (isLinkExist == true)
+            //{
+            //    return Json(0);
+            //}
             else
             {
                 UrlTbl urlTbl = new UrlTbl()
                 {
-                    UrlLink = domainLink + urlVM.UrlLink,
+                    UrlLink = domainLink +'_'+ customerInfo.CustomerName+'/'+ urlVM.CustomerPointName,
                     DomainLink = urlVM.DomainLink,
                     CustomerIdFk= urlVM.CustomerId,
                     CustomerPointName = urlVM.CustomerPointName
@@ -103,20 +106,21 @@ namespace URLEntryMVC.Controllers
         [HttpPost]
         public async Task<ActionResult> UpdateLink(SaveUrlVM urlVM)
         {
+            var customerInfo = await _customerRepository.GetCustomerById(urlVM.CustomerId);
             bool isLinkExistForCustomerOnEdit = await urlRepositoryObj.IsPointExistForCustomerOnEdit(urlVM.CustomerPointName ?? String.Empty, urlVM.CustomerId, urlVM.Id);
             if (isLinkExistForCustomerOnEdit)
                 return Json(-1);
-            bool isLinkExist = await urlRepositoryObj.IsLinkExistOnEdit(domainLink + urlVM.UrlLink, urlVM.Id);
-            if (isLinkExist == true)
-            {
-                return Json(0);
-            }
+            //bool isLinkExist = await urlRepositoryObj.IsLinkExistOnEdit(domainLink + urlVM.UrlLink, urlVM.Id);
+            //if (isLinkExist == true)
+            //{
+            //    return Json(0);
+            //}
             else
             {
                 UrlTbl urlTbl = new UrlTbl()
                 {
                     Id = urlVM.Id,
-                    UrlLink = domainLink + urlVM.UrlLink,
+                    UrlLink = domainLink + '_' + customerInfo.CustomerName + '/' + urlVM.CustomerPointName,
                     DomainLink = urlVM.DomainLink,
                     CustomerIdFk = urlVM.CustomerId,
                     CustomerPointName = urlVM.CustomerPointName
@@ -132,17 +136,19 @@ namespace URLEntryMVC.Controllers
             return Json(1);
         }
         [AllowAnonymous]
-        public IActionResult checkRawUrl()
+        public async Task<IActionResult> checkRawUrl()
         {
             var statusCode = HttpContext.Response.StatusCode;
             var feauter = Request.HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
             var path = feauter?.OriginalPath.ToString().Remove(0,1);
             var url = domainLink + path;
 
-            var domainLinkObj = _db.UrlTbls.Where(x => x.UrlLink == url.Trim()).Select(x => x.DomainLink).FirstOrDefault();
+            var domainLinkObj =await _db.UrlTbls.Where(x => x.UrlLink == url.Trim()).FirstOrDefaultAsync();
             if (domainLinkObj != null)
             {
-                return Redirect(domainLinkObj);
+                domainLinkObj.TotalClicks = domainLinkObj.TotalClicks == null ? 1: domainLinkObj.TotalClicks+1; 
+                urlRepositoryObj.UpdateLink(domainLinkObj);
+                return Redirect(domainLinkObj.DomainLink??"");
             }
             return StatusCode(statusCode);
         }

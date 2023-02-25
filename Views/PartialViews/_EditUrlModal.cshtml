@@ -2,19 +2,7 @@
 <form id="updateUrlForm">
     <div class="row">
         <div class="col-sm-6">
-            <label>URL</label><span style="color:red"> *</span>
             @Html.HiddenFor(m=>m.Id)
-            @Html.EditorFor(m => m.UrlLink, new { htmlAttributes = new { @class = "form-control",@required="required"} })
-            @Html.ValidationMessageFor(model => model.UrlLink, "", new { @class = "text-danger",id="urlError" })
-        </div>
-        <div class="col-sm-6">
-            <label>Domain Link</label><span style="color:red"> *</span>
-            @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@required="required",@type="url" } })
-            @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-6">
             <label>Select Customer</label><span style="color:red"> *</span>
             <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName"))" required>
                 <option value="">--Select Customer--</option>
@@ -28,6 +16,19 @@
             @Html.ValidationMessageFor(model => model.CustomerPointName, "", new { @class = "text-danger",id="customerPointError" })
         </div>
     </div>
+    <div class="row">
+        @*<div class="col-sm-6">
+            <label>URL</label><span style="color:red"> *</span>
+            @Html.EditorFor(m => m.UrlLink, new { htmlAttributes = new { @class = "form-control",@required="required"} })
+            @Html.ValidationMessageFor(model => model.UrlLink, "", new { @class = "text-danger",id="urlError" })
+        </div>*@
+        <div class="col-sm-12">
+            <label>Domain Link</label><span style="color:red"> *</span>
+            @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@required="required",@type="url" } })
+            @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
+        </div>
+    </div>
+    
 </form>
 <script>
     $("#updateBtn").click(function() {

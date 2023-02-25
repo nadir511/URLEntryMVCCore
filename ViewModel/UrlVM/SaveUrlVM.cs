@@ -5,7 +5,7 @@ namespace URLEntryMVC.ViewModel.UrlVM
     public class SaveUrlVM
     {
         public int Id { get; set; }
-        [Required]
+        //[Required]
         [Display(Name = "URL Link")]
         public string? UrlLink { get; set; }
         public string? CustomerPointName { get; set; }

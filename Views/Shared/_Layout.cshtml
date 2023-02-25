@@ -1,5 +1,8 @@
-﻿<!DOCTYPE html>
-
+﻿@using Microsoft.AspNetCore.Http
+@using URLEntryMVC.ApplicationConstants
+@using URLEntryMVC.HelperMethods
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
 <!-- =========================================================
 * Sneat - Bootstrap 5 HTML Admin Template - Pro | v1.0.0
 ==============================================================
@@ -90,7 +93,13 @@
                 <div class="app-brand demo">
                     <a href="index.html" class="app-brand-link">
                         <span class="app-brand-logo demo">
-                            <img src="~/TSP_Logo.png" style="height:50px" />
+                            @if(string.IsNullOrWhiteSpace(HttpContextAccessor.HttpContext.Session.GetString(AppConstant.CustomerLogoStr))){
+                                <img src="~/TSP_Logo.png" style="height:50px" />
+                            }
+                            else
+                            {   
+                                <img alt="Logo" src="@HttpContextAccessor.HttpContext.Session.GetString(AppConstant.CustomerLogoStr)" height="50" width="100"/>
+                            }
                         </span>
                     </a>
                 </div>
@@ -99,21 +108,21 @@
 
                 <ul class="menu-inner py-1">
                     <!-- Dashboard -->
-                    <li class="menu-item active">
+                    <li class="menu-item @Html.IsActive("URL","ListOfLinks")">
                         <a href="@Url.Action("ListOfLinks","URL")" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-home-circle"></i>
                             <div data-i18n="Analytics">Dashboard</div>
                         </a>
                     </li>
                     <!-- Customers -->
-                    <li class="menu-item">
+                    <li class="menu-item @Html.IsActive("Customers","CustomerList")">
                         <a href="@Url.Action("CustomerList","Customers")" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-info-circle"></i>
                             <div data-i18n="Analytics">Customers</div>
                         </a>
                     </li>
                     <!-- User-Managment -->
-                    <li class="menu-item">
+                    <li class="menu-item @Html.IsActive("Account","UsersList")">
                         <a href="@Url.Action("UsersList","Account")" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-user-circle"></i>
                             <div data-i18n="Analytics">User Management</div>
@@ -155,7 +164,7 @@
                                                 </div>
                                                 <div class="flex-grow-1">
                                                     <span class="fw-semibold d-block">@User.Identity.Name</span>
-                                                    <small class="text-muted">Admin</small>
+                                                    <small class="text-muted">@HttpContextAccessor.HttpContext.Session.GetString(AppConstant.loggedInUserRole)</small>
                                                 </div>
                                             </div>
                                         </a>

@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Security.Claims;
+using URLEntryMVC.ApplicationConstants;
 using URLEntryMVC.Data;
 using URLEntryMVC.Extensions;
 using URLEntryMVC.Interfaces;
@@ -91,7 +93,7 @@ namespace URLEntryMVC.Controllers
 
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    //await _signInManager.SignInAsync(user, isPersistent: false);
                     await _userManager.AddToRoleAsync(user, model.RoleName);
                     jsonReturnModelObj.isSuccessfull = 1;
                     string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
@@ -205,12 +207,26 @@ namespace URLEntryMVC.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel user)
         {
+            HttpContext.Session.Remove(AppConstant.CustomerLogoStr);
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(user.Email, user.Password, user.RememberMe, false);
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, user.Password, user.RememberMe, false);
 
                 if (result.Succeeded)
                 {
+                    var userInfo = await _userManager.FindByNameAsync(user.UserName);
+                    var role = await _userManager.GetRolesAsync(userInfo);
+                    if (userInfo.CustomerIdFk!=null)
+                    {
+                        var customerInfo = await _customerRepository.GetCustomerById(userInfo.CustomerIdFk??0);
+                        if (customerInfo!=null && customerInfo.CustomerPic!=null)
+                        {
+                            var base64Image = Convert.ToBase64String(customerInfo.CustomerPic);
+                            var Logo = String.Format("data:image/png;base64,{0}", base64Image);
+                            HttpContext.Session.SetString(AppConstant.CustomerLogoStr, Logo);
+                        }
+                    }
+                    HttpContext.Session.SetString(AppConstant.loggedInUserRole, role.FirstOrDefault() ?? string.Empty);
                     return RedirectToAction("ListOfLinks", "URL");
                 }
 
