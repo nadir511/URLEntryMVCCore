@@ -47,6 +47,7 @@
 
     <link rel="stylesheet" href="../TemplateFiles/assets/vendor/libs/apex-charts/apex-charts.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- Page CSS -->
     <!-- Helpers -->
     <script src="../TemplateFiles/assets/vendor/js/helpers.js"></script>
@@ -80,6 +81,32 @@
             margin-top: -50px;
             border-radius: 10px;
         }
+        /*Select2 Code*/
+        .select2-container--default .select2-selection--single {
+            height: 46px !important;
+            padding: 10px 16px;
+            font-size: 18px;
+            line-height: 1.33;
+            border-radius: 6px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow b {
+                top: 85% !important;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                line-height: 26px !important;
+            }
+
+        .select2-container--default .select2-selection--single {
+            border: 1px solid #CCC !important;
+            box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset;
+            transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+        }
+
+        .select2-container {
+            z-index: 100000;
+        }
     </style>
 </head>
 
@@ -93,12 +120,13 @@
                 <div class="app-brand demo">
                     <a href="index.html" class="app-brand-link">
                         <span class="app-brand-logo demo">
-                            @if(string.IsNullOrWhiteSpace(HttpContextAccessor.HttpContext.Session.GetString(AppConstant.CustomerLogoStr))){
+                            @if (string.IsNullOrWhiteSpace(HttpContextAccessor.HttpContext.Session.GetString(AppConstant.CustomerLogoStr)))
+                            {
                                 <img src="~/TSP_Logo.png" style="height:50px" />
                             }
                             else
-                            {   
-                                <img alt="Logo" src="@HttpContextAccessor.HttpContext.Session.GetString(AppConstant.CustomerLogoStr)" height="50" width="100"/>
+                            {
+                                <img alt="Logo" src="@HttpContextAccessor.HttpContext.Session.GetString(AppConstant.CustomerLogoStr)" height="50" width="100" />
                             }
                         </span>
                     </a>
@@ -254,7 +282,7 @@
     <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
     <script src="../TemplateFiles/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="../TemplateFiles/assets/vendor/js/menu.js"></script>
     <!-- endbuild -->
     <!-- Vendors JS -->

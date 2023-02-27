@@ -6,6 +6,7 @@ namespace URLEntryMVC.ViewModel.CustomerVM
     {
         public int Id { get; set; }
         [Required]
+        [RegularExpression(@"^[^\s\,]*$", ErrorMessage = "No white space allowed")]
         public string CustomerName { get; set; } = null!;
 
         public string? Address { get; set; }

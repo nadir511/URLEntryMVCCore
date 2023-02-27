@@ -47,17 +47,22 @@
         </div>
     </div>
 </div>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <script>
+    $(document).ready(function() {
+        $('#customersList').select2();
+    });
     function ChangeRole(obj) {
         var selectedRole = $("#roleList").val();
         if (selectedRole == "Customer") {
             $("#customerDiv").show();
-            $("#customersList").prop('required',true);
+            $("#customersList").prop('required', true);
         }
         else if (selectedRole == "Admin") {
             $("#customerDiv").hide();
             $("#customersList").val('');
-            $("#customersList").prop('required',false);
+            $("#customersList").prop('required', false);
         }
     };
     $("#saveBtn").click(function() {

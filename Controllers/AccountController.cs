@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Security.Claims;
 using URLEntryMVC.ApplicationConstants;
 using URLEntryMVC.Data;
 using URLEntryMVC.Extensions;

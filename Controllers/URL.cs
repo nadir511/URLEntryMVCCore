@@ -6,6 +6,9 @@ using URLEntryMVC.Interfaces;
 using URLEntryMVC.Data;
 using URLEntryMVC.ViewModel.UrlVM;
 using Microsoft.EntityFrameworkCore;
+using URLEntryMVC.Extensions;
+using Microsoft.AspNetCore.Identity;
+using URLEntryMVC.ApplicationConstants;
 
 namespace URLEntryMVC.Controllers
 {
@@ -17,13 +20,15 @@ namespace URLEntryMVC.Controllers
         private readonly IUrlRepository urlRepositoryObj;
         private readonly DataContext _db;
         private readonly ICustomerRepository _customerRepository;
+        private readonly UserManager<ApplicationUserExtension> _userManager;
         private string domainLink = "http://tapthat.online/";
 
-        public URL(IUrlRepository urlRepository, DataContext db,ICustomerRepository customerRepository)
+        public URL(IUrlRepository urlRepository, DataContext db,ICustomerRepository customerRepository, UserManager<ApplicationUserExtension> userManager)
         {
             urlRepositoryObj = urlRepository;
             _db = db;
             _customerRepository = customerRepository;
+            _userManager = userManager;
         }
         
         [Authorize]
@@ -33,15 +38,22 @@ namespace URLEntryMVC.Controllers
             var Links = await urlRepositoryObj.ListOfLinks();
             ViewBag.TotalPoints = _db.UrlTbls.ToList().Count();
             ViewBag.TotalCustomers = _db.CustomerTbls.ToList().Count();
+            
             List<UrlVM> UrlList = Links.Select(x => new UrlVM
             {
                 Id = x.Id,
                 UrlLink = x.UrlLink??string.Empty,
                 DomainLink = x.DomainLink ?? string.Empty,
                 CustomerName=_db.CustomerTbls.Where(y=>y.Id==x.CustomerIdFk).Select(x=>x.CustomerName).FirstOrDefault(),
+                CustomerId=x.CustomerIdFk,
                 CustomerPointName=x.CustomerPointName,
                 TotalClicks=x.TotalClicks
             }).ToList();
+            if (User.IsInRole(AppConstant.CustomerRole))
+            {
+                var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
+                UrlList = UrlList.Where(x => x.CustomerId == userInfo.CustomerIdFk).ToList();
+            }
             return View(UrlList);
         }
         [Authorize]

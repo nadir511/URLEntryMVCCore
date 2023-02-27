@@ -23,12 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="UrlDB.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Data\" />
   </ItemGroup>
 
