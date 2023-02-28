@@ -95,6 +95,9 @@
                             @Html.DisplayNameFor(model => model.UrlLink)
                         </th>
                         <th>
+                            Notes
+                        </th>
+                        <th>
                             @Html.DisplayNameFor(model => model.DomainLink)
                         </th>
                         @if (User.IsInRole(AppConstant.AdminRole))
@@ -120,6 +123,9 @@
                                 {
                                     <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.CustomerPointName)</a>
                                 }
+                            </td>
+                            <td>
+                                @Html.EditorFor(m=>item.CustomerNotes, new { htmlAttributes = new { @class = "form-control",@readonly="readonly" } })
                             </td>
                             <td>
                                 @Html.EditorFor(m=>item.DomainLink, new { htmlAttributes = new { @class = "form-control",@readonly="readonly" } })

@@ -23,6 +23,7 @@ namespace URLEntryMVC.ViewModel.AccountVM
         public List<CustomerInfo>? CustomerList { get; set; }
         public int? CustomerId { get; set; }
         public List<CreateRoleViewModel>? RolesList { get; set; }
+        [Display(Name = "Role Name")]
         public string? RoleName { get; set; }
     }
 }

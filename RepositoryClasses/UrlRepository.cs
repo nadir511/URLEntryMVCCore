@@ -103,7 +103,7 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
-        public async Task<UrlTbl> GetUrlById(int Id)
+        public async Task<UrlTbl?> GetUrlById(int Id)
         {
             try
             {

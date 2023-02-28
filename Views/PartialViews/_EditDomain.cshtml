@@ -7,6 +7,11 @@
             @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@required="required",@type="url" } })
             @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
         </div>
+        <div class="col-sm-12">
+            <label class="form-label" for="CustomerNotes">Customer Notes</label>
+            <textarea id="customerNotes" asp-for="CustomerNotes" class="form-control" placeholder="Add Notes"></textarea>
+            <span asp-validation-for="CustomerNotes" class="text-danger"></span>
+        </div>
     </div>
 </form>
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>

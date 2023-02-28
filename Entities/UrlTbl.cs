@@ -15,6 +15,7 @@ public partial class UrlTbl
     public int? TotalClicks { get; set; }
 
     public int? CustomerIdFk { get; set; }
+    public string? CustomerNotes { get; set; }
 
     public virtual CustomerTbl? CustomerIdFkNavigation { get; set; }
 }

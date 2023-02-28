@@ -47,6 +47,7 @@ namespace URLEntryMVC.Controllers
                 CustomerName=_db.CustomerTbls.Where(y=>y.Id==x.CustomerIdFk).Select(x=>x.CustomerName).FirstOrDefault(),
                 CustomerId=x.CustomerIdFk,
                 CustomerPointName=x.CustomerPointName,
+                CustomerNotes=x.CustomerNotes,
                 TotalClicks=x.TotalClicks
             }).ToList();
             if (User.IsInRole(AppConstant.CustomerRole))
@@ -149,6 +150,7 @@ namespace URLEntryMVC.Controllers
             SaveUrlVM editUrlVM = new SaveUrlVM();
             editUrlVM.Id = obj.Id;
             editUrlVM.DomainLink = obj.DomainLink;
+            editUrlVM.CustomerNotes= obj.CustomerNotes;
             return PartialView("~/Views/PartialViews/_EditDomain.cshtml", editUrlVM);
         }
         [Authorize]
@@ -161,6 +163,7 @@ namespace URLEntryMVC.Controllers
                 if (domainLinkObj != null)
                 {
                     domainLinkObj.DomainLink = urlVM.DomainLink;
+                    domainLinkObj.CustomerNotes = urlVM.CustomerNotes;
                     urlRepositoryObj.UpdateLink(domainLinkObj);
                 }
                 return Json(1);
