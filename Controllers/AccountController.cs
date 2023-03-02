@@ -111,7 +111,7 @@ namespace URLEntryMVC.Controllers
             return View(model);
         }
         [HttpGet]
-        public async Task<ActionResult> EditRegister(string userId)
+        public async Task<ActionResult> EditRegister(string userId,bool? isPasswordUpdate)
         {
             EditRegisterViewModel? registerVMObj = new EditRegisterViewModel();
             registerVMObj = _userManager.Users.Where(x => x.Id == userId).Select(x => new EditRegisterViewModel
@@ -134,6 +134,7 @@ namespace URLEntryMVC.Controllers
             {
                 RoleName = x.Name
             }).ToList();
+            registerVMObj.IsPasswordUpdateCall = isPasswordUpdate??false;
             return PartialView("~/Views/Account/EditRegister.cshtml", registerVMObj);
         }
         [HttpPost]
@@ -160,7 +161,10 @@ namespace URLEntryMVC.Controllers
                 var UserInfo =await _userManager.FindByIdAsync(registerVMObj.UserId);
                 UserInfo.UserName = registerVMObj.UserName;
                 UserInfo.Email= registerVMObj.Email;
-                //UserInfo.PasswordHash = _userManager.PasswordHasher.HashPassword(UserInfo,registerVMObj.Password);
+                if (registerVMObj.IsPasswordUpdateCall==true)
+                {
+                    UserInfo.PasswordHash = _userManager.PasswordHasher.HashPassword(UserInfo, registerVMObj.Password);
+                }
                 var result = await _userManager.UpdateAsync(UserInfo);
 
                 if (result.Succeeded)
@@ -169,6 +173,10 @@ namespace URLEntryMVC.Controllers
                     await _userManager.AddToRoleAsync(UserInfo, registerVMObj.RoleName);
                     jsonReturnModelObj.isSuccessfull = 1;
                     string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                    if (registerVMObj.UserId== GetCurrentUserId())
+                    {
+                        await _signInManager.SignInAsync(UserInfo, isPersistent: false);
+                    }
                     return Json(jsonObj);
                 }
 
@@ -183,6 +191,7 @@ namespace URLEntryMVC.Controllers
             }
             return View();
         }
+
         public async Task<ActionResult> DeleteUser(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -282,5 +291,10 @@ namespace URLEntryMVC.Controllers
             return View(model);
         }
         #endregion
+        public string GetCurrentUserId()
+        {
+            var userId=_userManager.GetUserId(User);
+            return userId;
+        }
     }
 }

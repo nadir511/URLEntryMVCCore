@@ -62,7 +62,8 @@
 <script>
     $(document).ready(function() {
         $('#customersList').select2({
-            dropdownAutoWidth: true
+            dropdownAutoWidth: true,
+            dropdownParent: $('#MainAppModal .modal-content')
         });
     });
     $(function() {

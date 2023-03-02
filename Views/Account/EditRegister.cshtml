@@ -8,31 +8,56 @@
             <form id="updateUserForm">
                 <div asp-validation-summary="All" class="text-danger"></div>
                 @Html.HiddenFor(m=>m.UserId)
-                <div class="form-group">
-                    <label asp-for="UserName"></label><span style="color:red"> *</span>
-                    <input asp-for="UserName" class="form-control" required />
-                    <span asp-validation-for="UserName" class="text-danger"></span>
+                @Html.HiddenFor(m=>m.IsPasswordUpdateCall)
+                <div id="passDiv" style="display:none">
+                    <div class="form-group form-password-toggle">
+                        <label asp-for="Password"></label><span style="color:red"> *</span>
+                        <div class="input-group input-group-merge">
+                            <input asp-for="Password" id="Password" class="form-control"
+                                   placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                   autocomplete="new-password" required />
+                            <span class="input-group-text cursor-pointer"><i class="bx bx-hide" id="passwordMain"></i></span>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group form-password-toggle">
+                        <label asp-for="ConfirmPassword"></label><span style="color:red"> *</span>
+                        <div class="input-group input-group-merge">
+                            <input asp-for="ConfirmPassword" id="PasswordConfirm" class="form-control"
+                                   placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                   autocomplete="new-password" required />
+                            <span class="input-group-text cursor-pointer"><i class="bx bx-hide" id="passwordConfirm"></i></span>
+                        </div>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Email"></label><span style="color:red"> *</span>
-                    <input asp-for="Email" class="form-control" required />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label>Select Role</label><span style="color:red"> *</span>
-                    <select id="roleList" class="form-control" asp-for="RoleName" asp-items="@(new SelectList(Model.RolesList, "RoleName", "RoleName",Model.RoleName))" onchange="ChangeRole()" required>
-                        <option value="">Select Role</option>
-                    </select>
-                    <input type="hidden" asp-for="RoleName" />
-                    @Html.ValidationMessageFor(m => m.RoleName, "", new { @class = "text-danger", id="selectRoleError" })
-                </div>
-                <div class="form-group" style="display:none" id="customerDiv">
-                    <label>Select Customer</label><span style="color:red"> *</span>
-                    <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName",Model.CustomerId))">
-                        <option value="">Select Customer</option>
-                    </select>
-                    <input type="hidden" asp-for="CustomerId" />
-                    @Html.ValidationMessageFor(m => m.CustomerId, "", new { @class = "text-danger", id="selectCustomerError" })
+                <div id="userDiv" style="display:none">
+                    <div class="form-group">
+                        <label asp-for="UserName"></label><span style="color:red"> *</span>
+                        <input asp-for="UserName" class="form-control" required />
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Email"></label><span style="color:red"> *</span>
+                        <input asp-for="Email" class="form-control" required />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Role</label><span style="color:red"> *</span>
+                        <select id="roleList" class="form-control" asp-for="RoleName" asp-items="@(new SelectList(Model.RolesList, "RoleName", "RoleName",Model.RoleName))" onchange="ChangeRole()" required>
+                            <option value="">Select Role</option>
+                        </select>
+                        <input type="hidden" asp-for="RoleName" />
+                        @Html.ValidationMessageFor(m => m.RoleName, "", new { @class = "text-danger", id="selectRoleError" })
+                    </div>
+                    <div class="form-group" style="display:none" id="customerDiv">
+                        <label>Select Customer</label><span style="color:red"> *</span>
+                        <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName",Model.CustomerId))">
+                            <option value="">Select Customer</option>
+                        </select>
+                        <input type="hidden" asp-for="CustomerId" />
+                        @Html.ValidationMessageFor(m => m.CustomerId, "", new { @class = "text-danger", id="selectCustomerError" })
+                    </div>
                 </div>
             </form>
         </div>
@@ -43,17 +68,41 @@
 <script>
     $(document).ready(function() {
         ChangeRole();
+        if ('@Model.IsPasswordUpdateCall' == 'True') {
+            $('#passDiv').show();
+            $("#Password").prop('required', true);
+            $("#PasswordConfirm").prop('required', true);
+        }
+        else if ('@Model.IsPasswordUpdateCall' == 'False') {
+            $('#userDiv').show();
+            $("#Password").prop('required', false);
+            $("#PasswordConfirm").prop('required', false);
+        }
+    });
+    $(function() {
+        $("#passwordMain").click(function() {
+            $(this).toggleClass("bx-hide bx-show");
+            var type = $(this).hasClass("bx-show") ? "text" : "password";
+            $("#Password").attr("type", type);
+        });
+    });
+    $(function() {
+        $("#passwordConfirm").click(function() {
+            $(this).toggleClass("bx-hide bx-show");
+            var type = $(this).hasClass("bx-show") ? "text" : "password";
+            $("#PasswordConfirm").attr("type", type);
+        });
     });
     function ChangeRole() {
         var selectedRole = $("#roleList").val();
         if (selectedRole == "Customer") {
             $("#customerDiv").show();
-            $("#customersList").prop('required',true);
+            $("#customersList").prop('required', true);
         }
         else if (selectedRole == "Admin") {
             $("#customerDiv").hide();
             $("#customersList").val('');
-            $("#customersList").prop('required',false);
+            $("#customersList").prop('required', false);
         }
     };
     $("#saveBtn").click(function() {

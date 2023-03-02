@@ -34,14 +34,17 @@
                             </td>
                             <td>
                                 <button type="button" class="btn btn-primary" id="btnEditCustomer" onclick="EditUser('@item.Id')">
-                                    <i class="bx bxs-edit"></i>
+                                    <i class="bx bxs-edit" title="Edit User"></i>
                                 </button>
                                 @if (User.Identity.Name != item.UserName)
                                 {
                                     <button type="button" class="btn btn-primary" id="btnDeleteCustomer" onclick="DeleteUser('@item.Id')">
-                                        <i class="bx bxs-trash"></i>
+                                        <i class="bx bxs-trash" title="Delete User"></i>
                                     </button>
                                 }
+                                <button type="button" class="btn btn-primary" id="btnEditCustomer" onclick="UpdateUserPass('@item.Id')">
+                                    <i class="bx bxs-lock" title="Update Password"></i>
+                                </button>
                             </td>
                         </tr>
                     }
@@ -139,4 +142,23 @@
             }
         })
     });
+    function UpdateUserPass(id) {
+        $.ajax({
+            type: 'GET',
+            url: "@Url.Action("EditRegister", "Account")",
+            data: { userId: id,isPasswordUpdate:true },
+            beforeSend: function() {
+                $("#logoLoader").fadeIn();
+            },
+            success: function(obj) {
+                $("#logoLoader").fadeOut();
+                $('#MainModalLabel').html('Update User');
+                $('#MainModalBody').html(obj);
+                $('#MainAppModal').modal('show');
+            },
+            error: (error) => {
+                console.log(JSON.stringify(error));
+            }
+        });
+    }
 </script>
