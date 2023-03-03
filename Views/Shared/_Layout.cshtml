@@ -204,6 +204,10 @@
                                         <div class="dropdown-divider"></div>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" href="#" onclick="resetPassword()">
+                                            <i class="bx bxs-lock me-2"></i>
+                                            <span class="align-middle">Reset Password</span>
+                                        </a>
                                         <a class="dropdown-item" href="@Url.Action("Logout","Account")">
                                             <i class="bx bx-power-off me-2"></i>
                                             <span class="align-middle">Log Out</span>
@@ -296,5 +300,36 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script>
+    function resetPassword() {
+        $.ajax({
+            url: "@Url.Action("ResetPassword", "Account")",
+            type: 'GET',
+            contentType: 'application/json',
+            beforeSend: function() {
+                $("#logoLoader").fadeIn();
+            },
+            success: function(objPV) {
+                $('#MainModalBody').html(objPV);
+                $("#MainAppModal").modal({
+                    backdrop: 'static', // Prevent to close on click outside the modal
+                    keyboard: false, // Prevent to close by ESC
+                    show: true
+                });
+                $("#MainModalLabel").text('Reset Password');
+                $('#MainAppModal').modal('show');
+            },
+            complete: function() {
+                $("#logoLoader").fadeOut();
+                
+            },
+            error: function(errorMsg) {
+                console.log(errorMsg);
+                $("#logoLoader").fadeOut();
+            }
+        });
+    }
+</script>
 </body>
 </html>
+

@@ -139,16 +139,16 @@
                             <td>
                                 @if (User.IsInRole(AppConstant.AdminRole))
                                 {
-                                    <button type="button" class="btn btn-primary" id="btnEditUrl" onclick="EditUrl(@item.Id)">
+                                    <button type="button" class="btn btn-primary"  onclick="EditUrl(@item.Id)">
                                         <i class="bx bxs-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-primary" id="btnEditUrl" onclick="DeleteUrl(@item.Id)">
+                                    <button type="button" class="btn btn-primary"  onclick="DeleteUrl(@item.Id)">
                                         <i class="bx bxs-trash"></i>
                                     </button>
                                 }
                                 @if (User.IsInRole(AppConstant.CustomerRole))
                                 {
-                                    <button type="button" class="btn btn-primary" id="btnEditUrl" onclick="EditDomainLink(@item.Id)">
+                                    <button type="button" class="btn btn-primary"  onclick="EditDomainLink(@item.Id)">
                                         <i class="bx bxs-edit"></i>
                                     </button>
                                 }

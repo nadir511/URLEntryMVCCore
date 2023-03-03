@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using URLEntryMVC.ApplicationConstants;
 using URLEntryMVC.Data;
@@ -111,7 +112,7 @@ namespace URLEntryMVC.Controllers
             return View(model);
         }
         [HttpGet]
-        public async Task<ActionResult> EditRegister(string userId,bool? isPasswordUpdate)
+        public async Task<ActionResult> EditRegister(string userId)
         {
             EditRegisterViewModel? registerVMObj = new EditRegisterViewModel();
             registerVMObj = _userManager.Users.Where(x => x.Id == userId).Select(x => new EditRegisterViewModel
@@ -134,7 +135,7 @@ namespace URLEntryMVC.Controllers
             {
                 RoleName = x.Name
             }).ToList();
-            registerVMObj.IsPasswordUpdateCall = isPasswordUpdate??false;
+            //registerVMObj.IsPasswordUpdateCall = isPasswordUpdate??false;
             return PartialView("~/Views/Account/EditRegister.cshtml", registerVMObj);
         }
         [HttpPost]
@@ -161,10 +162,10 @@ namespace URLEntryMVC.Controllers
                 var UserInfo =await _userManager.FindByIdAsync(registerVMObj.UserId);
                 UserInfo.UserName = registerVMObj.UserName;
                 UserInfo.Email= registerVMObj.Email;
-                if (registerVMObj.IsPasswordUpdateCall==true)
-                {
-                    UserInfo.PasswordHash = _userManager.PasswordHasher.HashPassword(UserInfo, registerVMObj.Password);
-                }
+                //if (registerVMObj.IsPasswordUpdateCall==true)
+                //{
+                //    UserInfo.PasswordHash = _userManager.PasswordHasher.HashPassword(UserInfo, registerVMObj.Password);
+                //}
                 var result = await _userManager.UpdateAsync(UserInfo);
 
                 if (result.Succeeded)
@@ -173,10 +174,10 @@ namespace URLEntryMVC.Controllers
                     await _userManager.AddToRoleAsync(UserInfo, registerVMObj.RoleName);
                     jsonReturnModelObj.isSuccessfull = 1;
                     string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
-                    if (registerVMObj.UserId== GetCurrentUserId())
-                    {
-                        await _signInManager.SignInAsync(UserInfo, isPersistent: false);
-                    }
+                    //if (registerVMObj.UserId== GetCurrentUserId())
+                    //{
+                    //    await _signInManager.SignInAsync(UserInfo, isPersistent: false);
+                    //}
                     return Json(jsonObj);
                 }
 
@@ -250,7 +251,35 @@ namespace URLEntryMVC.Controllers
 
             return RedirectToAction("Login");
         }
+        [HttpGet]
+        public ActionResult ResetPassword()
+        {
+            ResetPasswordVM modelObj = new ResetPasswordVM();
+            modelObj.Id =GetCurrentUserId();
+            return PartialView("_ResetPassword", modelObj); 
+        }
+        [HttpPost]
+        public async Task<ActionResult> ResetPassword(ResetPasswordVM resetPasswordVM)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(GetCurrentUserId());
+                if (user != null)
+                {
+                    string code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var resetPass = await _userManager.ResetPasswordAsync(user, code, resetPasswordVM.Password);
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return Json(1);
+                }
+                return Json(0);
+            }
+            catch (Exception)
+            {
 
+                throw;
+            }
+            
+        }
         public class JsonReturnModel
         {
             public List<string> errors = new List<string>();

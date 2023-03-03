@@ -42,9 +42,6 @@
                                         <i class="bx bxs-trash" title="Delete User"></i>
                                     </button>
                                 }
-                                <button type="button" class="btn btn-primary" id="btnEditCustomer" onclick="UpdateUserPass('@item.Id')">
-                                    <i class="bx bxs-lock" title="Update Password"></i>
-                                </button>
                             </td>
                         </tr>
                     }
@@ -142,23 +139,23 @@
             }
         })
     });
-    function UpdateUserPass(id) {
-        $.ajax({
-            type: 'GET',
-            url: "@Url.Action("EditRegister", "Account")",
-            data: { userId: id,isPasswordUpdate:true },
-            beforeSend: function() {
-                $("#logoLoader").fadeIn();
-            },
-            success: function(obj) {
-                $("#logoLoader").fadeOut();
-                $('#MainModalLabel').html('Update User');
-                $('#MainModalBody').html(obj);
-                $('#MainAppModal').modal('show');
-            },
-            error: (error) => {
-                console.log(JSON.stringify(error));
-            }
-        });
-    }
+    //function UpdateUserPass(id) {
+    //    $.ajax({
+    //        type: 'GET',
+    //        url: "@Url.Action("EditRegister", "Account")",
+    //        data: { userId: id,isPasswordUpdate:true },
+    //        beforeSend: function() {
+    //            $("#logoLoader").fadeIn();
+    //        },
+    //        success: function(obj) {
+    //            $("#logoLoader").fadeOut();
+    //            $('#MainModalLabel').html('Update User');
+    //            $('#MainModalBody').html(obj);
+    //            $('#MainAppModal').modal('show');
+    //        },
+    //        error: (error) => {
+    //            console.log(JSON.stringify(error));
+    //        }
+    //    });
+    //}
 </script>
