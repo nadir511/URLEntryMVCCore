@@ -6,7 +6,7 @@
                 <li id="errorMsg" class="text-danger"></li>
             </ul>
             <form id="updateUserForm">
-                <div asp-validation-summary="All" class="text-danger"></div>
+                @*<div asp-validation-summary="All" class="text-danger"></div>*@
                 @Html.HiddenFor(m=>m.UserId)
                 @Html.HiddenFor(m=>m.IsPasswordUpdateCall)
                     <div class="form-group">

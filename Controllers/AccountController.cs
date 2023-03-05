@@ -8,6 +8,7 @@ using URLEntryMVC.Data;
 using URLEntryMVC.Extensions;
 using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModel.AccountVM;
+using URLEntryMVC.ViewModel.EmailServiceVM;
 using URLEntryMVC.ViewModel.UrlVM;
 
 
@@ -19,18 +20,21 @@ namespace URLEntryMVC.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUserExtension> _signInManager;
         private readonly DataContext _db;
+        private readonly IEmailService _mailService;
         private readonly ICustomerRepository _customerRepository;
 
         public AccountController(UserManager<ApplicationUserExtension> userManager,
                                  RoleManager<IdentityRole> roleManager,
                                  SignInManager<ApplicationUserExtension> signInManager,
                                  DataContext dataContext,
+                                 IEmailService mailService,
                                  ICustomerRepository customerRepository)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
             _db = dataContext;
+            _mailService = mailService;
             _customerRepository = customerRepository;
         }
         public async Task<ActionResult> UsersList()
@@ -95,6 +99,10 @@ namespace URLEntryMVC.Controllers
                 {
                     //await _signInManager.SignInAsync(user, isPersistent: false);
                     await _userManager.AddToRoleAsync(user, model.RoleName);
+                    //var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    //var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new { token, email = user.Email }, Request.Scheme);
+                    //var message = new MessageVM(new string[] { user.Email }, "Confirmation email link for UserName:"+ model.UserName, confirmationLink);
+                    //_mailService.SendEmail(message);
                     jsonReturnModelObj.isSuccessfull = 1;
                     string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
                     return Json(jsonObj);
@@ -110,6 +118,15 @@ namespace URLEntryMVC.Controllers
                 }
             }
             return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string token, string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return View("Error");
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            return View(result.Succeeded ? nameof(ConfirmEmail) : "Error");
         }
         [HttpGet]
         public async Task<ActionResult> EditRegister(string userId)
@@ -263,19 +280,95 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(GetCurrentUserId());
-                if (user != null)
+                JsonReturnModel jsonReturnModelObj = new JsonReturnModel();
+                if (!ModelState.IsValid)
                 {
-                    string code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    var resetPass = await _userManager.ResetPasswordAsync(user, code, resetPasswordVM.Password);
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return Json(1);
+                    List<string> errors = new List<string>();
+                    foreach (var modelState in ModelState.Values)
+                    {
+                        foreach (var modelError in modelState.Errors)
+                        {
+                            errors.Add(modelError.ErrorMessage);
+                        }
+                    }
+                    jsonReturnModelObj.isSuccessfull = 0;
+                    jsonReturnModelObj.errors.AddRange(errors);
+                    string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                    return Json(jsonObj);
                 }
-                return Json(0);
+                if (ModelState.IsValid)
+                {
+                    var user = await _userManager.FindByIdAsync(GetCurrentUserId());
+                    if (user != null)
+                    {
+                        string code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                        var resetPass = await _userManager.ResetPasswordAsync(user, code, resetPasswordVM.Password);
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        jsonReturnModelObj.isSuccessfull = 1;
+                        string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                        return Json(jsonObj);
+                    }
+                }
+                return View();
             }
             catch (Exception)
             {
 
+                throw;
+            }
+            
+        }
+        [HttpGet]
+        public ActionResult ForgetPassword()
+        {
+            ForgetPasswordVM modelObj = new ForgetPasswordVM();
+            return PartialView("_ForgetPassword", modelObj);
+        }
+        [HttpPost]
+        public async Task<ActionResult> ForgetPassword(ForgetPasswordVM modelObj)
+        {
+            JsonReturnModel jsonReturnModelObj = new JsonReturnModel();
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    List<string> errors = new List<string>();
+                    foreach (var modelState in ModelState.Values)
+                    {
+                        foreach (var modelError in modelState.Errors)
+                        {
+                            errors.Add(modelError.ErrorMessage);
+                        }
+                    }
+                    jsonReturnModelObj.isSuccessfull = 0;
+                    jsonReturnModelObj.errors.AddRange(errors);
+                    string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                    return Json(jsonObj);
+                }
+                if (ModelState.IsValid)
+                {
+                    var user = await _userManager.FindByNameAsync(modelObj.UserName.Trim());
+                    if (user == null)
+                    {
+                        jsonReturnModelObj.errors.Add("Username is not correct");
+                        jsonReturnModelObj.isSuccessfull = 0;
+                        string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                        return Json(jsonObj);
+                    }
+                    if (user != null)
+                    {
+                        string code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                        var resetPass = await _userManager.ResetPasswordAsync(user, code, modelObj.Password);
+                        jsonReturnModelObj.isSuccessfull = 1;
+                        string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                        return Json(jsonObj);
+                    }
+                    return PartialView("_ForgetPassword", modelObj);
+                }
+                return View();
+            }
+            catch (Exception)
+            {
                 throw;
             }
             

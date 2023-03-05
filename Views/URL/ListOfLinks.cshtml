@@ -125,10 +125,12 @@
                                 }
                             </td>
                             <td>
-                                @Html.EditorFor(m=>item.CustomerNotes, new { htmlAttributes = new { @class = "form-control",@readonly="readonly" } })
+                                <input class="form-control" value="@item.CustomerNotes" readonly/>
+                                @*@Html.EditorFor(m=>item.CustomerNotes, new { htmlAttributes = new { @class = "form-control",@readonly="readonly" } })*@
                             </td>
                             <td>
-                                @Html.EditorFor(m=>item.DomainLink, new { htmlAttributes = new { @class = "form-control",@readonly="readonly" } })
+                                <input class="form-control" value="@item.DomainLink" readonly/>
+                                @*@Html.EditorFor(m=>item.DomainLink, new { htmlAttributes = new { @class = "form-control",@readonly="readonly" } })*@
                             </td>
                             @if (User.IsInRole(AppConstant.AdminRole))
                             {
@@ -172,7 +174,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+                <button type="button" class="btn btn-primary" id="saveUrlBtn">Save</button>
             </div>
         </div>
     </div>

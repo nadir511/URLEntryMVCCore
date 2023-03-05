@@ -12,6 +12,7 @@ namespace URLEntryMVC.ViewModel.AccountVM
         [EmailAddress]
         public string? Email { get; set; }
         [Required]
+        [StringLength(20, ErrorMessage = "Maximum length allowed for new password is 20 characters.", MinimumLength = 8)]
         [DataType(DataType.Password)]
         public string? Password { get; set; }
 

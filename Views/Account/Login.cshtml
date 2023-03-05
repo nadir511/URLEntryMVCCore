@@ -5,33 +5,27 @@
 
 <!DOCTYPE html>
 
-<html
-  lang="en"
-  class="light-style customizer-hide"
-  dir="ltr"
-  data-theme="theme-default"
-  data-assets-path="../assets/"
-  data-template="vertical-menu-template-free"
->
-  <head>
+<html lang="en"
+      class="light-style customizer-hide"
+      dir="ltr"
+      data-theme="theme-default"
+      data-assets-path="../assets/"
+      data-template="vertical-menu-template-free">
+<head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
-    />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
     <title>Tap-That</title>
 
     <meta name="description" content="" />
 
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+          rel="stylesheet" />
 
     <!-- Icons. Uncomment required icon fonts -->
     <link rel="stylesheet" href="../TemplateFiles/assets/vendor/fonts/boxicons.css" />
@@ -50,60 +44,113 @@
     <!-- Helpers -->
     <script src="../TemplateFiles/assets/vendor/js/helpers.js"></script>
     <script src="../TemplateFiles/assets/js/config.js"></script>
-  </head>
+    <style>
+        .loaderContainer {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 9999 !important;
+            cursor: pointer;
+            display: none;
+        }
 
-  <body>
+        .loaderBody {
+            background: #0000;
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -100px;
+            margin-top: -50px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
     <!-- Content -->
 
     <div class="container-xxl">
-      <div class="authentication-wrapper authentication-basic container-p-y">
-        <div class="authentication-inner">
-          <!-- Register -->
-          <div class="card">
-            <div class="card-body">
-              <!-- Logo -->
-              <div class="app-brand justify-content-center">
-                  <img src="~/TSP_Logo.png" style="height:50px"/>
-              </div>
-              <!-- /Logo -->
-              <h4 class="mb-2">Welcome to Tap-That! 👋</h4>
-              <p class="mb-4">Please sign-in to your account and start the adventure</p>
+        <div class="authentication-wrapper authentication-basic container-p-y">
+            <div class="authentication-inner">
+                <!-- Register -->
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Logo -->
+                        <div class="app-brand justify-content-center">
+                            <img src="~/TSP_Logo.png" style="height:50px" />
+                        </div>
+                        <!-- /Logo -->
+                        <h4 class="mb-2">Welcome to Tap-That! 👋</h4>
+                        <p class="mb-4">Please sign-in to your account and start the adventure</p>
 
-              <form method="POST">
-                <div class="mb-3">
-                  <div class="form-group">
-                    <label asp-for="UserName"></label>
-                    <input asp-for="UserName" class="form-control" />
-                    <span asp-validation-for="UserName" class="text-danger"></span>
-                  </div>
+                        <form method="POST">
+                            <div class="mb-3">
+                                <div class="form-group">
+                                    <label asp-for="UserName"></label>
+                                    <input asp-for="UserName" class="form-control" />
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="mb-3 form-password-toggle">
+                                <div class="d-flex justify-content-between">
+                                    <label class="form-label" for="password">Password</label>
+                                    <a href="#" onclick="resetPassword()">
+                                        <small>Forgot Password?</small>
+                                    </a>
+                                </div>
+                                <div class="input-group input-group-merge">
+                                    <input asp-for="Password"
+                                           type="password"
+                                           id="password"
+                                           name="password"
+                                           placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                           aria-describedby="password"
+                                           class="form-control" />
+                                    <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="mb-3 form-password-toggle">
-                  <div class="d-flex justify-content-between">
-                    <label class="form-label" for="password">Password</label>
-                  </div>
-                  <div class="input-group input-group-merge">
-                <input asp-for="Password"
-                       type="password"
-                       id="password"
-                       name="password"
-                       placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                       aria-describedby="password"
-                       class="form-control" />
-                       <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
-                  </div>
-                  <span asp-validation-for="Password" class="text-danger"></span>
-                  </div>
-                <div class="mb-3">
-                  <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
-                </div>
-              </form>
+                <!-- /Register -->
             </div>
-          </div>
-          <!-- /Register -->
         </div>
-      </div>
     </div>
-
+    <div id="logoLoader" class="loaderContainer">
+        <div class="loaderBody">
+            <div class="text-center">
+                <div><img src="~/loader.gif" /></div>
+            </div>
+        </div>
+    </div>
+    <!--Add modal -->
+    <div class="modal fade" id="MainAppModal" tabindex="-1" aria-labelledby="MainModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="MainModalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="MainModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
     <script src="../TemplateFiles/assets/vendor/libs/jquery/jquery.js"></script>
@@ -113,15 +160,43 @@
 
     <script src="../TemplateFiles/assets/vendor/js/menu.js"></script>
     <!-- endbuild -->
-
     <!-- Vendors JS -->
-
     <!-- Main JS -->
     <script src="../TemplateFiles/assets/js/main.js"></script>
 
     <!-- Page JS -->
-
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
-  </body>
+    <script>
+        function resetPassword() {
+            $.ajax({
+                url: "@Url.Action("ForgetPassword", "Account")",
+                type: 'GET',
+                contentType: 'application/json',
+                beforeSend: function() {
+                    $("#logoLoader").fadeIn();
+                },
+                success: function(objPV) {
+                    debugger;
+                    $('#MainModalBody').html(objPV);
+                    $("#MainAppModal").modal({
+                        backdrop: 'static', // Prevent to close on click outside the modal
+                        keyboard: false, // Prevent to close by ESC
+                        show: true
+                    });
+                    $("#MainModalLabel").text('Forget Password');
+                    $('#MainAppModal').modal('show');
+                },
+                complete: function() {
+                    $("#logoLoader").fadeOut();
+
+                },
+                error: function(errorMsg) {
+                    console.log(errorMsg);
+                    $("#logoLoader").fadeOut();
+                }
+            });
+        }
+    </script>
+</body>
 </html>
