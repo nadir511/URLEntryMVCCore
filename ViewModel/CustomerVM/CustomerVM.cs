@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using URLEntryMVC.ViewModel.AccountVM;
 
 namespace URLEntryMVC.ViewModel.CustomerVM
 {
@@ -15,5 +16,11 @@ namespace URLEntryMVC.ViewModel.CustomerVM
 
         public IFormFile? CustomerLogo { get; set; }
         public byte[] CustomerPic { get; set; } = null!;
+    }
+    public class DeleteCustomerVM
+    {
+        public List<UrlVM.UrlVM>? customerPoint { get; set; }
+        public List<UsersVM>? customerUsers { get; set; }
+        public bool ? isDeleted { get; set; }   
     }
 }

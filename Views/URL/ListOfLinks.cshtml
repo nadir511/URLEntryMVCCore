@@ -14,23 +14,30 @@
         <div class="col-lg-8 mb-4 order-0">
             <div class="card">
                 <div class="d-flex align-items-end row">
-                    <div class="col-sm-7">
+                    <div class="col-sm-9">
                         <div class="card-body">
                             <h5 class="card-title text-primary">Smart Contact Points Powered By Tap-That</h5>
                             <p class="mb-4">
-                                Using the latest in NFC technology we are connecting businesses to their current and potential
-                                customers in new and exciting ways with bespoke solutions to drive towards achieving their goals.
+                                Our team is dedicated to delivering high value solutions and exceptional customer service.
+                                If you have any questions about our products or services, please do not hesitate to reach out to us.
+                                We make sure that your experience with our Smart Contact Points is seamless and successful.
                             </p>
 
                         </div>
                     </div>
-                    <div class="col-sm-5 text-center text-sm-left">
-                        <div class="card-body pb-0 px-0 px-md-4">
-                            <img src="../TemplateFiles/assets/img/illustrations/man-with-laptop-light.png"
-                                 height="140"
-                                 alt="View Badge User"
-                                 data-app-dark-img="illustrations/man-with-laptop-dark.png"
-                                 data-app-light-img="illustrations/man-with-laptop-light.png" />
+                    <div class="col-sm-3">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">Contact Us</h5>
+                            <p>
+                                <a href="mailto:office@tap-that.io">
+                                    office@tap-that.io
+                                </a>
+                            </p>
+                            <p class="mb-5">
+                                <a href="tel:UK:+07748645453">
+                                    UK: +07748645453
+                                </a>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -125,11 +132,11 @@
                                 }
                             </td>
                             <td>
-                                <input class="form-control" value="@item.CustomerNotes" readonly/>
+                                <input class="form-control" value="@item.CustomerNotes" readonly />
                                 @*@Html.EditorFor(m=>item.CustomerNotes, new { htmlAttributes = new { @class = "form-control",@readonly="readonly" } })*@
                             </td>
                             <td>
-                                <input class="form-control" value="@item.DomainLink" readonly/>
+                                <input class="form-control" value="@item.DomainLink" readonly />
                                 @*@Html.EditorFor(m=>item.DomainLink, new { htmlAttributes = new { @class = "form-control",@readonly="readonly" } })*@
                             </td>
                             @if (User.IsInRole(AppConstant.AdminRole))
@@ -141,16 +148,16 @@
                             <td>
                                 @if (User.IsInRole(AppConstant.AdminRole))
                                 {
-                                    <button type="button" class="btn btn-primary"  onclick="EditUrl(@item.Id)">
+                                    <button type="button" class="btn btn-primary" onclick="EditUrl(@item.Id)">
                                         <i class="bx bxs-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-primary"  onclick="DeleteUrl(@item.Id)">
+                                    <button type="button" class="btn btn-primary" onclick="DeleteUrl(@item.Id)">
                                         <i class="bx bxs-trash"></i>
                                     </button>
                                 }
                                 @if (User.IsInRole(AppConstant.CustomerRole))
                                 {
-                                    <button type="button" class="btn btn-primary"  onclick="EditDomainLink(@item.Id)">
+                                    <button type="button" class="btn btn-primary" onclick="EditDomainLink(@item.Id)">
                                         <i class="bx bxs-edit"></i>
                                     </button>
                                 }
@@ -185,7 +192,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="EditexampleModalLabel">Edit Point</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                @*<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>*@
             </div>
             <div class="modal-body" id="EditModalBody">
             </div>
@@ -237,6 +244,11 @@
             success: function(obj) {
                 $("#logoLoader").fadeOut();
                 $('#ModalBody').html(obj);
+                $('#AppModal').modal({
+                    backdrop: 'static', // Prevent to close on click outside the modal
+                    keyboard: false, // Prevent to close by ESC
+                    show: true
+                });
                 $('#AppModal').modal('show');
             },
         });
@@ -252,6 +264,11 @@
             success: function(obj) {
                 $("#logoLoader").fadeOut();
                 $('#EditModalBody').html(obj);
+                $('#EditAppModal').modal({
+                    backdrop: 'static', // Prevent to close on click outside the modal
+                    keyboard: false, // Prevent to close by ESC
+                    show: true
+                });
                 $('#EditAppModal').modal('show');
             },
             error: (error) => {
@@ -261,6 +278,11 @@
     }
     function DeleteUrl(id) {
         selectedUrlId = id;
+        $('#DeleteAppModal').modal({
+            backdrop: 'static', // Prevent to close on click outside the modal
+            keyboard: false, // Prevent to close by ESC
+            show: true
+        });
         $('#DeleteAppModal').modal('show');
     }
     $("#deleteBtn").click(function() {

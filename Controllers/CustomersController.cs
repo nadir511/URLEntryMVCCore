@@ -4,17 +4,20 @@ using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModel.AccountVM;
 using URLEntryMVC.ViewModel.CustomerVM;
+using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.Controllers
 {
     public class CustomersController : Controller
     {
         private readonly ICustomerRepository _customerRepository;
+        private readonly IUrlRepository _urlRepository;
         private readonly DataContext _db;
 
-        public CustomersController(ICustomerRepository customerRepository,DataContext dataContext)
+        public CustomersController(ICustomerRepository customerRepository, IUrlRepository urlRepository, DataContext dataContext)
         {
             _customerRepository = customerRepository;
+            _urlRepository = urlRepository;
             _db = dataContext;
         }
         public async Task<ActionResult<List<CustomerVM>>> CustomerList()
@@ -129,10 +132,28 @@ namespace URLEntryMVC.Controllers
                 throw;
             }
         }
+        [HttpGet]
         public async Task<ActionResult> DeleteCustomer(int Id)
+        {
+            DeleteCustomerVM deleteCustomerVM = new DeleteCustomerVM();
+            deleteCustomerVM.customerPoint = await _customerRepository.ListOfPointsAgainstCustomer(Id);
+            deleteCustomerVM.customerUsers = await _customerRepository.ListOfUsersAgainstCustomer(Id);
+            if ((deleteCustomerVM.customerPoint.Count() + deleteCustomerVM.customerUsers.Count())>0)
+            {
+                deleteCustomerVM.isDeleted = false;
+            }
+            else
+            {
+                deleteCustomerVM.isDeleted = true;
+            }
+            return PartialView("~/Views/Customers/_DeleteCustomer.cshtml", deleteCustomerVM);
+        }
+        [HttpPost]
+        public async Task<ActionResult> ConfirmDeleteCustomer(int Id)
         {
             try
             {
+                var Links = await _urlRepository.ListOfLinks();
                 await _customerRepository.DeleteCustomer(Id);
                 return Json(1);
             }
@@ -140,7 +161,6 @@ namespace URLEntryMVC.Controllers
             {
                 throw;
             }
-
         }
         [HttpGet]
         public async Task<ActionResult> ShowCustomerUsers(int Id)

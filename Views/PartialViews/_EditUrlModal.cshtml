@@ -18,9 +18,9 @@
     </div>
     <div class="row">
         @*<div class="col-sm-6">
-            <label>URL</label><span style="color:red"> *</span>
-            @Html.EditorFor(m => m.UrlLink, new { htmlAttributes = new { @class = "form-control",@required="required"} })
-            @Html.ValidationMessageFor(model => model.UrlLink, "", new { @class = "text-danger",id="urlError" })
+        <label>URL</label><span style="color:red"> *</span>
+        @Html.EditorFor(m => m.UrlLink, new { htmlAttributes = new { @class = "form-control",@required="required"} })
+        @Html.ValidationMessageFor(model => model.UrlLink, "", new { @class = "text-danger",id="urlError" })
         </div>*@
         <div class="col-sm-12">
             <label>Domain Link</label><span style="color:red"> *</span>
@@ -28,12 +28,37 @@
             @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
         </div>
     </div>
-    
+
 </form>
+@*Sure Message Modal*@
+<div class="modal fade" id="ConfirmUpdateAppModal" tabindex="-1" aria-labelledby="UpdateExampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body" id="UpdateModalBody">
+                Are you sure you want to Update the Point?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateConfirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <script>
+    $(document).ready(function() {
+        $('#EditexampleModalLabel').text("Edit " + '@Model.CustomerPointName')
+    });
     $("#updateBtn").click(function() {
+        $('#ConfirmUpdateAppModal').modal({
+            backdrop: 'static', // Prevent to close on click outside the modal
+            keyboard: false, // Prevent to close by ESC
+            show: true
+        });
+        $('#ConfirmUpdateAppModal').modal('show');
+    });
+    $("#updateConfirmBtn").click(function() {
         if ($("#updateUrlForm").valid()) {
             $.ajax({
                 type: "POST",
@@ -48,7 +73,7 @@
                     if (data == 0) {
                         $('#urlError').text('URL already exist');
                     }
-                    else if(data == -1){
+                    else if (data == -1) {
                         $('#customerPointError').text('Customer point already exist');
                     }
                     else if (data == 1) {

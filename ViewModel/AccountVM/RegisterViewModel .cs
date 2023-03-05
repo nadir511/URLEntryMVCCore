@@ -12,7 +12,7 @@ namespace URLEntryMVC.ViewModel.AccountVM
         [EmailAddress]
         public string? Email { get; set; }
         [Required]
-        [StringLength(20, ErrorMessage = "Maximum length allowed for new password is 20 characters.", MinimumLength = 8)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,15}$", ErrorMessage = "Password must be between 6 and 20 characters and contain one uppercase letter, one lowercase letter, one digit and one special character.")]
         [DataType(DataType.Password)]
         public string? Password { get; set; }
 

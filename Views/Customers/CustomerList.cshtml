@@ -71,7 +71,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="DeleteModalBody">
-                Are you sure you want to delete the Customer?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -103,6 +102,11 @@
                 $('#MainModalLabel').html('Add Customer');
                 $('#saveBtn').html('Update');
                 $('#MainModalBody').html(obj);
+                $('#MainAppModal').modal({
+                    backdrop: 'static', // Prevent to close on click outside the modal
+                    keyboard: false, // Prevent to close by ESC
+                    show: true
+                });
                 $('#MainAppModal').modal('show');
             },
         });
@@ -119,6 +123,11 @@
                 $("#logoLoader").fadeOut();
                 $('#MainModalLabel').html('Update Customer');
                 $('#MainModalBody').html(obj);
+                $('#MainAppModal').modal({
+                    backdrop: 'static', // Prevent to close on click outside the modal
+                    keyboard: false, // Prevent to close by ESC
+                    show: true
+                });
                 $('#MainAppModal').modal('show');
             },
             error: (error) => {
@@ -128,12 +137,29 @@
     }
     function DeleteCustomer(id) {
         selectedCustomerId = id;
-        $('#DeleteAppModal').modal('show');
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("DeleteCustomer", "Customers")',
+            data: { Id: selectedCustomerId },
+            beforeSend: function() {
+                $("#logoLoader").fadeIn();
+            },
+            success: function(obj) {
+                $("#logoLoader").fadeOut();
+                $('#DeleteModalBody').html(obj);
+                $('#DeleteAppModal').modal({
+                    backdrop: 'static', // Prevent to close on click outside the modal
+                    keyboard: false, // Prevent to close by ESC
+                    show: true
+                });
+                $('#DeleteAppModal').modal('show');
+            }
+        })
     }
     $("#deleteBtn").click(function() {
         $.ajax({
             type: "POST",
-            url: '@Url.Action("DeleteCustomer", "Customers")',
+            url: '@Url.Action("ConfirmDeleteCustomer", "Customers")',
             data: { Id: selectedCustomerId },
             beforeSend: function() {
                 $("#logoLoader").fadeIn();

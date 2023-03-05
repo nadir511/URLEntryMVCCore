@@ -5,6 +5,7 @@ using URLEntryMVC.Entities;
 using URLEntryMVC.Extensions;
 using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModel.AccountVM;
+using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.RepositoryClasses
 {
@@ -17,6 +18,40 @@ namespace URLEntryMVC.RepositoryClasses
         {
             _db = dataContext;
             _userManager = userManager;
+        }
+        public async Task<List<UrlVM>> ListOfPointsAgainstCustomer(int customerId)
+        {
+            try
+            {
+                List<UrlVM> listOfPointsAgainstCustomer =await _db.UrlTbls.Where(x => x.CustomerIdFk == customerId).Select(x => new UrlVM
+                {
+                    UrlLink = x.UrlLink,
+                    CustomerPointName = x.CustomerPointName
+                }).ToListAsync();
+                return listOfPointsAgainstCustomer;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public async Task<List<UsersVM>> ListOfUsersAgainstCustomer(int customerId)
+        {
+            try
+            {
+                List<UsersVM> listOfUsersAgainstCustomer = await _userManager.Users.Where(x => x.CustomerIdFk == customerId).Select(x => new UsersVM
+                {
+                    UserName=x.UserName,
+                    Email=x.Email
+                }).ToListAsync();
+                return listOfUsersAgainstCustomer;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         public async Task<bool> DeleteCustomer(int Id)
         {
@@ -33,6 +68,7 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
+        
 
         public async Task<CustomerTbl> GetCustomerById(int Id)
         {
