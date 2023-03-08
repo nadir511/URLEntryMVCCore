@@ -167,8 +167,10 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                List<UsersVM> usersList = await _customerRepository.GetUsersByCustomerId(Id);
-                return PartialView("~/Views/Customers/CustomerUsersList.cshtml", usersList);
+                DeleteCustomerVM CustomerVMInfo = new DeleteCustomerVM();
+                CustomerVMInfo.customerPoint = await _customerRepository.ListOfPointsAgainstCustomer(Id);
+                CustomerVMInfo.customerUsers = await _customerRepository.ListOfUsersAgainstCustomer(Id);
+                return PartialView("~/Views/Customers/CustomerUsersList.cshtml", CustomerVMInfo);
             }
             catch (Exception)
             {

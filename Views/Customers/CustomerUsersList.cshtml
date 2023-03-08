@@ -1,34 +1,77 @@
-﻿@model IEnumerable<URLEntryMVC.ViewModel.AccountVM.UsersVM>
+﻿@model URLEntryMVC.ViewModel.CustomerVM.DeleteCustomerVM
 <div class="container-xxl flex-grow-1 container-p-y">
-    <div class="card">
-        <div class="table-responsive text-nowrap p-2">
-            <table class="table table-striped table-bordered" id="userTbl">
-                <thead>
-                    <tr>
-                        <th>
-                            User Name
-                        </th>
-                        <th>
-                            Email
-                        </th>
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between pb-0">
+                <div class="card-title mb-0">
+                    <h5 class="m-0 me-2">Customer Points</h5>
+                    <small class="text-muted">Can not delete the customer due to assigned Points!</small>
+                </div>
+            </div>
+            <div class="table-responsive text-nowrap p-2">
+                <table class="table table-striped table-bordered" id="userTbl">
+                    <thead>
                         <tr>
-                            <td>
-                                @Html.HiddenFor(modelItem => item.Id)
-                                @Html.DisplayFor(modelItem => item.UserName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Email)
-                            </td>
+                            <th>
+                                Customer Point Name
+                            </th>
+                            <th>
+                                Point URL
+                            </th>
+
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.customerPoint)
+                        {
+                            <tr>
+                                <td>
+                                    <input class="form-control" value="@item.CustomerPointName" readonly />
+                                </td>
+                                <td>
+                                    <input class="form-control" value="@item.UrlLink" readonly />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
+<div class="container-xxl flex-grow-1 container-p-y">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between pb-0">
+                <div class="card-title mb-0">
+                    <h5 class="m-0 me-2">Customer Users</h5>
+                    <small class="text-muted">Can not delete the customer due to assigned Users!</small>
+                </div>
+            </div>
+            <div class="table-responsive text-nowrap p-2">
+                <table class="table table-striped table-bordered" id="userTbl">
+                    <thead>
+                        <tr>
+                            <th>
+                                User Name
+                            </th>
+                            <th>
+                                Email
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.customerUsers)
+                        {
+                            <tr>
+                                <td>
+                                    <input class="form-control" value="@item.UserName" readonly />
+                                </td>
+                                <td>
+                                    <input class="form-control" value="@item.Email" readonly />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>

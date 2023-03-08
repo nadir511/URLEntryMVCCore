@@ -54,6 +54,7 @@ namespace URLEntryMVC.Controllers
             {
                 var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
                 UrlList = UrlList.Where(x => x.CustomerId == userInfo.CustomerIdFk).ToList();
+                ViewBag.TotalPoints=UrlList.Count();
             }
             return View(UrlList);
         }
