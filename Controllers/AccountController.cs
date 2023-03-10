@@ -102,7 +102,7 @@ namespace URLEntryMVC.Controllers
                     await _userManager.AddToRoleAsync(user, model.RoleName);
                     var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new { token, email = user.Email }, Request.Scheme);
-                    var message = new MessageVM(new string[] { user.Email }, "Confirmation email link for UserName:" + model.UserName, confirmationLink);
+                    var message = new MessageVM(user.UserName, model.Password, new string[] { user.Email }, "TapThat account Email Confirmation", confirmationLink);
                     _mailService.SendEmail(message);
                     jsonReturnModelObj.isSuccessfull = 1;
                     string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
