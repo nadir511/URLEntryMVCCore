@@ -22,8 +22,12 @@ public static class ApplicationServicesExtension
         {
             options.UseSqlServer(_config.GetConnectionString("DefaultConnection"));
         });
-        _services.AddIdentity<ApplicationUserExtension, IdentityRole>()
-                 .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
+        _services.AddIdentity<ApplicationUserExtension, IdentityRole>(options =>
+        {
+            options.User.RequireUniqueEmail = true;
+            //options.SignIn.RequireConfirmedEmail = true;
+        })
+        .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
         
         _services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         _services.AddSession();

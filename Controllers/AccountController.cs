@@ -90,7 +90,8 @@ namespace URLEntryMVC.Controllers
                 {
                     UserName = model.UserName,
                     Email = model.Email,
-                    CustomerIdFk = model.CustomerId
+                    CustomerIdFk = model.CustomerId,
+                    EmailConfirmed=false
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);

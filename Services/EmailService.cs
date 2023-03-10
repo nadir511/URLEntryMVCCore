@@ -1,4 +1,5 @@
 ﻿using MailKit.Net.Smtp;
+using MailKit.Security;
 using MimeKit;
 using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModel.EmailServiceVM;
@@ -32,8 +33,7 @@ namespace URLEntryMVC.Services
             {
                 try
                 {
-                    var test = _emailConfig.SmtpServer;
-                    client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, false);
+                    client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, SecureSocketOptions.Auto);
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
                     client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
                     client.Send(mailMessage);

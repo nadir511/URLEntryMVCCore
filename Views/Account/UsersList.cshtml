@@ -90,6 +90,11 @@
                 $("#logoLoader").fadeOut();
                 $('#MainModalLabel').html('Register User');
                 $('#MainModalBody').html(obj);
+                $('#MainAppModal').modal({
+                    backdrop: 'static', // Prevent to close on click outside the modal
+                    keyboard: false, // Prevent to close by ESC
+                    show: true
+                });
                 $('#MainAppModal').modal('show');
             },
             error: (error) => {
