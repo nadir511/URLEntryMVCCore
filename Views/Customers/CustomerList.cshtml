@@ -182,6 +182,12 @@
             },
             success: function(obj) {
                 $("#logoLoader").fadeOut();
+                //Swal.fire({
+                //    title: 'User Creation',
+                //    iconHtml: 'User has been created and confirmation email has been sent on user email address',
+                //    timer: 10000,
+                //    showCloseButton: true
+                //});
                 $('#MainModalLabel').html('Customer Users');
                 $('#MainModalBody').html(obj);
                 $('#saveBtn').hide();

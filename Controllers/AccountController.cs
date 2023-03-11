@@ -102,7 +102,7 @@ namespace URLEntryMVC.Controllers
                     await _userManager.AddToRoleAsync(user, model.RoleName);
                     var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new { token, email = user.Email }, Request.Scheme);
-                    var message = new MessageVM(user.UserName, model.Password, new string[] { user.Email }, "TapThat account Email Confirmation", confirmationLink);
+                    var message = new MessageVM(user.UserName, model.Password, new string[] { user.Email }, "TapThat account Email Confirmation", confirmationLink,null);
                     _mailService.SendEmail(message);
                     jsonReturnModelObj.isSuccessfull = 1;
                     string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
@@ -121,13 +121,18 @@ namespace URLEntryMVC.Controllers
             return View(model);
         }
         [HttpGet]
-        public async Task<IActionResult> ConfirmEmail(string token, string email)
+        public async Task<ActionResult> ConfirmEmail(string token, string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
                 return View("Error");
             var result = await _userManager.ConfirmEmailAsync(user, token);
             return View(result.Succeeded ? nameof(ConfirmEmail) : "Error");
+        }
+        [HttpGet]
+        public IActionResult Error()
+        {
+            return View();
         }
         [HttpGet]
         public async Task<ActionResult> EditRegister(string userId)
@@ -239,9 +244,9 @@ namespace URLEntryMVC.Controllers
             {
                 var result = await _signInManager.PasswordSignInAsync(user.UserName, user.Password, user.RememberMe, false);
 
+                var userInfo = await _userManager.FindByNameAsync(user.UserName);
                 if (result.Succeeded)
                 {
-                    var userInfo = await _userManager.FindByNameAsync(user.UserName);
                     var role = await _userManager.GetRolesAsync(userInfo);
                     if (userInfo.CustomerIdFk!=null)
                     {
@@ -255,6 +260,10 @@ namespace URLEntryMVC.Controllers
                     }
                     HttpContext.Session.SetString(AppConstant.loggedInUserRole, role.FirstOrDefault() ?? string.Empty);
                     return RedirectToAction("ListOfLinks", "URL");
+                }
+                if (userInfo!=null && !userInfo.EmailConfirmed)
+                {
+                    ModelState.AddModelError("Password", "Please activate your account");
                 }
 
                 ModelState.AddModelError("Password", "Username or password is incorrect!");
@@ -329,50 +338,45 @@ namespace URLEntryMVC.Controllers
         public async Task<ActionResult> ForgetPassword(ForgetPasswordVM modelObj)
         {
             JsonReturnModel jsonReturnModelObj = new JsonReturnModel();
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
+                List<string> errors = new List<string>();
+                foreach (var modelState in ModelState.Values)
                 {
-                    List<string> errors = new List<string>();
-                    foreach (var modelState in ModelState.Values)
+                    foreach (var modelError in modelState.Errors)
                     {
-                        foreach (var modelError in modelState.Errors)
-                        {
-                            errors.Add(modelError.ErrorMessage);
-                        }
+                        errors.Add(modelError.ErrorMessage);
                     }
-                    jsonReturnModelObj.isSuccessfull = 0;
-                    jsonReturnModelObj.errors.AddRange(errors);
-                    string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
-                    return Json(jsonObj);
                 }
-                if (ModelState.IsValid)
-                {
-                    var user = await _userManager.FindByNameAsync(modelObj.UserName.Trim());
-                    if (user == null)
-                    {
-                        jsonReturnModelObj.errors.Add("Username is not correct");
-                        jsonReturnModelObj.isSuccessfull = 0;
-                        string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
-                        return Json(jsonObj);
-                    }
-                    if (user != null)
-                    {
-                        string code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                        var resetPass = await _userManager.ResetPasswordAsync(user, code, modelObj.Password);
-                        jsonReturnModelObj.isSuccessfull = 1;
-                        string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
-                        return Json(jsonObj);
-                    }
-                    return PartialView("_ForgetPassword", modelObj);
-                }
-                return View();
+                jsonReturnModelObj.isSuccessfull = 0;
+                jsonReturnModelObj.errors.AddRange(errors);
+                string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                return Json(jsonObj);
             }
-            catch (Exception)
+            var user = await _userManager.FindByEmailAsync(modelObj.Email.Trim());
+            if (user == null)
             {
-                throw;
+                jsonReturnModelObj.isSuccessfull = 0;
+                jsonReturnModelObj.errors.Add("No user exist against this email.");
+                string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                return Json(jsonObj);
             }
-            
+            else
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var callback = Url.Action(nameof(ResetPasswordUsingEmail), "Account", new { token, email = user.Email }, Request.Scheme);
+                var message = new MessageVM(null, null, new string[] { user.Email }, "Reset password link", callback, "forgetPassword");
+                _mailService.SendEmail(message);
+                jsonReturnModelObj.isSuccessfull = 1;
+                string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
+                return Json(jsonObj);
+            }
+        }
+        public ActionResult ResetPasswordUsingEmail()
+        {
+            ResetPasswordVM modelObj = new ResetPasswordVM();
+            modelObj.Id = GetCurrentUserId();
+            return PartialView("_ResetPassword", modelObj);
         }
         public class JsonReturnModel
         {

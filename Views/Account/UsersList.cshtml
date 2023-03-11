@@ -136,10 +136,12 @@
             success: function(data) {
                 $("#logoLoader").fadeOut();
                 if (data == 1) {
-                    location.reload(true);
-                }
-                else if (data == 1) {
-                    alert('Some error has been occured while deleting the user')
+                    if (data == 1) {
+                        location.reload(true);
+                    }
+                    else if (data == 0) {
+                        alert('Some error has been occured while deleting the user')
+                    }
                 }
             }
         })

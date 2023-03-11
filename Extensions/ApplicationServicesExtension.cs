@@ -25,7 +25,7 @@ public static class ApplicationServicesExtension
         _services.AddIdentity<ApplicationUserExtension, IdentityRole>(options =>
         {
             options.User.RequireUniqueEmail = true;
-            //options.SignIn.RequireConfirmedEmail = true;
+            options.SignIn.RequireConfirmedEmail = true;
         })
         .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
         
