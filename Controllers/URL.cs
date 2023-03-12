@@ -18,14 +18,16 @@ namespace URLEntryMVC.Controllers
     public class URL : Controller
     {
         private readonly IUrlRepository urlRepositoryObj;
+        private readonly IWebHostEnvironment _env;
         private readonly DataContext _db;
         private readonly ICustomerRepository _customerRepository;
         private readonly UserManager<ApplicationUserExtension> _userManager;
-        private string domainLink = "http://tapthat.online/";
+        private string domainLink = "https://tapthat.online/";
 
-        public URL(IUrlRepository urlRepository, DataContext db,ICustomerRepository customerRepository, UserManager<ApplicationUserExtension> userManager)
+        public URL(IUrlRepository urlRepository, IWebHostEnvironment environment, DataContext db,ICustomerRepository customerRepository, UserManager<ApplicationUserExtension> userManager)
         {
             urlRepositoryObj = urlRepository;
+            _env = environment;
             _db = db;
             _customerRepository = customerRepository;
             _userManager = userManager;

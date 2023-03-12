@@ -365,18 +365,39 @@ namespace URLEntryMVC.Controllers
             {
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var callback = Url.Action(nameof(ResetPasswordUsingEmail), "Account", new { token, email = user.Email }, Request.Scheme);
-                var message = new MessageVM(null, null, new string[] { user.Email }, "Reset password link", callback, "forgetPassword");
+                var message = new MessageVM(user.UserName, null, new string[] { user.Email }, "Reset password link", callback, "forgetPassword");
                 _mailService.SendEmail(message);
                 jsonReturnModelObj.isSuccessfull = 1;
                 string jsonObj = JsonConvert.SerializeObject(jsonReturnModelObj);
                 return Json(jsonObj);
             }
         }
-        public ActionResult ResetPasswordUsingEmail()
+        [HttpGet]
+        public ActionResult ResetPasswordUsingEmail(string token, string email)
         {
-            ResetPasswordVM modelObj = new ResetPasswordVM();
-            modelObj.Id = GetCurrentUserId();
-            return PartialView("_ResetPassword", modelObj);
+            ResetPasswordUsingEmailVM modelObj = new ResetPasswordUsingEmailVM();
+            modelObj.Email = email;
+            modelObj.Token = token;
+            return View(modelObj);
+        }
+        [HttpPost]
+        public async Task<ActionResult> ResetPasswordUsingEmail(ResetPasswordUsingEmailVM modelObj)
+        {
+            if (!ModelState.IsValid)
+                return View(modelObj);
+            var user = await _userManager.FindByEmailAsync(modelObj.Email);
+            if (user == null)
+                RedirectToAction(nameof(Logout));
+            var resetPassResult = await _userManager.ResetPasswordAsync(user, modelObj.Token, modelObj.Password);
+            if (!resetPassResult.Succeeded)
+            {
+                foreach (var error in resetPassResult.Errors)
+                {
+                    ModelState.TryAddModelError(error.Code, error.Description);
+                }
+                return View();
+            }
+            return RedirectToAction(nameof(Logout));
         }
         public class JsonReturnModel
         {

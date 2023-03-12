@@ -20,24 +20,6 @@ namespace URLEntryMVC.Services
         }
         public void SendEmail(MessageVM message)
         {
-            //var from = _emailConfig.From;
-            //var to = message.To;
-            //var subject = message.Subject;
-            //var body = message.Body;
-
-            //var username = _emailConfig.UserName; // get from Mailtrap
-            //var password = _emailConfig.Password; // get from Mailtrap
-
-            //var host = _emailConfig.SmtpServer;
-            //var port = _emailConfig.Port;
-
-            //var client = new SmtpClient(host, port)
-            //{
-            //    Credentials = new NetworkCredential(username, password),
-            //    EnableSsl = false
-            //};
-
-            //client.Send(from, to, subject, body);
             var emailMessage = CreateEmailMessage(message);
             Send(emailMessage);
         }
@@ -47,7 +29,7 @@ namespace URLEntryMVC.Services
             var messageBody=settingUpTheEmailTemplate(message.UserName, message.Password, message.Content, message.EmailType);
             #endregion
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("email", _emailConfig.From));
+            emailMessage.From.Add(new MailboxAddress("Tap-That", _emailConfig.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = messageBody };

@@ -110,12 +110,7 @@
                         $('#errorMsg').html(obj.errors[0]);
                     }
                     else if (obj.isSuccessfull == 1) {
-                        Swal.fire({
-                            title: 'User Creation',
-                            iconHtml: 'User has been created and confirmation email has been sent on user email address',
-                            timer: 10000,
-                            showCloseButton: true
-                        });
+                        alert('Email has been sent to user with the account credential.')
                         location.reload(true);
                     }
                 }
