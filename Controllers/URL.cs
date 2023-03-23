@@ -130,17 +130,26 @@ namespace URLEntryMVC.Controllers
         {
             var obj =await urlRepositoryObj.GetUrlById(id);
             var customer = await _customerRepository.ListOfCustomers();
+            var pointCategory = await _customerRepository.ListOfPointCategories();
             SaveUrlVM editUrlVM = new SaveUrlVM();
             editUrlVM.CustomerList = customer.Select(x => new CustomerInfo
             {
                 CustomerId = x.Id,
                 CustomerName = x.CustomerName
             }).ToList();
+            editUrlVM.PointCategoryList = pointCategory.Select(x => new PointCategoryInfo
+            {
+                CategoryId = x.CategoryId,
+                CategoryName = x.CategoryName
+            }).ToList();
             editUrlVM.Id = obj.Id;
             editUrlVM.UrlLink = obj.UrlLink;
             editUrlVM.DomainLink = obj.DomainLink;
             editUrlVM.CustomerPointName = obj.CustomerPointName;
             editUrlVM.CustomerId = obj.CustomerIdFk??0;
+            editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
+            editUrlVM.Subject = obj.Subject;
+            editUrlVM.Text = obj.Body;
             return PartialView("~/Views/PartialViews/_EditUrlModal.cshtml", editUrlVM);
         }
         [Authorize]
