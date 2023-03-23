@@ -74,7 +74,8 @@ namespace URLEntryMVC.RepositoryClasses
         {
             try
             {
-                return await _db.CustomerTbls.Where(x => x.Id == Id).FirstOrDefaultAsync();
+                CustomerTbl customerTbl = new CustomerTbl();
+                return await _db.CustomerTbls.Where(x => x.Id == Id).FirstOrDefaultAsync()?? customerTbl;
             }
             catch (Exception)
             {
@@ -121,7 +122,18 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
+        public async Task<List<PointCategory>> ListOfPointCategories()
+        {
+            try
+            {
+                return await _db.PointCategories.ToListAsync();
+            }
+            catch (Exception)
+            {
 
+                throw;
+            }
+        }
         public bool SaveCustomer(CustomerTbl CustomerInfo)
         {
             try

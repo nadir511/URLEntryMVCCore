@@ -16,6 +16,12 @@ namespace URLEntryMVC.ViewModel.UrlVM
         public string? CustomerPointName { get; set; }
         public string? CustomerNotes { get; set; }
         public int? TotalClicks { get; set; }
+        public int? PointCategoryId { get; set; }
+        public string? PointCategoryName { get; set; }
+        public string? Subject { get; set; }
+
+        public string? Body { get; set; }
+        public string? PointEmails { get; set; }
 
     }
 

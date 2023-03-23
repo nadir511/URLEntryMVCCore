@@ -11,6 +11,7 @@ namespace URLEntryMVC.Interfaces
         Task<bool> IsCustomerExistOnEdit(string CustomerName, int Id);
         bool SaveCustomer(CustomerTbl CustomerInfo);
         Task<List<CustomerTbl>> ListOfCustomers();
+        Task<List<PointCategory>> ListOfPointCategories();
         Task<CustomerTbl> GetCustomerById(int id);
         Task<bool> DeleteCustomer(int Id);
         Task<List<UsersVM>> GetUsersByCustomerId(int CustomerId);

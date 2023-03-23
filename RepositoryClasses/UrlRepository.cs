@@ -2,6 +2,7 @@
 using URLEntryMVC.Data;
 using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
+using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.RepositoryClasses
 {
@@ -78,12 +79,33 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
-        public void SaveLink(UrlTbl UrlInfo)
+        public void SaveLink(SaveUrlVM PointInfo)
         {
             try
             {
-                _db.Entry(UrlInfo).State = EntityState.Added;
+                var savePointInfo = new UrlTbl()
+                {
+                    UrlLink = PointInfo.UrlLink,
+                    DomainLink = PointInfo.DomainLink,
+                    CustomerIdFk = PointInfo.CustomerId,
+                    CustomerPointName = PointInfo.CustomerPointName,
+                    PointCategoryIdFk = PointInfo.PointCategoryId,
+                    Subject = PointInfo.Subject,
+                    Body = PointInfo.Text
+                };
+                _db.UrlTbls.Add(savePointInfo);
                 _db.SaveChanges();
+                if (!string.IsNullOrWhiteSpace(PointInfo.allEmailsStr))
+                {
+                    var pointEmail = new PointEmail()
+                    {
+                        PointIdFk = savePointInfo.Id,
+                        Email = PointInfo.allEmailsStr
+                    };
+                    _db.PointEmails.Add(pointEmail);
+                    _db.SaveChanges();
+                }
+                
             }
             catch (Exception)
             {

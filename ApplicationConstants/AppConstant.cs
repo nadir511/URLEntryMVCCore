@@ -7,5 +7,8 @@
         public const string CustomerRole = "Customer";
         public const string CustomerLogoStr = "CustomerLogoStr";
         public const string CustomerId = "CustomerId";
+
+        public const string StdContractPoint = "Standard Contact";
+        public const string EmailContractPoint = "Email Contact";
     }
 }

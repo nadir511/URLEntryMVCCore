@@ -1,4 +1,5 @@
 ﻿using URLEntryMVC.Entities;
+using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.Interfaces
 {
@@ -9,7 +10,7 @@ namespace URLEntryMVC.Interfaces
         Task<bool> IsPointExistForCustomer(string CustomerPointName,int CustomerId);
         Task<bool> IsLinkExistOnEdit(string url,int Id);
         Task<bool> IsPointExistForCustomerOnEdit(string CustomerPointName, int CustomerId,int PointId);
-        void SaveLink(UrlTbl UrlInfo);
+        void SaveLink(SaveUrlVM UrlInfo);
         Task<List<UrlTbl>> ListOfLinks();
         Task<UrlTbl?> GetUrlById(int id);
         void DeleteUrl(int Id);

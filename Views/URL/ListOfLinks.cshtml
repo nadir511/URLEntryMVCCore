@@ -35,9 +35,9 @@
                                 </a>
                             </p>
                             <p class="mb-5">
-                                Contact:
+                                Phone:
                                 <a href="tel:UK:+07748645453">
-                                     +07748645453
+                                     07748645453
                                 </a>
                             </p>
                         </div>
@@ -103,6 +103,7 @@
                         <th>
                             @Html.DisplayNameFor(model => model.UrlLink)
                         </th>
+                        <th>Point Category</th>
                         <th>
                             Notes
                         </th>
@@ -126,12 +127,30 @@
                                 @Html.HiddenFor(modelItem => item.Id)
                                 @if (User.IsInRole(AppConstant.AdminRole))
                                 {
-                                    <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.UrlLink)</a>
+                                    if (item.PointCategoryId==1)
+                                    {
+                                    <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.UrlLink)</a>    
+                                    }
+                                    else if(item.PointCategoryId==2)
+                                    {
+                                        <a href="mailto:@item.PointEmails?subject=@item.Subject&body=@item.Body">@Html.DisplayFor(modelItem => item.UrlLink)</a>
+                                    }
+
                                 }
                                 else
                                 {
-                                    <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.CustomerPointName)</a>
+                                    if (item.PointCategoryId == 1)
+                                    {
+                                        <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.CustomerPointName)</a>
+                                    }
+                                    else
+                                    {
+                                        
+                                    }
                                 }
+                            </td>
+                            <td>
+                                <input class="form-control" value="@item.PointCategoryName" readonly />
                             </td>
                             <td>
                                 <input class="form-control" value="@item.CustomerNotes" readonly />
