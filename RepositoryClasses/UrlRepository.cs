@@ -14,11 +14,25 @@ namespace URLEntryMVC.RepositoryClasses
         {
             _db = _dataContext;
         }
-        public void UpdateLink(UrlTbl UrlInfo)
+        public void UpdateLink(SaveUrlVM PointInfo)
         {
             try
             {
-                _db.Entry(UrlInfo).State = EntityState.Modified;
+                var savePointInfo = new UrlTbl()
+                {
+                    Id=PointInfo.Id,
+                    UrlLink = PointInfo.UrlLink,
+                    DomainLink = PointInfo.DomainLink,
+                    CustomerIdFk = PointInfo.CustomerId,
+                    CustomerPointName = PointInfo.CustomerPointName,
+                    PointCategoryIdFk = PointInfo.PointCategoryId,
+                    Subject = PointInfo.Subject,
+                    Body = PointInfo.Text
+                };
+                _db.Entry(savePointInfo).State = EntityState.Modified;
+                var EmailInfo = _db.PointEmails.Where(x => x.PointIdFk == PointInfo.Id).FirstOrDefault();
+                if (EmailInfo != null)
+                    EmailInfo.Email = PointInfo.allEmailsStr;
                 _db.SaveChanges();
             }
             catch (Exception)
@@ -130,6 +144,18 @@ namespace URLEntryMVC.RepositoryClasses
             try
             {
                 return await _db.UrlTbls.Where(x => x.Id == Id).FirstOrDefaultAsync();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public async Task<string?> GetEmailsByPointId(int PointId)
+        {
+            try
+            {
+                return await _db.PointEmails.Where(x => x.PointIdFk == PointId).Select(x=>x.Email).FirstOrDefaultAsync();
             }
             catch (Exception)
             {

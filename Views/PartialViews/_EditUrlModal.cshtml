@@ -19,7 +19,7 @@
     <div class="row">
         <div class="col-sm-12">
             <label>Select Point Category</label><span style="color:red"> *</span>
-            <select id="pointCatList" class="form-control" asp-for="PointCategoryId" asp-items="@(new SelectList(Model.PointCategoryList, "CategoryId", "CategoryName"))" onchange="ChangePointCat(this)" required>
+            <select id="pointCatList" class="form-control" asp-for="PointCategoryId" asp-items="@(new SelectList(Model.PointCategoryList, "CategoryId", "CategoryName"))" onchange="ChangePointCat(this)" disabled>
                 <option value="">--Select Point Category--</option>
             </select>
             <input type="hidden" asp-for="PointCategoryId" />
@@ -80,6 +80,7 @@
     });
     function ChangePointCat() {
         var selectedpointCat = $("#pointCatList").val();
+        console.log(selectedpointCat);
         if (selectedpointCat == 1) {
             $("#stdPointProp").show();
             $("#emailPointProp").hide();
