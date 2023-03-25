@@ -143,9 +143,9 @@
                                     {
                                         <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.CustomerPointName)</a>
                                     }
-                                    else
+                                    else if(item.PointCategoryId==2)
                                     {
-                                        
+                                        <a href="mailto:@item.PointEmails?subject=@item.Subject&body=@item.Body">@Html.DisplayFor(modelItem => item.CustomerPointName)</a>
                                     }
                                 }
                             </td>
@@ -325,7 +325,7 @@
     function EditDomainLink(id) {
         $.ajax({
             type: 'GET',
-            url: "@Url.Action("UpdateDomainLink", "URL")",
+            url: "@Url.Action("UpdatePointInfo", "URL")",
             data: { id: id },
             beforeSend: function() {
                 $("#logoLoader").fadeIn();

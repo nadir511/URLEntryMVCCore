@@ -2,11 +2,41 @@
 <form id="editDomainForm">
     <div class="row">
         @Html.HiddenFor(m=>m.Id)
-        <div class="col-sm-12">
+        @*<div class="col-sm-12">
             <label>Domain Link</label><span style="color:red"> *</span>
             @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@required="required",@type="url" } })
             @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
+        </div>*@
+        <div class="row" style="display:none" id="stdPointProp">
+            <div class="col-sm-12">
+                <label>Domain Link</label><span style="color:red"> *</span>
+                @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@type="url",@id="pointDomin" } })
+                @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
+            </div>
         </div>
+        <div class="row" style="display:none" id="emailPointProp">
+            <div class="col-sm-12">
+                <label>Email's</label><span style="color:red"> *</span>
+                @Html.EditorFor(m => m.Email1, new { htmlAttributes = new { @class = "form-control mb-1",@id="pointEmai1",@placeholder="Enter 1st Email",@type="email" } })
+                @Html.ValidationMessageFor(m => m.Email1, "", new { @class = "text-danger", id="email1Error" })
+                @Html.EditorFor(m => m.Email2, new { htmlAttributes = new { @class = "form-control mb-1",@id="pointEmai2",@placeholder="Enter 2nd Email",@autocomplete="off",@type="email" } })
+                @Html.ValidationMessageFor(m => m.Email2, "", new { @class = "text-danger", id="email2Error" })
+                @Html.EditorFor(m => m.Email3, new { htmlAttributes = new { @class = "form-control",@id="pointEmai3",@placeholder="Enter 3rd Email",@autocomplete="off",@type="email" } })
+                @Html.ValidationMessageFor(m => m.Email3, "", new { @class = "text-danger", id="email3Error" })
+            </div>
+            <div class="col-sm-6">
+                <label>Subject</label><span style="color:red"> *</span>
+                @Html.EditorFor(m => m.Subject, new { htmlAttributes = new { @class = "form-control",@placeholder="Enter Subject",@id="SubjectId" } })
+                @Html.ValidationMessageFor(m => m.Subject, "", new { @class = "text-danger", id="subjectError" })
+            </div>
+            <div class="col-sm-12">
+                <label>Text</label><span style="color:red"> *</span>
+                @Html.TextAreaFor(m => m.Text, new { @class = "form-control",@placeholder="Enter Text",@id="TextId" })
+                @Html.ValidationMessageFor(m => m.Text, "", new { @class = "text-danger", id="textError" })
+            </div>
+
+        </div>
+
         <div class="col-sm-12">
             <label class="form-label" for="CustomerNotes">Customer Notes</label>
             <textarea id="customerNotes" asp-for="CustomerNotes" class="form-control" placeholder="Add Notes"></textarea>
@@ -17,11 +47,46 @@
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <script>
+    $(document).ready(function() {
+        ChangePointCat();
+    });
+    function ChangePointCat() {
+        var selectedpointCat = @Model.PointCategoryId;
+        console.log(selectedpointCat);
+        if (selectedpointCat == 1) {
+            $("#stdPointProp").show();
+            $("#emailPointProp").hide();
+            $("#pointDomin").prop('required', true);
+
+            $("#SubjectId").val('');
+            $("#SubjectId").prop('required', false);
+            $("#TextId").val('');
+            $("#TextId").prop('required', false);
+            $("#pointEmai1").val('');
+            $("#pointEmai2").val('');
+            $("#pointEmai3").val('');
+            $("#pointEmai1").prop('required', false);
+        }
+        else if (selectedpointCat == 2) {
+            $("#stdPointProp").hide();
+            $("#emailPointProp").show();
+            $("#pointDomin").val('');
+            $("#pointDomin").prop('required', false);
+
+            $("#SubjectId").prop('required', true);
+            $("#TextId").prop('required', true);
+            $("#pointEmai1").prop('required', true);
+        }
+        else {
+            $("#stdPointProp").hide();
+            $("#emailPointProp").hide();
+        }
+    };
     $("#updateBtn").click(function() {
         if ($("#editDomainForm").valid()) {
             $.ajax({
                 type: "POST",
-                url: '@Url.Action("UpdateDomainLink", "URL")',
+                url: '@Url.Action("UpdatePointInfo", "URL")',
                 dataType: 'json',
                 data: $("#editDomainForm").serializeArray(),
                 beforeSend: function() {

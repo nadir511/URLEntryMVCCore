@@ -27,7 +27,8 @@ namespace URLEntryMVC.RepositoryClasses
                     CustomerPointName = PointInfo.CustomerPointName,
                     PointCategoryIdFk = PointInfo.PointCategoryId,
                     Subject = PointInfo.Subject,
-                    Body = PointInfo.Text
+                    Body = PointInfo.Text,
+                    CustomerNotes= PointInfo.CustomerNotes
                 };
                 _db.Entry(savePointInfo).State = EntityState.Modified;
                 var EmailInfo = _db.PointEmails.Where(x => x.PointIdFk == PointInfo.Id).FirstOrDefault();

@@ -159,7 +159,7 @@ namespace URLEntryMVC.Controllers
                     emails = emailsStr.Split(',');
                 editUrlVM.Email1 = emails[0];
                 editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
-                editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null; ;
+                editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
             }
 
             return PartialView("~/Views/PartialViews/_EditUrlModal.cshtml", editUrlVM);
@@ -176,7 +176,7 @@ namespace URLEntryMVC.Controllers
             {
                 SaveUrlVM urlTbl = new SaveUrlVM()
                 {
-                    Id= urlVM.Id,
+                    Id = urlVM.Id,
                     UrlLink = domainLink + '_' + customerInfo.CustomerName + '/' + urlVM.CustomerPointName,
                     DomainLink = urlVM.DomainLink,
                     CustomerId = urlVM.CustomerId,
@@ -208,27 +208,67 @@ namespace URLEntryMVC.Controllers
         }
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult> UpdateDomainLink(int id)
+        public async Task<ActionResult> UpdatePointInfo(int id)
         {
             var obj = await urlRepositoryObj.GetUrlById(id);
             SaveUrlVM editUrlVM = new SaveUrlVM();
             editUrlVM.Id = obj.Id;
             editUrlVM.DomainLink = obj.DomainLink;
             editUrlVM.CustomerNotes = obj.CustomerNotes;
+            editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
+            editUrlVM.Subject = obj.Subject;
+            editUrlVM.Text = obj.Body;
+
+            string[] emails = new string[3];
+            if (obj.PointCategoryIdFk == 2)
+            {
+                var emailsStr = await urlRepositoryObj.GetEmailsByPointId(id);
+                if (emailsStr != null)
+                    emails = emailsStr.Split(',');
+                editUrlVM.Email1 = emails[0];
+                editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
+                editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
+            }
             return PartialView("~/Views/PartialViews/_EditDomain.cshtml", editUrlVM);
         }
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult> UpdateDomainLink(SaveUrlVM urlVM)
+        public async Task<ActionResult> UpdatePointInfo(SaveUrlVM urlVM)
         {
             try
             {
-                var domainLinkObj = await _db.UrlTbls.Where(x => x.Id == urlVM.Id).FirstOrDefaultAsync();
+                SaveUrlVM? domainLinkObj = await _db.UrlTbls.Where(x => x.Id == urlVM.Id).Select(x => new SaveUrlVM
+                {
+                    Id = x.Id,
+                    DomainLink = urlVM.DomainLink??x.DomainLink,
+                    UrlLink=x.UrlLink,
+                    CustomerId=x.CustomerIdFk??0,
+                    CustomerPointName=x.CustomerPointName,
+                    PointCategoryId=x.PointCategoryIdFk,
+                    CustomerNotes = urlVM.CustomerNotes,
+                    Subject = urlVM.Subject??x.Subject,
+                    Text = urlVM.Text??x.Body,
+                }).FirstOrDefaultAsync();
                 if (domainLinkObj != null)
                 {
-                    domainLinkObj.DomainLink = urlVM.DomainLink;
-                    domainLinkObj.CustomerNotes = urlVM.CustomerNotes;
-                    await _db.SaveChangesAsync();
+                    if (domainLinkObj.PointCategoryId == 2)
+                    {
+                        StringBuilder? emails = new StringBuilder();
+                        if (!string.IsNullOrWhiteSpace(urlVM.Email1))
+                        {
+                            emails.Append(urlVM.Email1);
+                        }
+                        if (!string.IsNullOrWhiteSpace(urlVM.Email2))
+                        {
+                            emails.Append("," + urlVM.Email2);
+                        }
+                        if (!string.IsNullOrWhiteSpace(urlVM.Email3))
+                        {
+                            emails.Append("," + urlVM.Email3);
+                        }
+                        domainLinkObj.allEmailsStr = emails.ToString();
+                    }
+                    urlRepositoryObj.UpdateLink(domainLinkObj);
                 }
                 return Json(1);
             }

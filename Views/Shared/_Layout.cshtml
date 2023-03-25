@@ -49,7 +49,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../css/email.multiple.css" />
-    
+
     <!-- Page CSS -->
     <!-- Helpers -->
     <script src="../TemplateFiles/assets/vendor/js/helpers.js"></script>
@@ -138,6 +138,25 @@
 
                 <ul class="menu-inner py-1">
                     <!-- Dashboard -->
+                    @*<li class="menu-item">
+                        <a href="@Url.Action("ListOfLinks","URL")" class="menu-link ">
+                            <i class="menu-icon tf-icons bx bx-layout"></i>
+                            <div >Layouts</div>
+                        </a>
+                        <div data-i18n="Layouts" class="menu-toggle" ></div>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="layouts-without-menu.html" class="menu-link">
+                                    <div data-i18n="Without menu">Without menu</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="layouts-without-navbar.html" class="menu-link">
+                                    <div data-i18n="Without navbar">Without navbar</div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>*@
                     <li class="menu-item @Html.IsActive("URL","ListOfLinks")">
                         <a href="@Url.Action("ListOfLinks","URL")" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-home-circle"></i>
@@ -304,35 +323,35 @@
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script>
-    function resetPassword() {
-        $.ajax({
-            url: "@Url.Action("ResetPassword", "Account")",
-            type: 'GET',
-            contentType: 'application/json',
-            beforeSend: function() {
-                $("#logoLoader").fadeIn();
-            },
-            success: function(objPV) {
-                $('#MainModalBody').html(objPV);
-                $("#MainAppModal").modal({
-                    backdrop: 'static', // Prevent to close on click outside the modal
-                    keyboard: false, // Prevent to close by ESC
-                    show: true
-                });
-                $("#MainModalLabel").text('Reset Password');
-                $('#MainAppModal').modal('show');
-            },
-            complete: function() {
-                $("#logoLoader").fadeOut();
-                
-            },
-            error: function(errorMsg) {
-                console.log(errorMsg);
-                $("#logoLoader").fadeOut();
-            }
-        });
-    }
-</script>
+        function resetPassword() {
+            $.ajax({
+                url: "@Url.Action("ResetPassword", "Account")",
+                type: 'GET',
+                contentType: 'application/json',
+                beforeSend: function() {
+                    $("#logoLoader").fadeIn();
+                },
+                success: function(objPV) {
+                    $('#MainModalBody').html(objPV);
+                    $("#MainAppModal").modal({
+                        backdrop: 'static', // Prevent to close on click outside the modal
+                        keyboard: false, // Prevent to close by ESC
+                        show: true
+                    });
+                    $("#MainModalLabel").text('Reset Password');
+                    $('#MainAppModal').modal('show');
+                },
+                complete: function() {
+                    $("#logoLoader").fadeOut();
+
+                },
+                error: function(errorMsg) {
+                    console.log(errorMsg);
+                    $("#logoLoader").fadeOut();
+                }
+            });
+        }
+    </script>
 </body>
 </html>
 

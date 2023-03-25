@@ -185,6 +185,7 @@ namespace URLEntryMVC.Controllers
                 var UserInfo =await _userManager.FindByIdAsync(registerVMObj.UserId);
                 UserInfo.UserName = registerVMObj.UserName;
                 UserInfo.Email= registerVMObj.Email;
+                UserInfo.CustomerIdFk = registerVMObj.CustomerId;
                 //if (registerVMObj.IsPasswordUpdateCall==true)
                 //{
                 //    UserInfo.PasswordHash = _userManager.PasswordHasher.HashPassword(UserInfo, registerVMObj.Password);
