@@ -260,7 +260,7 @@ namespace URLEntryMVC.Controllers
                         }
                     }
                     HttpContext.Session.SetString(AppConstant.loggedInUserRole, role.FirstOrDefault() ?? string.Empty);
-                    return RedirectToAction("ListOfLinks", "URL");
+                    return RedirectToAction("ListOfLinks", "URL",new { pointCategory=AppConstant.AllContractPoint });
                 }
                 if (userInfo!=null && !userInfo.EmailConfirmed)
                 {

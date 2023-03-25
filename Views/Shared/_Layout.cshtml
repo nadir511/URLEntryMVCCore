@@ -2,6 +2,7 @@
 @using URLEntryMVC.ApplicationConstants
 @using URLEntryMVC.HelperMethods
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
 <!DOCTYPE html>
 <!-- =========================================================
 * Sneat - Bootstrap 5 HTML Admin Template - Pro | v1.0.0
@@ -113,6 +114,7 @@
 </head>
 
 <body>
+
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
@@ -138,42 +140,46 @@
 
                 <ul class="menu-inner py-1">
                     <!-- Dashboard -->
-                    @*<li class="menu-item">
-                        <a href="@Url.Action("ListOfLinks","URL")" class="menu-link ">
-                            <i class="menu-icon tf-icons bx bx-layout"></i>
-                            <div >Layouts</div>
+                    <li class="menu-item" id="tempIdForSubMenu">
+                        <a href="javascript:void(0)" class="menu-link menu-toggle">
+                            <i class="menu-icon tf-icons bx bx-box"></i>
+                            <div data-i18n="User interface">NFC Points</div>
                         </a>
-                        <div data-i18n="Layouts" class="menu-toggle" ></div>
                         <ul class="menu-sub">
                             <li class="menu-item">
-                                <a href="layouts-without-menu.html" class="menu-link">
-                                    <div data-i18n="Without menu">Without menu</div>
+                                <a href="@Url.Action("ListOfLinks","URL",new { pointCategory=AppConstant.AllContractPoint})" class="menu-link">
+                                    <div data-i18n="Text Divider">Overview</div>
                                 </a>
                             </li>
                             <li class="menu-item">
-                                <a href="layouts-without-navbar.html" class="menu-link">
-                                    <div data-i18n="Without navbar">Without navbar</div>
+                                <a href="@Url.Action("ListOfLinks","URL",new { pointCategory=AppConstant.StdContractPoint})" class="menu-link">
+                                    <div data-i18n="Text Divider">Standard Point</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="@Url.Action("ListOfLinks","URL",new { pointCategory=AppConstant.EmailContractPoint})" class="menu-link">
+                                    <div data-i18n="Text Divider">Email Points</div>
                                 </a>
                             </li>
                         </ul>
-                    </li>*@
-                    <li class="menu-item @Html.IsActive("URL","ListOfLinks")">
-                        <a href="@Url.Action("ListOfLinks","URL")" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                            <div data-i18n="Analytics">Dashboard</div>
-                        </a>
                     </li>
+                    @*<li class="menu-item @Html.IsActive("URL","ListOfLinks")">
+                    <a href="@Url.Action("ListOfLinks","URL")" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                    <div data-i18n="Analytics">Dashboard</div>
+                    </a>
+                    </li>*@
                     @if (User.IsInRole(AppConstant.AdminRole))
                     {
                         <!-- Customers -->
-                        <li class="menu-item @Html.IsActive("Customers","CustomerList")">
+                        <li class="menu-item">
                             <a href="@Url.Action("CustomerList","Customers")" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-info-circle"></i>
                                 <div data-i18n="Analytics">Customers</div>
                             </a>
                         </li>
                         <!-- User-Managment -->
-                        <li class="menu-item @Html.IsActive("Account","UsersList")">
+                        <li class="menu-item">
                             <a href="@Url.Action("UsersList","Account")" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-user-circle"></i>
                                 <div data-i18n="Analytics">User Management</div>
@@ -323,6 +329,35 @@
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script>
+        $(document).ready(function() {
+            
+            // get all menu items
+            const menuItems = document.querySelectorAll('.menu-item');
+            // loop through each menu item
+            menuItems.forEach((item) => {
+                // check if the item's link matches the current URL
+                const link = item.querySelector('.menu-link');
+                if (link.href === window.location.href) {
+                    item.classList.add('active');
+                }
+            });
+            const subMenuLinks = document.querySelectorAll('.menu-sub a');
+            subMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    // Get the parent <li> element of the clicked <a> element
+                    //const parentLi = this.parentNode.parentNode;
+                    //const parentLi2 = this.parentNode.parentNode.parentNode;
+                    // Add the 'active' class to the parent <li> element
+                    //parentLi.classList.add('active');
+                    //parentLi.classList.add('open');
+
+                    //This is just the temperory solution
+                    var myLink = document.getElementById("tempIdForSubMenu");
+                    myLink.classList.add("active", "open");
+                    debugger;
+                });
+            });
+        });
         function resetPassword() {
             $.ajax({
                 url: "@Url.Action("ResetPassword", "Account")",

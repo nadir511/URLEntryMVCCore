@@ -37,7 +37,7 @@ namespace URLEntryMVC.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<List<UrlVM>>> ListOfLinks()
+        public async Task<ActionResult<List<UrlVM>>> ListOfLinks(string pointCategory)
         {
             var Links = await urlRepositoryObj.ListOfLinks();
             ViewBag.TotalPoints = _db.UrlTbls.ToList().Count();
@@ -59,6 +59,14 @@ namespace URLEntryMVC.Controllers
                 Body = x.Body,
                 PointEmails = _db.PointEmails.Where(y => y.PointIdFk == x.Id).Select(x => x.Email).FirstOrDefault()
             }).ToList();
+            if (pointCategory==AppConstant.StdContractPoint)
+            {
+                UrlList = UrlList.Where(x => x.PointCategoryId == 1).ToList();
+            }
+            else if (pointCategory == AppConstant.EmailContractPoint)
+            {
+                UrlList = UrlList.Where(x => x.PointCategoryId == 2).ToList();
+            }
             if (User.IsInRole(AppConstant.CustomerRole))
             {
                 var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
