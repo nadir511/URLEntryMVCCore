@@ -153,7 +153,7 @@
                             </li>
                             <li class="menu-item">
                                 <a href="@Url.Action("ListOfLinks","URL",new { pointCategory=AppConstant.StdContractPoint})" class="menu-link">
-                                    <div data-i18n="Text Divider">Standard Point</div>
+                                    <div data-i18n="Text Divider">Standard Points</div>
                                 </a>
                             </li>
                             <li class="menu-item">
@@ -330,32 +330,40 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script>
         $(document).ready(function() {
-            
+            var linkUrl = window.location.href;
             // get all menu items
             const menuItems = document.querySelectorAll('.menu-item');
             // loop through each menu item
             menuItems.forEach((item) => {
                 // check if the item's link matches the current URL
                 const link = item.querySelector('.menu-link');
-                if (link.href === window.location.href) {
+                if (link.href == linkUrl) {
+                    debugger;
                     item.classList.add('active');
                 }
-            });
-            const subMenuLinks = document.querySelectorAll('.menu-sub a');
-            subMenuLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    // Get the parent <li> element of the clicked <a> element
-                    //const parentLi = this.parentNode.parentNode;
-                    //const parentLi2 = this.parentNode.parentNode.parentNode;
-                    // Add the 'active' class to the parent <li> element
-                    //parentLi.classList.add('active');
-                    //parentLi.classList.add('open');
-
+                if (linkUrl.includes('URL/ListOfLinks')) {
                     //This is just the temperory solution
                     var myLink = document.getElementById("tempIdForSubMenu");
                     myLink.classList.add("active", "open");
-                    debugger;
-                });
+                }
+                //const subMenuLinks = document.querySelectorAll('.menu-sub a');
+                //subMenuLinks.forEach(link => {
+                //    link.addEventListener('click', function(event) {
+                //        debugger;
+                //        // Get the parent <li> element of the clicked <a> element
+                //        //const parentLi = this.parentNode.parentNode;
+                //        //const parentLi2 = this.parentNode.parentNode.parentNode;
+                //        // Add the 'active' class to the parent <li> element
+                //        //parentLi.classList.add('active');
+                //        //parentLi.classList.add('open');
+                //        event.preventDefault(); // prevent default link behavior
+
+                //        //This is just the temperory solution
+                //        var myLink = document.getElementById("tempIdForSubMenu");
+                //        myLink.classList.add("active", "open");
+
+                //    });
+                //});
             });
         });
         function resetPassword() {

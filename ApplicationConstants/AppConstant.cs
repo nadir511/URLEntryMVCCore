@@ -11,5 +11,8 @@
         public const string AllContractPoint = "All Contact";
         public const string StdContractPoint = "Standard Contact";
         public const string EmailContractPoint = "Email Contact";
+
+        public const int StdContractPointId = 1;
+        public const int EmailContractPointId = 2;
     }
 }

@@ -37,7 +37,7 @@
                             <p class="mb-5">
                                 Phone:
                                 <a href="tel:UK:+07748645453">
-                                     07748645453
+                                    07748645453
                                 </a>
                             </p>
                         </div>
@@ -103,13 +103,19 @@
                         <th>
                             @Html.DisplayNameFor(model => model.UrlLink)
                         </th>
-                        <th>Point Category</th>
+                        @if (ViewBag.pointCategory != AppConstant.StdContractPoint && ViewBag.pointCategory != AppConstant.EmailContractPoint)
+                        {
+                            <th>Point Category</th>
+                        }
                         <th>
                             Notes
                         </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.DomainLink)
-                        </th>
+                        @if (ViewBag.pointCategory == AppConstant.StdContractPoint)
+                        {
+                            <th>
+                                @Html.DisplayNameFor(model => model.DomainLink)
+                            </th>
+                        }
                         @if (User.IsInRole(AppConstant.AdminRole))
                         {
                             <th>
@@ -127,11 +133,11 @@
                                 @Html.HiddenFor(modelItem => item.Id)
                                 @if (User.IsInRole(AppConstant.AdminRole))
                                 {
-                                    if (item.PointCategoryId==1)
+                                    if (item.PointCategoryId == 1)
                                     {
-                                    <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.UrlLink)</a>    
+                                        <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.UrlLink)</a>
                                     }
-                                    else if(item.PointCategoryId==2)
+                                    else if (item.PointCategoryId == 2)
                                     {
                                         <a href="mailto:@item.PointEmails?subject=@item.Subject&body=@item.Body">@Html.DisplayFor(modelItem => item.UrlLink)</a>
                                     }
@@ -143,23 +149,28 @@
                                     {
                                         <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.CustomerPointName)</a>
                                     }
-                                    else if(item.PointCategoryId==2)
+                                    else if (item.PointCategoryId == 2)
                                     {
                                         <a href="mailto:@item.PointEmails?subject=@item.Subject&body=@item.Body">@Html.DisplayFor(modelItem => item.CustomerPointName)</a>
                                     }
                                 }
                             </td>
-                            <td>
-                                <input class="form-control" value="@item.PointCategoryName" readonly />
-                            </td>
+                            @if (ViewBag.pointCategory != AppConstant.StdContractPoint && ViewBag.pointCategory != AppConstant.EmailContractPoint)
+                            {
+                                <td>
+                                    <input class="form-control" value="@item.PointCategoryName" readonly />
+                                </td>
+                            }
                             <td>
                                 <input class="form-control" value="@item.CustomerNotes" readonly />
                                 @*@Html.EditorFor(m=>item.CustomerNotes, new { htmlAttributes = new { @class = "form-control",@readonly="readonly" } })*@
                             </td>
-                            <td>
-                                <input class="form-control" value="@item.DomainLink" readonly />
-                                @*@Html.EditorFor(m=>item.DomainLink, new { htmlAttributes = new { @class = "form-control",@readonly="readonly" } })*@
-                            </td>
+                            @if (ViewBag.pointCategory == AppConstant.StdContractPoint)
+                            {
+                                <td>
+                                    <input class="form-control" value="@item.DomainLink" readonly />
+                                </td>
+                            }
                             @if (User.IsInRole(AppConstant.AdminRole))
                             {
                                 <td>

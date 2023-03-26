@@ -42,6 +42,7 @@ namespace URLEntryMVC.Controllers
             var Links = await urlRepositoryObj.ListOfLinks();
             ViewBag.TotalPoints = _db.UrlTbls.ToList().Count();
             ViewBag.TotalCustomers = _db.CustomerTbls.ToList().Count();
+            ViewBag.pointCategory = pointCategory;
 
             List<UrlVM> UrlList = Links.Select(x => new UrlVM
             {
@@ -61,11 +62,11 @@ namespace URLEntryMVC.Controllers
             }).ToList();
             if (pointCategory==AppConstant.StdContractPoint)
             {
-                UrlList = UrlList.Where(x => x.PointCategoryId == 1).ToList();
+                UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.StdContractPointId).ToList();
             }
             else if (pointCategory == AppConstant.EmailContractPoint)
             {
-                UrlList = UrlList.Where(x => x.PointCategoryId == 2).ToList();
+                UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.EmailContractPointId).ToList();
             }
             if (User.IsInRole(AppConstant.CustomerRole))
             {
@@ -160,7 +161,7 @@ namespace URLEntryMVC.Controllers
             editUrlVM.Text = obj.Body;
             string[] emails = new string[3];
 
-            if (obj.PointCategoryIdFk == 2)
+            if (obj.PointCategoryIdFk == AppConstant.EmailContractPointId)
             {
                 var emailsStr = await urlRepositoryObj.GetEmailsByPointId(id);
                 if (emailsStr != null)
@@ -193,7 +194,7 @@ namespace URLEntryMVC.Controllers
                     Subject = urlVM.Subject,
                     Text = urlVM.Text
                 };
-                if (urlVM.PointCategoryId == 2)
+                if (urlVM.PointCategoryId == AppConstant.EmailContractPointId)
                 {
                     StringBuilder? emails = new StringBuilder();
                     if (!string.IsNullOrWhiteSpace(urlVM.Email1))
@@ -259,7 +260,7 @@ namespace URLEntryMVC.Controllers
                 }).FirstOrDefaultAsync();
                 if (domainLinkObj != null)
                 {
-                    if (domainLinkObj.PointCategoryId == 2)
+                    if (domainLinkObj.PointCategoryId == AppConstant.EmailContractPointId)
                     {
                         StringBuilder? emails = new StringBuilder();
                         if (!string.IsNullOrWhiteSpace(urlVM.Email1))
@@ -304,7 +305,15 @@ namespace URLEntryMVC.Controllers
             {
                 domainLinkObj.TotalClicks = domainLinkObj.TotalClicks == null ? 1 : domainLinkObj.TotalClicks + 1;
                 await _db.SaveChangesAsync();
-                return Redirect(domainLinkObj.DomainLink ?? "");
+                if (domainLinkObj.PointCategoryIdFk==AppConstant.StdContractPointId)
+                {
+                    return Redirect(domainLinkObj.DomainLink ?? "");
+                }
+                else if (domainLinkObj.PointCategoryIdFk == AppConstant.EmailContractPointId)
+                {
+                    var emails = _db.PointEmails.Where(x => x.PointIdFk == domainLinkObj.Id).Select(x => x.Email).FirstOrDefault();
+                    return Redirect("mailto:"+emails+ "?subject=" + domainLinkObj .Subject+ "&body="+ domainLinkObj.Body);
+                }
             }
             return StatusCode(statusCode);
         }

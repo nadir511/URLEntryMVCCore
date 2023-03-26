@@ -6,7 +6,7 @@ using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.RepositoryClasses
 {
-    public class UrlRepository:IUrlRepository
+    public class UrlRepository : IUrlRepository
     {
         private readonly DataContext _db;
 
@@ -18,19 +18,20 @@ namespace URLEntryMVC.RepositoryClasses
         {
             try
             {
-                var savePointInfo = new UrlTbl()
+                var savePointInfo= _db.UrlTbls.Where(x => x.Id == PointInfo.Id).FirstOrDefault();
+
+                if (savePointInfo != null)
                 {
-                    Id=PointInfo.Id,
-                    UrlLink = PointInfo.UrlLink,
-                    DomainLink = PointInfo.DomainLink,
-                    CustomerIdFk = PointInfo.CustomerId,
-                    CustomerPointName = PointInfo.CustomerPointName,
-                    PointCategoryIdFk = PointInfo.PointCategoryId,
-                    Subject = PointInfo.Subject,
-                    Body = PointInfo.Text,
-                    CustomerNotes= PointInfo.CustomerNotes
-                };
-                _db.Entry(savePointInfo).State = EntityState.Modified;
+                    savePointInfo.Id = PointInfo.Id;
+                    savePointInfo.UrlLink = PointInfo.UrlLink;
+                    savePointInfo.DomainLink = PointInfo.DomainLink;
+                    savePointInfo.CustomerIdFk = PointInfo.CustomerId;
+                    savePointInfo.CustomerPointName = PointInfo.CustomerPointName;
+                    savePointInfo.PointCategoryIdFk = PointInfo.PointCategoryId;
+                    savePointInfo.Subject = PointInfo.Subject;
+                    savePointInfo.Body = PointInfo.Text;
+                    savePointInfo.CustomerNotes = PointInfo.CustomerNotes;
+                }
                 var EmailInfo = _db.PointEmails.Where(x => x.PointIdFk == PointInfo.Id).FirstOrDefault();
                 if (EmailInfo != null)
                     EmailInfo.Email = PointInfo.allEmailsStr;
@@ -68,7 +69,7 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
-        public async Task<bool> IsPointExistForCustomer(string customerPoint,int customerId)
+        public async Task<bool> IsPointExistForCustomer(string customerPoint, int customerId)
         {
             try
             {
@@ -81,11 +82,11 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
-        public async Task<bool> IsPointExistForCustomerOnEdit(string customerPoint, int customerId,int PointId)
+        public async Task<bool> IsPointExistForCustomerOnEdit(string customerPoint, int customerId, int PointId)
         {
             try
             {
-                var result = await _db.UrlTbls.Where(x => x.CustomerPointName == customerPoint.Trim() && x.CustomerIdFk == customerId &&x.Id!= PointId).FirstOrDefaultAsync();
+                var result = await _db.UrlTbls.Where(x => x.CustomerPointName == customerPoint.Trim() && x.CustomerIdFk == customerId && x.Id != PointId).FirstOrDefaultAsync();
                 return (result == null ? false : true);
             }
             catch (Exception)
@@ -120,7 +121,7 @@ namespace URLEntryMVC.RepositoryClasses
                     _db.PointEmails.Add(pointEmail);
                     _db.SaveChanges();
                 }
-                
+
             }
             catch (Exception)
             {
@@ -156,7 +157,7 @@ namespace URLEntryMVC.RepositoryClasses
         {
             try
             {
-                return await _db.PointEmails.Where(x => x.PointIdFk == PointId).Select(x=>x.Email).FirstOrDefaultAsync();
+                return await _db.PointEmails.Where(x => x.PointIdFk == PointId).Select(x => x.Email).FirstOrDefaultAsync();
             }
             catch (Exception)
             {
@@ -170,7 +171,12 @@ namespace URLEntryMVC.RepositoryClasses
             {
                 var UrlInfo = _db.UrlTbls.Where(x => x.Id == Id).FirstOrDefault();
                 if (UrlInfo != null)
+                {
+                    var pointEmail = _db.PointEmails.Where(x => x.PointIdFk == UrlInfo.Id).FirstOrDefault();
+                    if (pointEmail != null)
+                        _db.PointEmails.Remove(pointEmail);
                     _db.UrlTbls.Remove(UrlInfo);
+                }
                 _db.SaveChanges();
             }
             catch (Exception)
