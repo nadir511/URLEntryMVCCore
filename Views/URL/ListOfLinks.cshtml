@@ -92,7 +92,7 @@
             {
                 <button type="button" class="btn btn-primary mb-2" id="btnAddNewUrl">
                     <i class="menu-icon tf-icons bx bx-plus-circle"></i>
-                    Add New URL
+                    Add New Point
                 </button>
             }
         </h5>
@@ -105,7 +105,7 @@
                         </th>
                         @if (ViewBag.pointCategory != AppConstant.StdContractPoint && ViewBag.pointCategory != AppConstant.EmailContractPoint)
                         {
-                            <th>Point Category</th>
+                            <th>Category</th>
                         }
                         <th>
                             Notes
@@ -119,10 +119,10 @@
                         @if (User.IsInRole(AppConstant.AdminRole))
                         {
                             <th>
-                                Total Clicks
+                                Total Tap's
                             </th>
                         }
-                        <th>Action</th>
+                        <th>Edit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -206,7 +206,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add New URL</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Add New Point</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="ModalBody">

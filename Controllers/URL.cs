@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Identity;
 using URLEntryMVC.ApplicationConstants;
 using URLEntryMVC.ViewModel.PointCategoryVM;
 using System.Text;
+using Microsoft.AspNetCore.Http.Extensions;
+using System.Net;
+using System.Net.Mime;
+using System.Web;
 
 namespace URLEntryMVC.Controllers
 {
@@ -312,7 +316,17 @@ namespace URLEntryMVC.Controllers
                 else if (domainLinkObj.PointCategoryIdFk == AppConstant.EmailContractPointId)
                 {
                     var emails = _db.PointEmails.Where(x => x.PointIdFk == domainLinkObj.Id).Select(x => x.Email).FirstOrDefault();
-                    return Redirect("mailto:"+emails+ "?subject=" + domainLinkObj .Subject+ "&body="+ domainLinkObj.Body);
+                    var encodedSubject = Uri.EscapeDataString(domainLinkObj.Subject??"");
+                    var encodedBody = Uri.EscapeDataString(domainLinkObj.Body??"");
+
+                    //string encodedSubjectText = "=?utf-8?B?" + Convert.ToBase64String(Encoding.UTF8.GetBytes(domainLinkObj.Subject ?? "")) + "?=";
+                    //string encodedBodyText = "=?utf-8?B?" + Convert.ToBase64String(Encoding.UTF8.GetBytes(domainLinkObj.Body ?? "")) + "?=";
+
+                    var mailToStr = "mailto:" + emails + "?subject=" + HttpUtility.HtmlAttributeEncode(encodedSubject) + "&body=" + HttpUtility.HtmlAttributeEncode(encodedBody);
+
+                    //string mailtoLink = string.Format("mailto:{0}?Content-Type={1}&subject={2}&body={3}", emails, "text/plain; charset=utf-8", HttpUtility.UrlEncode(encodedSubjectText), HttpUtility.UrlEncode(encodedBodyText));
+                    //string mailtoLink = "mailto:recipient@example.com?subject=Example%20Subject&body=%3D%3Futf-8%3FB%3F44GT44KT44Gr44Gh44Gv%3F%3D%0D%0AContent-Type%3A%20text%2Fplain%3B%20charset%3Dutf-8";
+                    return Redirect(mailToStr);
                 }
             }
             return StatusCode(statusCode);
