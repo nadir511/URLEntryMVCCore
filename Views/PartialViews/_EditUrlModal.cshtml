@@ -35,7 +35,7 @@
     </div>
     <div class="row" style="display:none" id="emailPointProp">
         <div class="col-sm-12">
-            <label>Email's- Recipient Email Address (Max 3)</label><span style="color:red"> *</span>
+            <label>Recipient Email Address (Max 3)</label><span style="color:red"> *</span>
             @Html.EditorFor(m => m.Email1, new { htmlAttributes = new { @class = "form-control mb-1",@id="pointEmai1",@placeholder="Enter 1st Email",@type="email" } })
             @Html.ValidationMessageFor(m => m.Email1, "", new { @class = "text-danger", id="email1Error" })
             @Html.EditorFor(m => m.Email2, new { htmlAttributes = new { @class = "form-control mb-1",@id="pointEmai2",@placeholder="Enter 2nd Email",@autocomplete="off",@type="email" } })

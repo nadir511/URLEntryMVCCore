@@ -20,20 +20,36 @@ namespace URLEntryMVC.Services
         }
         public void SendEmail(MessageVM message)
         {
-            var emailMessage = CreateEmailMessage(message);
-            Send(emailMessage);
+            try
+            {
+                var emailMessage = CreateEmailMessage(message);
+                Send(emailMessage);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            
         }
         private MimeMessage CreateEmailMessage(MessageVM message)
         {
-            #region|Setting up the Template|
-            var messageBody=settingUpTheEmailTemplate(message.UserName, message.Password, message.Content, message.EmailType);
-            #endregion
-            var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("Tap-That", _emailConfig.From));
-            emailMessage.To.AddRange(message.To);
-            emailMessage.Subject = message.Subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = messageBody };
-            return emailMessage;
+            try
+            {
+                #region|Setting up the Template|
+                var messageBody = settingUpTheEmailTemplate(message.UserName, message.Password, message.Content, message.EmailType);
+                #endregion
+                var emailMessage = new MimeMessage();
+                emailMessage.From.Add(new MailboxAddress("Tap-That", _emailConfig.From));
+                emailMessage.To.AddRange(message.To);
+                emailMessage.Subject = message.Subject;
+                emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = messageBody };
+                return emailMessage;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            
         }
         private void Send(MimeMessage mailMessage)
         {
