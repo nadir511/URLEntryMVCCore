@@ -1,7 +1,7 @@
 ﻿@model URLEntryMVC.ViewModel.UrlVM.SaveUrlVM
 <form id="updateUrlForm">
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-5">
             @Html.HiddenFor(m=>m.Id)
             <label>Select Customer</label><span style="color:red"> *</span>
             <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName"))" required>
@@ -10,10 +10,17 @@
             <input type="hidden" asp-for="CustomerId" />
             @Html.ValidationMessageFor(m => m.CustomerId, "", new { @class = "text-danger", id="selectCustomerError" })
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-5">
             <label>Customer Point</label><span style="color:red"> *</span>
             @Html.EditorFor(m => m.CustomerPointName, new { htmlAttributes = new { @class = "form-control",@required="required"} })
             @Html.ValidationMessageFor(model => model.CustomerPointName, "", new { @class = "text-danger",id="customerPointError" })
+        </div>
+        <div class="col-sm-2">
+            <label class="custom-control-label" for="is_pointSave">Save P.</label>
+            <div class="form-check form-switch">
+                @Html.CheckBoxFor(m => m.SaveInLibrary, new { @class = "form-check-input", id = "is_pointSave" })
+                @Html.ValidationMessageFor(m => m.SaveInLibrary, "", new { @class = "text-danger" })
+            </div>
         </div>
     </div>
     <div class="row">

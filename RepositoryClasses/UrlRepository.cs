@@ -23,6 +23,7 @@ namespace URLEntryMVC.RepositoryClasses
                 if (savePointInfo != null)
                 {
                     savePointInfo.Id = PointInfo.Id;
+                    savePointInfo.SaveInLibrary = PointInfo.SaveInLibrary;
                     savePointInfo.UrlLink = PointInfo.UrlLink;
                     savePointInfo.DomainLink = PointInfo.DomainLink;
                     savePointInfo.CustomerIdFk = PointInfo.CustomerId;
@@ -101,6 +102,7 @@ namespace URLEntryMVC.RepositoryClasses
             {
                 var savePointInfo = new UrlTbl()
                 {
+                    SaveInLibrary= PointInfo.SaveInLibrary,
                     UrlLink = PointInfo.UrlLink,
                     DomainLink = PointInfo.DomainLink,
                     CustomerIdFk = PointInfo.CustomerId,

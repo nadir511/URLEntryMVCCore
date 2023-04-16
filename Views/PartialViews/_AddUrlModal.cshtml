@@ -1,18 +1,28 @@
 ﻿@model URLEntryMVC.ViewModel.UrlVM.SaveUrlVM
 <form id="addUrlForm">
     <div class="row">
-        <div class="col-sm-6">
-            <label>Select Customer</label><span style="color:red"> *</span>
+        <div class="col-sm-12">
+            <label style="display:block">Select Customer<span style="color:red"> *</span></label>
             <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName"))" required>
                 <option value="">--Select Customer--</option>
             </select>
             <input type="hidden" asp-for="CustomerId" />
             @Html.ValidationMessageFor(m => m.CustomerId, "", new { @class = "text-danger", id="selectCustomerError" })
         </div>
-        <div class="col-sm-6">
+
+    </div>
+    <div class="row">
+        <div class="col-sm-10">
             <label>Customer Point</label><span style="color:red"> *</span>
             @Html.EditorFor(m => m.CustomerPointName, new { htmlAttributes = new { @class = "form-control",@required="required"} })
             @Html.ValidationMessageFor(model => model.CustomerPointName, "", new { @class = "text-danger",id="customerPointError" })
+        </div>
+        <div class="col-sm-2">
+            <label class="custom-control-label" for="is_pointSave">Save P.</label>
+            <div class="form-check form-switch">
+                @Html.CheckBoxFor(m => m.SaveInLibrary, new { @class = "form-check-input", id = "is_pointSave" })
+                @Html.ValidationMessageFor(m => m.SaveInLibrary, "", new { @class = "text-danger" })
+            </div>
         </div>
     </div>
     <div class="row">
@@ -23,6 +33,14 @@
             </select>
             <input type="hidden" asp-for="PointCategoryId" />
             @Html.ValidationMessageFor(m => m.PointCategoryId, "", new { @class = "text-danger", id="selectPointCatError" })
+        </div>
+    </div>
+    <div class="row" style="display:none" id="savePointsDiv">
+        <div class="col-sm-12">
+            <label style="display:block">Select From Save Points</label>
+            <select id="savePointsList" class="form-control" onchange="ChangeLibPoint(this)">
+                <option value="">--Select Point--</option>
+            </select>
         </div>
     </div>
     <div class="row" style="display:none" id="stdPointProp">
@@ -52,7 +70,7 @@
             @Html.TextAreaFor(m => m.Text, new { @class = "form-control",@placeholder="Enter Text",@id="TextId" })
             @Html.ValidationMessageFor(m => m.Text, "", new { @class = "text-danger", id="textError" })
         </div>
-        
+
     </div>
 
 </form>
@@ -60,17 +78,60 @@
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 
 <script>
-    $(document).ready(function($) {
-        //let data = [
-        //]
-        //$("#pointEmails").email_multiple({
-        //    data: data
-        //    // reset: true
-        //});
-
+    $(document).ready(function ($) {
+        $('#customersList').select2({
+            dropdownAutoWidth: true,
+            dropdownParent: $('#AppModal .modal-content')
+        });
+        $('#savePointsList').select2({
+            dropdownAutoWidth: true,
+            dropdownParent: $('#AppModal .modal-content')
+        });
     });
     function ChangePointCat(obj) {
+        $('#pointDomin').prop('readonly', false);
+        $('#pointDomin').val('');
+        $('#pointEmai1').prop('readonly', false);
+        $('#pointEmai1').val('');
+        $('#pointEmai2').prop('readonly', false);
+        $('#pointEmai2').val('');
+        $('#pointEmai3').prop('readonly', false);
+        $('#pointEmai3').val('');
+        $('#SubjectId').prop('readonly', false);
+        $('#SubjectId').val('');
+        $('#TextId').prop('readonly', false);
+        $('#TextId').val('');
+
         var selectedpointCat = $("#pointCatList").val();
+        var v = "<option value=>--Select Point--</option>";
+        $("#savePointsList").html(v);
+        if (selectedpointCat != "") {
+            $.ajax({
+                url: "@Url.Action("ListOfSavePoints", "URL")",
+                type: 'GET',
+                contentType: 'application/json',
+                data: { 'pointCategory': selectedpointCat },
+                beforeSend: function () {
+                    $("#logoLoader").fadeIn();
+                },
+                success: function (savePoints) {
+                    if (savePoints != "error") {
+                        $.each(savePoints, function (i, Points) {
+                            v += '<option value="' + Points.value + '">' + Points.text + '</option>';
+                        });
+                        $("#savePointsList").html(v);
+                    }
+                },
+                complete: function () {
+                    $("#logoLoader").fadeOut();
+                },
+                error: function (errorMsg) {
+                    console.log(errorMsg);
+                    $("#logoLoader").fadeOut();
+                }
+            });
+        }
+        $('#savePointsDiv').show();
         if (selectedpointCat == 1) {
             $("#stdPointProp").show();
             $("#emailPointProp").hide();
@@ -100,17 +161,71 @@
             $("#emailPointProp").hide();
         }
     };
-    $("#saveUrlBtn").click(function() {
+    function ChangeLibPoint(obj) {
+        var selectedSavePoint = $("#savePointsList").val();
+        if (selectedSavePoint != "") {
+            $.ajax({
+                url: "@Url.Action("InfoOfSavePoints", "URL")",
+                type: 'GET',
+                contentType: 'application/json',
+                data: { 'savePointId': selectedSavePoint },
+                beforeSend: function () {
+                    $("#logoLoader").fadeIn();
+                },
+                success: function (data) {
+                    $("#logoLoader").fadeOut();
+                    console.table(data);
+                    if (data.pointCategoryId == 1) {
+                        $('#pointDomin').prop('readonly', true);
+                        $('#pointDomin').val(data.domainLink);
+                    }
+                    else if (data.pointCategoryId == 2) {
+                        $('#pointEmai1').prop('readonly', true);
+                        $('#pointEmai1').val(data.email1);
+                        $('#pointEmai2').prop('readonly', true);
+                        $('#pointEmai2').val(data.email2);
+                        $('#pointEmai3').prop('readonly', true);
+                        $('#pointEmai3').val(data.email3);
+
+                        $('#SubjectId').prop('readonly', true);
+                        $('#SubjectId').val(data.subject);
+
+                        $('#TextId').prop('readonly', true);
+                        $('#TextId').val(data.text);
+                    }
+                }
+            });
+        }
+        else {
+            $('#pointDomin').prop('readonly', false);
+            $('#pointDomin').val('');
+
+            $('#pointEmai1').prop('readonly', false);
+            $('#pointEmai1').val('');
+            $('#pointEmai2').prop('readonly', false);
+            $('#pointEmai2').val('');
+            $('#pointEmai3').prop('readonly', false);
+            $('#pointEmai3').val('');
+
+            $('#SubjectId').prop('readonly', false);
+            $('#SubjectId').val('');
+
+            $('#TextId').prop('readonly', false);
+            $('#TextId').val('');
+        }
+    }
+
+    $("#saveUrlBtn").click(function () {
         if ($("#addUrlForm").valid()) {
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("SaveLink", "URL")',
                 dataType: 'json',
                 data: $("#addUrlForm").serializeArray(),
-                beforeSend: function() {
+                beforeSend: function () {
                     $("#logoLoader").fadeIn();
                 },
-                success: function(data) {
+                success: function (data) {
                     $("#logoLoader").fadeOut();
                     if (data == 0) {
                         $('#urlError').text('URL already exist');

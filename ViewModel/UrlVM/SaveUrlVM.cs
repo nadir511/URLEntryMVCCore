@@ -33,12 +33,19 @@ namespace URLEntryMVC.ViewModel.UrlVM
         [EmailAddress]
         public string? Email3 { get; set; }
         public string? allEmailsStr { get; set; }
+        public bool SaveInLibrary { get; set; }
         public List<CustomerInfo>? CustomerList { get; set; }
         public List<PointCategoryInfo>? PointCategoryList {get;set;}
+        public List<LibraryListPoints>? libraryListPoints { get; set; }
     }
     public class CustomerInfo
     {
         public int CustomerId { get; set; }
         public string? CustomerName { get; set; }
+    }
+    public class LibraryListPoints
+    {
+        public int PointId { get; set; }
+        public string? PointName { get; set; }
     }
 }

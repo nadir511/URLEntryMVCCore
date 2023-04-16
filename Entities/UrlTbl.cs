@@ -24,6 +24,7 @@ public partial class UrlTbl
     public string? Subject { get; set; }
 
     public string? Body { get; set; }
+    public bool ? SaveInLibrary { get; set; }
 
     public virtual CustomerTbl? CustomerIdFkNavigation { get; set; }
 

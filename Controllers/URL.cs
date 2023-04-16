@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using System.Net;
 using System.Net.Mime;
 using System.Web;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace URLEntryMVC.Controllers
 {
@@ -44,7 +45,7 @@ namespace URLEntryMVC.Controllers
         public async Task<ActionResult<List<UrlVM>>> ListOfLinks(string pointCategory)
         {
             var Links = await urlRepositoryObj.ListOfLinks();
-            ViewBag.TotalPoints = _db.UrlTbls.ToList().Count();
+            ViewBag.TotalPoints = Links.Count();
             ViewBag.TotalCustomers = _db.CustomerTbls.ToList().Count();
             ViewBag.pointCategory = pointCategory;
 
@@ -62,7 +63,7 @@ namespace URLEntryMVC.Controllers
                 TotalClicks = x.TotalClicks,
                 Subject = x.Subject,
                 Body = x.Body,
-                PointEmails = _db.PointEmails.Where(y => y.PointIdFk == x.Id).Select(x => x.Email).FirstOrDefault()
+                //PointEmails = _db.PointEmails.Where(y => y.PointIdFk == x.Id).Select(x => x.Email).FirstOrDefault()
             }).ToList();
             if (pointCategory==AppConstant.StdContractPoint)
             {
@@ -117,7 +118,8 @@ namespace URLEntryMVC.Controllers
                     CustomerPointName = urlVM.CustomerPointName,
                     PointCategoryId = urlVM.PointCategoryId,
                     Subject = urlVM.Subject,
-                    Text = urlVM.Text
+                    Text = urlVM.Text,
+                    SaveInLibrary= urlVM.SaveInLibrary
                 };
                 StringBuilder? emails = new StringBuilder();
                 if (!string.IsNullOrWhiteSpace(urlVM.Email1))
@@ -156,6 +158,7 @@ namespace URLEntryMVC.Controllers
                 CategoryName = x.CategoryName
             }).ToList();
             editUrlVM.Id = obj.Id;
+            editUrlVM.SaveInLibrary = obj.SaveInLibrary??false;
             editUrlVM.UrlLink = obj.UrlLink;
             editUrlVM.DomainLink = obj.DomainLink;
             editUrlVM.CustomerPointName = obj.CustomerPointName;
@@ -190,6 +193,7 @@ namespace URLEntryMVC.Controllers
                 SaveUrlVM urlTbl = new SaveUrlVM()
                 {
                     Id = urlVM.Id,
+                    SaveInLibrary= urlVM.SaveInLibrary,
                     UrlLink = domainLink + '_' + customerInfo.CustomerName + '/' + urlVM.CustomerPointName,
                     DomainLink = urlVM.DomainLink,
                     CustomerId = urlVM.CustomerId,
@@ -295,6 +299,40 @@ namespace URLEntryMVC.Controllers
         {
             urlRepositoryObj.DeleteUrl(Id);
             return Json(1);
+        }
+        public async Task<ActionResult> ListOfSavePoints(int pointCategory)
+        {
+            var Links = await urlRepositoryObj.ListOfLinks();
+            var savePoints = Links.Where(x => x.SaveInLibrary == true && x.PointCategoryIdFk == pointCategory).Select(x => new
+            {
+                pointId = x.Id,
+                pointName = x.CustomerPointName
+            }).ToList();
+            return Json(new SelectList(savePoints, "pointId", "pointName"));
+        }
+        public async Task<ActionResult> InfoOfSavePoints(int savePointId)
+        {
+            var obj = await urlRepositoryObj.GetUrlById(savePointId);
+            SaveUrlVM editUrlVM = new SaveUrlVM();
+            editUrlVM.Id = obj.Id;
+            editUrlVM.DomainLink = obj.DomainLink;
+            editUrlVM.CustomerNotes = obj.CustomerNotes;
+            editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
+            editUrlVM.Subject = obj.Subject;
+            editUrlVM.Text = obj.Body;
+            editUrlVM.PointCategoryId=obj.PointCategoryIdFk;
+
+            string[] emails = new string[3];
+            if (obj.PointCategoryIdFk == 2)
+            {
+                var emailsStr = await urlRepositoryObj.GetEmailsByPointId(savePointId);
+                if (emailsStr != null)
+                    emails = emailsStr.Split(',');
+                editUrlVM.Email1 = emails[0];
+                editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
+                editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
+            }
+            return Json(editUrlVM);
         }
         [AllowAnonymous]
         public async Task<IActionResult> checkRawUrl()
