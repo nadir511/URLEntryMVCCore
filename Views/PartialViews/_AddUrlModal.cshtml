@@ -1,4 +1,5 @@
-﻿@model URLEntryMVC.ViewModel.UrlVM.SaveUrlVM
+﻿@using URLEntryMVC.ApplicationConstants;
+@model URLEntryMVC.ViewModel.UrlVM.SaveUrlVM
 <form id="addUrlForm">
     <div class="row">
         <div class="col-sm-12">
@@ -17,7 +18,7 @@
             @Html.EditorFor(m => m.CustomerPointName, new { htmlAttributes = new { @class = "form-control",@required="required"} })
             @Html.ValidationMessageFor(model => model.CustomerPointName, "", new { @class = "text-danger",id="customerPointError" })
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-2" id="savePointDiv">
             <label class="custom-control-label" for="is_pointSave">Save P.</label>
             <div class="form-check form-switch">
                 @Html.CheckBoxFor(m => m.SaveInLibrary, new { @class = "form-check-input", id = "is_pointSave" })
@@ -102,10 +103,11 @@
         $('#TextId').prop('readonly', false);
         $('#TextId').val('');
 
+        $('#savePointsDiv').hide();
         var selectedpointCat = $("#pointCatList").val();
         var v = "<option value=>--Select Point--</option>";
         $("#savePointsList").html(v);
-        if (selectedpointCat != "") {
+        if (selectedpointCat != "" && selectedpointCat != @AppConstant.TapThatContractPointId) {
             $.ajax({
                 url: "@Url.Action("ListOfSavePoints", "URL")",
                 type: 'GET',
@@ -120,6 +122,7 @@
                             v += '<option value="' + Points.value + '">' + Points.text + '</option>';
                         });
                         $("#savePointsList").html(v);
+                        $('#savePointsDiv').show();
                     }
                 },
                 complete: function () {
@@ -131,12 +134,14 @@
                 }
             });
         }
-        $('#savePointsDiv').show();
-        if (selectedpointCat == 1) {
+        
+        if (selectedpointCat == @AppConstant.StdContractPointId) {
+            //need to enabled
             $("#stdPointProp").show();
             $("#emailPointProp").hide();
             $("#pointDomin").prop('required', true);
 
+            //need to disabled
             $("#SubjectId").val('');
             $("#SubjectId").prop('required', false);
             $("#TextId").val('');
@@ -146,15 +151,25 @@
             $("#pointEmai3").val('');
             $("#pointEmai1").prop('required', false);
         }
-        else if (selectedpointCat == 2) {
+        else if (selectedpointCat == @AppConstant.EmailContractPointId) {
+            //need to enabled
             $("#stdPointProp").hide();
             $("#emailPointProp").show();
             $("#pointDomin").val('');
             $("#pointDomin").prop('required', false);
 
+            //need to disabled
             $("#SubjectId").prop('required', true);
             $("#TextId").prop('required', true);
             $("#pointEmai1").prop('required', true);
+        }
+        else if (selectedpointCat == @AppConstant.TapThatContractPointId) {
+            //need to enabled
+            $('#savePointDiv').hide();
+            $('#is_pointSave').prop('checked', false);
+
+            //need to enabled
+
         }
         else {
             $("#stdPointProp").hide();

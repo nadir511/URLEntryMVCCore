@@ -4,7 +4,7 @@ namespace URLEntryMVC.ViewModel.UrlVM
 {
     public class UrlVM
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         [Required]
         [Display(Name = "Smart Contact Point")]
         public string? UrlLink { get; set; }

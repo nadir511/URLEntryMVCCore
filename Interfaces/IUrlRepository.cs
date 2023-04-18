@@ -11,7 +11,7 @@ namespace URLEntryMVC.Interfaces
         Task<bool> IsLinkExistOnEdit(string url,int Id);
         Task<bool> IsPointExistForCustomerOnEdit(string CustomerPointName, int CustomerId,int PointId);
         void SaveLink(SaveUrlVM UrlInfo);
-        Task<List<UrlTbl>> ListOfLinks();
+        Task<List<getListOfPoints>> ListOfLinks();
         Task<UrlTbl?> GetUrlById(int id);
         Task<string?> GetEmailsByPointId(int PointId);
         void DeleteUrl(int Id);

@@ -22,6 +22,7 @@ public partial class DataContext : IdentityDbContext<ApplicationUserExtension>
     public virtual DbSet<PointEmail> PointEmails { get; set; }
 
     public virtual DbSet<UrlTbl> UrlTbls { get; set; }
+    public virtual DbSet<getListOfPoints> GetListOfPoints { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -67,6 +68,10 @@ public partial class DataContext : IdentityDbContext<ApplicationUserExtension>
             entity.HasOne(d => d.PointCategoryIdFkNavigation).WithMany(p => p.UrlTbls)
                 .HasForeignKey(d => d.PointCategoryIdFk)
                 .HasConstraintName("FK_UrlTbl_PointCategory");
+        });
+        modelBuilder.Entity<getListOfPoints>(entity =>
+        {
+            entity.HasNoKey();
         });
     }
 

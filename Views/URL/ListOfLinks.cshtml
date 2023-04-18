@@ -88,17 +88,16 @@
     <div class="card">
         <h5 class="card-header d-flex justify-content-between align-items-center">
             NFC POINTS
-            <button type="button" class="btn btn-primary mb-2" id="multiEditBtn">
-                <i class="menu-icon tf-icons bx bx-plus-circle"></i>
-                Edit Selected Points
-            </button>
-            @if (User.IsInRole(AppConstant.AdminRole))
-            {
+            <div class="d-flex">
                 <button type="button" class="btn btn-primary mb-2" id="btnAddNewUrl">
                     <i class="menu-icon tf-icons bx bx-plus-circle"></i>
                     Add New Point
                 </button>
-            }
+                <button type="button" class="btn btn-primary mb-2" id="multiEditBtn" style="display:none;margin-left:5px">
+                    <i class="bx bxs-edit"></i>
+                    Multi-Edit
+                </button>
+            </div>
         </h5>
         <div class="table-responsive text-nowrap p-2">
             <table class="table table-striped table-bordered" id="linksTbl">
@@ -276,8 +275,6 @@
 
         //Multiple URL Editing
         var selectedIds = []; // Array to store selected checkbox IDs
-        // Hide edit buttons initially
-        $("#multiEditBtn").hide();
         // Checkboxes click event handler
         $("#linksTbl").on("change", "input[type=checkbox]", function () {
             var checkboxId = $(this).attr("id");
@@ -285,7 +282,6 @@
                 // Checkbox is checked, show edit button and add to selectedIds array
                 $("#multiEditBtn").show();
                 selectedIds.push(checkboxId);
-                console.log(selectedIds);
             }
             else {
                 // Checkbox is unchecked, remove from selectedIds array
@@ -299,34 +295,31 @@
                 }
             }
         })
-    });
-    //Multiple URL Editing
-    //var checkedIds = [];
-    //var checkboxes = document.getElementsByClassName("multiEditCheck");
-    //for (var i = 0; i < checkboxes.length; i++) {
-    //    checkboxes[i].addEventListener("change", function () {
-    //        if (this.checked) {
-    //            debugger;
-    //            var row = checkboxes[i].parentNode.parentNode;
-    //            var id = row.cells[0].innerText;
-    //            checkedIds.push(id);
-    //        }
-    //        else {
-    //            var index = checkedIds.indexOf(this.parentNode.parentNode);
-    //            if (index > -1) {
-    //                checkedIds.splice(index, 1);
-    //            }
-    //        }
 
-    //        // Show/hide edit buttons based on checked rows
-    //        var editButtons = document.getElementsByClassName("edit-buttons")[0];
-    //        if (checkedRows.length > 0) {
-    //            editButtons.style.display = "block";
-    //        } else {
-    //            editButtons.style.display = "none";
-    //        }
-    //    });
-    //}
+        $('#multiEditBtn').click(function () {
+            console.log(selectedIds);
+            var selectedPointCategory = '@ViewBag.pointCategory';
+            $.ajax({
+                url: "@Url.Action("UpdateMultiPointInfo", "URL")",
+                type: 'GET',
+                //contentType: "application/json; charset=utf-8",
+                traditional: true,
+                data: { pointIds: selectedIds, pointCategory: selectedPointCategory },
+                beforeSend: function () {
+                    $("#logoLoader").fadeIn();
+                },
+                success: function (obj) {
+                    $("#logoLoader").fadeOut();
+                    $('#EditModalBody').html(obj);
+                    $('#EditAppModal').modal('show');
+                },
+                error: (error) => {
+                    console.log(JSON.stringify(error));
+                }
+            });
+        });
+    });
+
     $("#btnAddNewUrl").click(function () {
         $.ajax({
             url: "@Url.Action("SaveLink", "URL")",

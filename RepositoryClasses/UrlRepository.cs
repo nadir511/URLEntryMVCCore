@@ -131,11 +131,11 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
-        public async Task<List<UrlTbl>> ListOfLinks()
+        public async Task<List<getListOfPoints>> ListOfLinks()
         {
             try
             {
-                return await _db.UrlTbls.ToListAsync();
+                return await _db.GetListOfPoints.FromSqlRaw("exec getListOfPoints").ToListAsync();
             }
             catch (Exception)
             {

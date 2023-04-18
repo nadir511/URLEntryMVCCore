@@ -14,5 +14,6 @@
 
         public const int StdContractPointId = 1;
         public const int EmailContractPointId = 2;
+        public const int TapThatContractPointId = 3;
     }
 }

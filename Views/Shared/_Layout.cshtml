@@ -163,12 +163,15 @@
                             </li>
                         </ul>
                     </li>
-                    @*<li class="menu-item @Html.IsActive("URL","ListOfLinks")">
-                    <a href="@Url.Action("ListOfLinks","URL")" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                    <div data-i18n="Analytics">Dashboard</div>
-                    </a>
-                    </li>*@
+                    @if (User.IsInRole(AppConstant.CustomerRole))
+                    {
+                        <li class="menu-item" id="custProfileMenu">
+                            <a href="@Url.Action("customerProfile","Customers",new { customerId=0})" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-info-circle"></i>
+                                <div data-i18n="Analytics">Profile</div>
+                            </a>
+                        </li>
+                    }
                     @if (User.IsInRole(AppConstant.AdminRole))
                     {
                         <!-- Customers -->
@@ -340,6 +343,10 @@
                 if (link.href == linkUrl) {
                     item.classList.add('active');
                 }
+                //if (linkUrl.includes('Customers/customerProfile')) {
+                    
+                //    $('#custProfileMenu').classList.add("active");
+                //}
                 if (linkUrl.includes('URL/ListOfLinks')) {
                     //This is just the temperory solution
                     var myLink = document.getElementById("tempIdForSubMenu");

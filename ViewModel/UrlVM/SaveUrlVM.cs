@@ -6,6 +6,7 @@ namespace URLEntryMVC.ViewModel.UrlVM
     public class SaveUrlVM
     {
         public int Id { get; set; }
+        public List<string>? PointIds { get; set; }
         //[Required]
         [Display(Name = "URL Link")]
         public string? UrlLink { get; set; }
@@ -37,6 +38,7 @@ namespace URLEntryMVC.ViewModel.UrlVM
         public List<CustomerInfo>? CustomerList { get; set; }
         public List<PointCategoryInfo>? PointCategoryList {get;set;}
         public List<LibraryListPoints>? libraryListPoints { get; set; }
+        public string? EditType { get; set; }
     }
     public class CustomerInfo
     {

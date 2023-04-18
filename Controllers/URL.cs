@@ -16,6 +16,7 @@ using System.Net;
 using System.Net.Mime;
 using System.Web;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Org.BouncyCastle.Utilities;
 
 namespace URLEntryMVC.Controllers
 {
@@ -51,21 +52,21 @@ namespace URLEntryMVC.Controllers
 
             List<UrlVM> UrlList = Links.Select(x => new UrlVM
             {
-                Id = x.Id,
-                PointCategoryId = x.PointCategoryIdFk,
-                PointCategoryName = x.PointCategoryIdFk == 1 ? AppConstant.StdContractPoint : AppConstant.EmailContractPoint,
-                UrlLink = x.UrlLink ?? string.Empty,
+                Id = x.PointId,
+                PointCategoryId = x.CategoryId,
+                PointCategoryName = x.CategoryName,
+                UrlLink = x.PointLink,
                 DomainLink = x.DomainLink ?? string.Empty,
-                CustomerName = _db.CustomerTbls.Where(y => y.Id == x.CustomerIdFk).Select(x => x.CustomerName).FirstOrDefault(),
-                CustomerId = x.CustomerIdFk,
-                CustomerPointName = x.CustomerPointName,
+                CustomerName = x.CustomerName,
+                CustomerId = x.CustomerId,
+                CustomerPointName = x.PointName,
                 CustomerNotes = x.CustomerNotes,
-                TotalClicks = x.TotalClicks,
-                Subject = x.Subject,
+                TotalClicks = x.TotalCliks,
+                Subject = x.Esubject,
                 Body = x.Body,
-                //PointEmails = _db.PointEmails.Where(y => y.PointIdFk == x.Id).Select(x => x.Email).FirstOrDefault()
+                PointEmails = x.Emails
             }).ToList();
-            if (pointCategory==AppConstant.StdContractPoint)
+            if (pointCategory == AppConstant.StdContractPoint)
             {
                 UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.StdContractPointId).ToList();
             }
@@ -119,7 +120,7 @@ namespace URLEntryMVC.Controllers
                     PointCategoryId = urlVM.PointCategoryId,
                     Subject = urlVM.Subject,
                     Text = urlVM.Text,
-                    SaveInLibrary= urlVM.SaveInLibrary
+                    SaveInLibrary = urlVM.SaveInLibrary
                 };
                 StringBuilder? emails = new StringBuilder();
                 if (!string.IsNullOrWhiteSpace(urlVM.Email1))
@@ -158,7 +159,7 @@ namespace URLEntryMVC.Controllers
                 CategoryName = x.CategoryName
             }).ToList();
             editUrlVM.Id = obj.Id;
-            editUrlVM.SaveInLibrary = obj.SaveInLibrary??false;
+            editUrlVM.SaveInLibrary = obj.SaveInLibrary ?? false;
             editUrlVM.UrlLink = obj.UrlLink;
             editUrlVM.DomainLink = obj.DomainLink;
             editUrlVM.CustomerPointName = obj.CustomerPointName;
@@ -193,7 +194,7 @@ namespace URLEntryMVC.Controllers
                 SaveUrlVM urlTbl = new SaveUrlVM()
                 {
                     Id = urlVM.Id,
-                    SaveInLibrary= urlVM.SaveInLibrary,
+                    SaveInLibrary = urlVM.SaveInLibrary,
                     UrlLink = domainLink + '_' + customerInfo.CustomerName + '/' + urlVM.CustomerPointName,
                     DomainLink = urlVM.DomainLink,
                     CustomerId = urlVM.CustomerId,
@@ -221,6 +222,74 @@ namespace URLEntryMVC.Controllers
                 }
                 urlRepositoryObj.UpdateLink(urlTbl);
                 return Json(1);
+            }
+        }
+        [HttpGet]
+        public ActionResult UpdateMultiPointInfo(List<string> pointIds, string pointCategory)
+        {
+            SaveUrlVM multiEditUrlVM = new SaveUrlVM();
+            if (pointCategory == AppConstant.StdContractPoint)
+            {
+                multiEditUrlVM.PointCategoryId = AppConstant.StdContractPointId;
+            }
+            else if (pointCategory == AppConstant.EmailContractPoint)
+            {
+                multiEditUrlVM.PointCategoryId = AppConstant.EmailContractPointId;
+            }
+            multiEditUrlVM.PointIds = pointIds;
+            multiEditUrlVM.EditType = "MultiEdit";
+            return PartialView("~/Views/PartialViews/_EditDomain.cshtml", multiEditUrlVM);
+        }
+        [HttpPost]
+        public async Task<ActionResult> UpdateMultiPointInfo(SaveUrlVM urlVM)
+        {
+            try
+            {
+                if (urlVM.PointIds!=null)
+                {
+                    foreach (var item in urlVM.PointIds)
+                    {
+                        int pointId =Convert.ToInt32(item);
+                        SaveUrlVM? domainLinkObj = await _db.UrlTbls.Where(x => x.Id == pointId).Select(x => new SaveUrlVM
+                        {
+                            Id = x.Id,
+                            DomainLink = urlVM.DomainLink ?? x.DomainLink,
+                            UrlLink = x.UrlLink,
+                            CustomerId = x.CustomerIdFk ?? 0,
+                            CustomerPointName = x.CustomerPointName,
+                            PointCategoryId = x.PointCategoryIdFk,
+                            CustomerNotes = urlVM.CustomerNotes,
+                            Subject = urlVM.Subject ?? x.Subject,
+                            Text = urlVM.Text ?? x.Body,
+                        }).FirstOrDefaultAsync();
+                        if (domainLinkObj != null)
+                        {
+                            if (domainLinkObj.PointCategoryId == AppConstant.EmailContractPointId)
+                            {
+                                StringBuilder? emails = new StringBuilder();
+                                if (!string.IsNullOrWhiteSpace(urlVM.Email1))
+                                {
+                                    emails.Append(urlVM.Email1);
+                                }
+                                if (!string.IsNullOrWhiteSpace(urlVM.Email2))
+                                {
+                                    emails.Append("," + urlVM.Email2);
+                                }
+                                if (!string.IsNullOrWhiteSpace(urlVM.Email3))
+                                {
+                                    emails.Append("," + urlVM.Email3);
+                                }
+                                domainLinkObj.allEmailsStr = emails.ToString();
+                            }
+                            urlRepositoryObj.UpdateLink(domainLinkObj);
+                        }
+                    }
+                }
+                return Json(1);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
         [Authorize]
@@ -257,14 +326,14 @@ namespace URLEntryMVC.Controllers
                 SaveUrlVM? domainLinkObj = await _db.UrlTbls.Where(x => x.Id == urlVM.Id).Select(x => new SaveUrlVM
                 {
                     Id = x.Id,
-                    DomainLink = urlVM.DomainLink??x.DomainLink,
-                    UrlLink=x.UrlLink,
-                    CustomerId=x.CustomerIdFk??0,
-                    CustomerPointName=x.CustomerPointName,
-                    PointCategoryId=x.PointCategoryIdFk,
+                    DomainLink = urlVM.DomainLink ?? x.DomainLink,
+                    UrlLink = x.UrlLink,
+                    CustomerId = x.CustomerIdFk ?? 0,
+                    CustomerPointName = x.CustomerPointName,
+                    PointCategoryId = x.PointCategoryIdFk,
                     CustomerNotes = urlVM.CustomerNotes,
-                    Subject = urlVM.Subject??x.Subject,
-                    Text = urlVM.Text??x.Body,
+                    Subject = urlVM.Subject ?? x.Subject,
+                    Text = urlVM.Text ?? x.Body,
                 }).FirstOrDefaultAsync();
                 if (domainLinkObj != null)
                 {
@@ -303,10 +372,10 @@ namespace URLEntryMVC.Controllers
         public async Task<ActionResult> ListOfSavePoints(int pointCategory)
         {
             var Links = await urlRepositoryObj.ListOfLinks();
-            var savePoints = Links.Where(x => x.SaveInLibrary == true && x.PointCategoryIdFk == pointCategory).Select(x => new
+            var savePoints = Links.Where(x => x.SaveInLibrary == true && x.CategoryId == pointCategory).Select(x => new
             {
-                pointId = x.Id,
-                pointName = x.CustomerPointName
+                pointId = x.PointId,
+                pointName = x.PointName
             }).ToList();
             return Json(new SelectList(savePoints, "pointId", "pointName"));
         }
@@ -320,7 +389,7 @@ namespace URLEntryMVC.Controllers
             editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
             editUrlVM.Subject = obj.Subject;
             editUrlVM.Text = obj.Body;
-            editUrlVM.PointCategoryId=obj.PointCategoryIdFk;
+            editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
 
             string[] emails = new string[3];
             if (obj.PointCategoryIdFk == 2)
@@ -347,15 +416,15 @@ namespace URLEntryMVC.Controllers
             {
                 domainLinkObj.TotalClicks = domainLinkObj.TotalClicks == null ? 1 : domainLinkObj.TotalClicks + 1;
                 await _db.SaveChangesAsync();
-                if (domainLinkObj.PointCategoryIdFk==AppConstant.StdContractPointId)
+                if (domainLinkObj.PointCategoryIdFk == AppConstant.StdContractPointId)
                 {
                     return Redirect(domainLinkObj.DomainLink ?? "");
                 }
                 else if (domainLinkObj.PointCategoryIdFk == AppConstant.EmailContractPointId)
                 {
                     var emails = _db.PointEmails.Where(x => x.PointIdFk == domainLinkObj.Id).Select(x => x.Email).FirstOrDefault();
-                    var encodedSubject = Uri.EscapeDataString(domainLinkObj.Subject??"");
-                    var encodedBody = Uri.EscapeDataString(domainLinkObj.Body??"");
+                    var encodedSubject = Uri.EscapeDataString(domainLinkObj.Subject ?? "");
+                    var encodedBody = Uri.EscapeDataString(domainLinkObj.Body ?? "");
 
                     //string encodedSubjectText = "=?utf-8?B?" + Convert.ToBase64String(Encoding.UTF8.GetBytes(domainLinkObj.Subject ?? "")) + "?=";
                     //string encodedBodyText = "=?utf-8?B?" + Convert.ToBase64String(Encoding.UTF8.GetBytes(domainLinkObj.Body ?? "")) + "?=";
