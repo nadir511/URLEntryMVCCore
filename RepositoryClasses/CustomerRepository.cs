@@ -5,6 +5,7 @@ using URLEntryMVC.Entities;
 using URLEntryMVC.Extensions;
 using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModel.AccountVM;
+using URLEntryMVC.ViewModel.CustomerVM;
 using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.RepositoryClasses
@@ -23,7 +24,7 @@ namespace URLEntryMVC.RepositoryClasses
         {
             try
             {
-                List<UrlVM> listOfPointsAgainstCustomer =await _db.UrlTbls.Where(x => x.CustomerIdFk == customerId).Select(x => new UrlVM
+                List<UrlVM> listOfPointsAgainstCustomer = await _db.UrlTbls.Where(x => x.CustomerIdFk == customerId).Select(x => new UrlVM
                 {
                     UrlLink = x.UrlLink,
                     CustomerPointName = x.CustomerPointName
@@ -42,8 +43,8 @@ namespace URLEntryMVC.RepositoryClasses
             {
                 List<UsersVM> listOfUsersAgainstCustomer = await _userManager.Users.Where(x => x.CustomerIdFk == customerId).Select(x => new UsersVM
                 {
-                    UserName=x.UserName,
-                    Email=x.Email
+                    UserName = x.UserName,
+                    Email = x.Email
                 }).ToListAsync();
                 return listOfUsersAgainstCustomer;
             }
@@ -57,7 +58,7 @@ namespace URLEntryMVC.RepositoryClasses
         {
             try
             {
-                var custObj=await _db.CustomerTbls.Where(x => x.Id == Id).FirstOrDefaultAsync();
+                var custObj = await _db.CustomerTbls.Where(x => x.Id == Id).FirstOrDefaultAsync();
                 if (custObj != null)
                     _db.CustomerTbls.Remove(custObj);
                 _db.SaveChanges();
@@ -68,14 +69,14 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
-        
+
 
         public async Task<CustomerTbl> GetCustomerById(int Id)
         {
             try
             {
                 CustomerTbl customerTbl = new CustomerTbl();
-                return await _db.CustomerTbls.Where(x => x.Id == Id).FirstOrDefaultAsync()?? customerTbl;
+                return await _db.CustomerTbls.Where(x => x.Id == Id).FirstOrDefaultAsync() ?? customerTbl;
             }
             catch (Exception)
             {
@@ -102,7 +103,7 @@ namespace URLEntryMVC.RepositoryClasses
         {
             try
             {
-                var result = await _db.CustomerTbls.Where(x => x.CustomerName == CustomerName.Trim() && x.Id!= CustomerId).FirstOrDefaultAsync();
+                var result = await _db.CustomerTbls.Where(x => x.CustomerName == CustomerName.Trim() && x.Id != CustomerId).FirstOrDefaultAsync();
                 return result == null ? false : true;
             }
             catch (Exception)
@@ -175,6 +176,39 @@ namespace URLEntryMVC.RepositoryClasses
             }
             catch (Exception)
             {
+                throw;
+            }
+        }
+        public async Task<List<(string value, string text)>> ListOfSocialProfByCustomer(int customerId)
+        {
+            try
+            {
+                var customerProfiles = await _db.CustomerTbls.Where(x => x.Id == customerId).Select(x => new CustomerSocialProfileVM
+                {
+                    Facebook = x.Facebook,
+                    Instagram = x.Instagram,
+                    Twitter = x.Twitter,
+                    LinkedIn = x.LinkedIn,
+                    TikTok = x.TikTok,
+                    Youtube = x.Youtube,
+                    Snapchat = x.Snapchat
+                }).FirstOrDefaultAsync();
+                List<(string? text,string? value)> profilesList = new List<(string? text, string? value)>
+                    {
+                        ("Facebook",customerProfiles.Facebook),
+                        ("Instagram",customerProfiles.Instagram),
+                        ("Twitter" , customerProfiles.Twitter ),
+                        ("LinkedIn" , customerProfiles.LinkedIn ),
+                        ("TikTok" , customerProfiles.TikTok ),
+                        ("Youtube" , customerProfiles.Youtube ),
+                        ("Snapchat" , customerProfiles.Snapchat )
+                    };
+                profilesList = profilesList.Where(x => x.value != null).ToList();
+                return profilesList;
+            }
+            catch (Exception)
+            {
+
                 throw;
             }
         }

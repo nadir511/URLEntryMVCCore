@@ -379,6 +379,12 @@ namespace URLEntryMVC.Controllers
             }).ToList();
             return Json(new SelectList(savePoints, "pointId", "pointName"));
         }
+        public async Task<ActionResult> ListOfSLinksByCustomer(int customerId)
+        {
+            var profiles =await _customerRepository.ListOfSocialProfByCustomer(customerId);
+            var profilesObj = profiles.Select(x => new {x.text,x.value }).ToList();
+            return Json(new SelectList(profilesObj, "value", "text"));
+        }
         public async Task<ActionResult> InfoOfSavePoints(int savePointId)
         {
             var obj = await urlRepositoryObj.GetUrlById(savePointId);

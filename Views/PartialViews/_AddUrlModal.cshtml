@@ -44,6 +44,14 @@
             </select>
         </div>
     </div>
+    <div class="row" style="display:none" id="socialMediaDiv">
+        <div class="col-sm-12">
+            <label style="display:block">Select From Social Media Profiles</label>
+            <select id="socialPointsList" class="form-control" onchange="ChangeSocialMediaPoint(this)">
+                <option value="">--Select Profile--</option>
+            </select>
+        </div>
+    </div>
     <div class="row" style="display:none" id="stdPointProp">
         <div class="col-sm-12">
             <label>Domain Link</label><span style="color:red"> *</span>
@@ -89,6 +97,12 @@
             dropdownParent: $('#AppModal .modal-content')
         });
     });
+    $('#customersList').change(function () {
+        $('#selectCustomerError').text('');
+        $('#socialPointsList').empty();
+        var v = "<option value=>--Select Profile--</option>";
+        $("#socialPointsList").html(v);
+    });
     function ChangePointCat(obj) {
         $('#pointDomin').prop('readonly', false);
         $('#pointDomin').val('');
@@ -105,9 +119,11 @@
 
         $('#savePointsDiv').hide();
         var selectedpointCat = $("#pointCatList").val();
-        var v = "<option value=>--Select Point--</option>";
-        $("#savePointsList").html(v);
+        var customerId = $("#customersList").val();
+
         if (selectedpointCat != "" && selectedpointCat != @AppConstant.TapThatContractPointId) {
+            var v = "<option value=>--Select Point--</option>";
+            $("#savePointsList").html(v);
             $.ajax({
                 url: "@Url.Action("ListOfSavePoints", "URL")",
                 type: 'GET',
@@ -134,12 +150,13 @@
                 }
             });
         }
-        
+
         if (selectedpointCat == @AppConstant.StdContractPointId) {
             //need to enabled
             $("#stdPointProp").show();
             $("#emailPointProp").hide();
             $("#pointDomin").prop('required', true);
+            $('#socialMediaDiv').hide();
 
             //need to disabled
             $("#SubjectId").val('');
@@ -157,19 +174,65 @@
             $("#emailPointProp").show();
             $("#pointDomin").val('');
             $("#pointDomin").prop('required', false);
+            $('#socialMediaDiv').hide();
 
             //need to disabled
             $("#SubjectId").prop('required', true);
             $("#TextId").prop('required', true);
             $("#pointEmai1").prop('required', true);
         }
-        else if (selectedpointCat == @AppConstant.TapThatContractPointId) {
+        else if (selectedpointCat != "" && selectedpointCat == @AppConstant.TapThatContractPointId) {
+            if (customerId == "" || customerId == null) {
+                $('#selectCustomerError').text('Select Customer');
+            }
+            else {
+                $('#selectCustomerError').text('');
+                var v = "<option value=>--Select Profile--</option>";
+                $("#socialPointsList").html(v);
+                $.ajax({
+                    url: "@Url.Action("ListOfSLinksByCustomer", "URL")",
+                    type: 'GET',
+                    contentType: 'application/json',
+                    data: { 'customerId': customerId },
+                    beforeSend: function () {
+                        $("#logoLoader").fadeIn();
+                    },
+                    success: function (profiles) {
+                        debugger;
+                        if (profiles != "error") {
+                            $.each(profiles, function (i, profile) {
+                                v += '<option value="' + profile.value + '">' + profile.text + '</option>';
+                            });
+                            $("#socialPointsList").html(v);
+                            $('#socialMediaDiv').show();
+                        }
+                    },
+                    complete: function () {
+                        $("#logoLoader").fadeOut();
+                    },
+                    error: function (errorMsg) {
+                        console.log(errorMsg);
+                        $("#logoLoader").fadeOut();
+                    }
+                });
+            }
             //need to enabled
             $('#savePointDiv').hide();
             $('#is_pointSave').prop('checked', false);
+            $("#stdPointProp").show();
+            $("#pointDomin").prop('required', true);
+            $('#socialMediaDiv').show();
 
-            //need to enabled
-
+            //need to disabled
+            $("#emailPointProp").hide();
+            $("#SubjectId").val('');
+            $("#SubjectId").prop('required', false);
+            $("#TextId").val('');
+            $("#TextId").prop('required', false);
+            $("#pointEmai1").val('');
+            $("#pointEmai2").val('');
+            $("#pointEmai3").val('');
+            $("#pointEmai1").prop('required', false);
         }
         else {
             $("#stdPointProp").hide();
@@ -191,21 +254,15 @@
                     $("#logoLoader").fadeOut();
                     console.table(data);
                     if (data.pointCategoryId == 1) {
-                        $('#pointDomin').prop('readonly', true);
                         $('#pointDomin').val(data.domainLink);
                     }
                     else if (data.pointCategoryId == 2) {
-                        $('#pointEmai1').prop('readonly', true);
                         $('#pointEmai1').val(data.email1);
-                        $('#pointEmai2').prop('readonly', true);
                         $('#pointEmai2').val(data.email2);
-                        $('#pointEmai3').prop('readonly', true);
                         $('#pointEmai3').val(data.email3);
 
-                        $('#SubjectId').prop('readonly', true);
                         $('#SubjectId').val(data.subject);
 
-                        $('#TextId').prop('readonly', true);
                         $('#TextId').val(data.text);
                     }
                 }

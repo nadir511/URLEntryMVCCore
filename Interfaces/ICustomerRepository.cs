@@ -1,5 +1,6 @@
 ﻿using URLEntryMVC.Entities;
 using URLEntryMVC.ViewModel.AccountVM;
+using URLEntryMVC.ViewModel.CustomerVM;
 using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.Interfaces
@@ -17,5 +18,6 @@ namespace URLEntryMVC.Interfaces
         Task<List<UsersVM>> GetUsersByCustomerId(int CustomerId);
         Task<List<UrlVM>> ListOfPointsAgainstCustomer(int customerId);
         Task<List<UsersVM>> ListOfUsersAgainstCustomer(int customerId);
+        Task<List<(string value, string text)>> ListOfSocialProfByCustomer(int customerId);
     }
 }
