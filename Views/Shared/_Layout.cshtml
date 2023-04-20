@@ -161,6 +161,11 @@
                                     <div data-i18n="Text Divider">Email Points</div>
                                 </a>
                             </li>
+                            <li class="menu-item">
+                                <a href="@Url.Action("ListOfLinks","URL",new { pointCategory=AppConstant.TapContractPoint})" class="menu-link">
+                                    <div data-i18n="Text Divider">Tap-That Points</div>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     @if (User.IsInRole(AppConstant.CustomerRole))

@@ -74,6 +74,10 @@ namespace URLEntryMVC.Controllers
             {
                 UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.EmailContractPointId).ToList();
             }
+            else if (pointCategory == AppConstant.TapContractPoint)
+            {
+                UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.TapThatContractPointId).ToList();
+            }
             if (User.IsInRole(AppConstant.CustomerRole))
             {
                 var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
@@ -422,7 +426,7 @@ namespace URLEntryMVC.Controllers
             {
                 domainLinkObj.TotalClicks = domainLinkObj.TotalClicks == null ? 1 : domainLinkObj.TotalClicks + 1;
                 await _db.SaveChangesAsync();
-                if (domainLinkObj.PointCategoryIdFk == AppConstant.StdContractPointId)
+                if (domainLinkObj.PointCategoryIdFk == AppConstant.StdContractPointId || domainLinkObj.PointCategoryIdFk == AppConstant.TapThatContractPointId)
                 {
                     return Redirect(domainLinkObj.DomainLink ?? "");
                 }

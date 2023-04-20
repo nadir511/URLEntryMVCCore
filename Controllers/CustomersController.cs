@@ -48,7 +48,7 @@ namespace URLEntryMVC.Controllers
             }
         }
         [HttpGet]
-        public async Task<ActionResult> customerProfile(int? customerId)
+        public async Task<ActionResult> customerProfile(int? customerId,bool? disableProfile)
         {
             CustomerVM customerVM = new CustomerVM();
             var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
@@ -69,7 +69,14 @@ namespace URLEntryMVC.Controllers
                 customerVM.Youtube = customerInfo.Youtube;
                 customerVM.Snapchat = customerInfo.Snapchat;
             }
-            return View(customerVM);
+            if (disableProfile==true)
+            {
+                return PartialView("~/Views/Customers/customerProfile.cshtml", customerVM);
+            }
+            else
+            {
+                return View(customerVM);
+            }
         }
         [HttpPost]
         public ActionResult customerProfile(CustomerVM customerVM)

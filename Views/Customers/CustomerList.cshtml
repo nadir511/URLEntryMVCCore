@@ -54,6 +54,9 @@
                                 <button type="button" class="btn btn-primary" id="btnDeleteCustomer" onclick="DeleteCustomer(@item.Id)">
                                     <i class="bx bxs-trash"></i>
                                 </button>
+                                <button type="button" class="btn btn-primary" id="btnDeleteCustomer" onclick="ShowCustomerProfile(@item.Id)">
+                                    <i class="bx bxs-user"></i>
+                                </button>
                             </td>
                         </tr>
                     }
@@ -189,6 +192,26 @@
                 //    showCloseButton: true
                 //});
                 $('#MainModalLabel').html('Customer Users');
+                $('#MainModalBody').html(obj);
+                $('#saveBtn').hide();
+                $('#MainAppModal').modal('show');
+            },
+            error: (error) => {
+                console.log(JSON.stringify(error));
+            }
+        });
+    }
+    function ShowCustomerProfile(Id){
+        $.ajax({
+            type: 'GET',
+            url: "@Url.Action("customerProfile", "Customers")",
+            data: { customerId: Id, disableProfile: true },
+            beforeSend: function () {
+                $("#logoLoader").fadeIn();
+            },
+            success: function (obj) {
+                $("#logoLoader").fadeOut();
+                $('#MainModalLabel').html('Customer Profile');
                 $('#MainModalBody').html(obj);
                 $('#saveBtn').hide();
                 $('#MainAppModal').modal('show');

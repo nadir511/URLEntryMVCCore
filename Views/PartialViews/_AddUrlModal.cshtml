@@ -201,7 +201,7 @@
                         debugger;
                         if (profiles != "error") {
                             $.each(profiles, function (i, profile) {
-                                v += '<option value="' + profile.value + '">' + profile.text + '</option>';
+                                v += '<option value="' + profile.text + '">' + profile.value + '</option>';
                             });
                             $("#socialPointsList").html(v);
                             $('#socialMediaDiv').show();
@@ -239,6 +239,15 @@
             $("#emailPointProp").hide();
         }
     };
+    function ChangeSocialMediaPoint(obj){
+        var selectedSocialPoint = $("#socialPointsList").val();
+        if (selectedSocialPoint != "") {
+             $('#pointDomin').val(selectedSocialPoint);
+        }
+        else{
+            $('#pointDomin').val('');
+        }
+    }
     function ChangeLibPoint(obj) {
         var selectedSavePoint = $("#savePointsList").val();
         if (selectedSavePoint != "") {
