@@ -48,13 +48,13 @@
                                 @Html.DisplayFor(modelItem => item.Address)
                             </td>
                             <td>
-                                <button type="button" class="btn btn-primary" id="btnEditCustomer" onclick="EditCustomer(@item.Id)">
+                                <button type="button" class="btn btn-primary" id="btnEditCustomer" title="Edit Customer" onclick="EditCustomer(@item.Id)">
                                     <i class="bx bxs-edit"></i>
                                 </button>
-                                <button type="button" class="btn btn-primary" id="btnDeleteCustomer" onclick="DeleteCustomer(@item.Id)">
+                                <button type="button" class="btn btn-primary" id="btnDeleteCustomer" title="Delete Customer" onclick="DeleteCustomer(@item.Id)">
                                     <i class="bx bxs-trash"></i>
                                 </button>
-                                <button type="button" class="btn btn-primary" id="btnDeleteCustomer" onclick="ShowCustomerProfile(@item.Id)">
+                                <button type="button" class="btn btn-primary" id="btnDeleteCustomer" title="Customer Profile" onclick="ShowCustomerProfile(@item.Id)">
                                     <i class="bx bxs-user"></i>
                                 </button>
                             </td>
@@ -211,6 +211,7 @@
             },
             success: function (obj) {
                 $("#logoLoader").fadeOut();
+                $("#dialogId").addClass("modal-xl");
                 $('#MainModalLabel').html('Customer Profile');
                 $('#MainModalBody').html(obj);
                 $('#saveBtn').hide();

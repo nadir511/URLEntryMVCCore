@@ -52,7 +52,16 @@ namespace URLEntryMVC.Controllers
         {
             CustomerVM customerVM = new CustomerVM();
             var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
-            CustomerTbl customerInfo = await _customerRepository.GetCustomerById((Int32)userInfo.CustomerIdFk);
+            var cstmrId = 0;
+            if (disableProfile==true)
+            {
+                cstmrId = (Int32)customerId;
+            }
+            else
+            {
+                cstmrId = (Int32)userInfo.CustomerIdFk;
+            }
+            CustomerTbl customerInfo = await _customerRepository.GetCustomerById(cstmrId);
             if (customerInfo != null)
             {
                 customerVM.Id = customerInfo.Id;
@@ -68,6 +77,7 @@ namespace URLEntryMVC.Controllers
                 customerVM.TikTok = customerInfo.TikTok;
                 customerVM.Youtube = customerInfo.Youtube;
                 customerVM.Snapchat = customerInfo.Snapchat;
+                customerVM.isProfileDisabled = disableProfile??false;
             }
             if (disableProfile==true)
             {

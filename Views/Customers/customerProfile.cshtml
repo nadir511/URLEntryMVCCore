@@ -97,9 +97,12 @@
                                 <span asp-validation-for="Snapchat" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="mt-2 text-end">
-                            <button type="submit" class="btn btn-primary me-2">Save changes</button>
-                        </div>
+                        if (Model.isProfileDisabled!=true)
+                        {
+                            <div class="mt-2 text-end">
+                                <button type="submit" class="btn btn-primary me-2" id="saveCustomerProflie">Save changes</button>
+                            </div>
+                        }
                     }
                 </div>
                 <!-- /Account -->

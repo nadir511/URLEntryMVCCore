@@ -14,7 +14,7 @@ namespace URLEntryMVC.ViewModel.CustomerVM
 
         public string? ContactNumber { get; set; }
         public string? CustomerEmail { get; set; }
-
+        public bool isProfileDisabled { get; set; }
         public IFormFile? CustomerLogo { get; set; }
         public byte[] CustomerPic { get; set; } = null!;
         public string? Instagram { get; set; }

@@ -1,21 +1,24 @@
-﻿@model URLEntryMVC.ViewModel.UrlVM.SaveUrlVM
+﻿@using URLEntryMVC.ApplicationConstants;
+@model URLEntryMVC.ViewModel.UrlVM.SaveUrlVM
 <form id="updateUrlForm">
     <div class="row">
-        <div class="col-sm-5">
-            @Html.HiddenFor(m=>m.Id)
-            <label>Select Customer</label><span style="color:red"> *</span>
+        <div class="col-sm-12">
+            <label style="display:block">Select Customer<span style="color:red"> *</span></label>
             <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName"))" required>
                 <option value="">--Select Customer--</option>
             </select>
             <input type="hidden" asp-for="CustomerId" />
             @Html.ValidationMessageFor(m => m.CustomerId, "", new { @class = "text-danger", id="selectCustomerError" })
         </div>
-        <div class="col-sm-5">
+
+    </div>
+    <div class="row">
+        <div class="col-sm-10">
             <label>Customer Point</label><span style="color:red"> *</span>
             @Html.EditorFor(m => m.CustomerPointName, new { htmlAttributes = new { @class = "form-control",@required="required"} })
             @Html.ValidationMessageFor(model => model.CustomerPointName, "", new { @class = "text-danger",id="customerPointError" })
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-2" id="savePointDiv">
             <label class="custom-control-label" for="is_pointSave">Save P.</label>
             <div class="form-check form-switch">
                 @Html.CheckBoxFor(m => m.SaveInLibrary, new { @class = "form-check-input", id = "is_pointSave" })
@@ -31,6 +34,22 @@
             </select>
             @*<input type="hidden" asp-for="PointCategoryId" />*@
             @Html.ValidationMessageFor(m => m.PointCategoryId, "", new { @class = "text-danger", id="selectPointCatError" })
+        </div>
+    </div>
+    <div class="row" style="display:none" id="savePointsDiv">
+        <div class="col-sm-12">
+            <label style="display:block">Select From Save Points</label>
+            <select id="savePointsList" class="form-control" onchange="ChangeLibPoint(this)">
+                <option value="">--Select Point--</option>
+            </select>
+        </div>
+    </div>
+    <div class="row" style="display:none" id="socialMediaDiv">
+        <div class="col-sm-12">
+            <label style="display:block">Select From Social Media Profiles</label>
+            <select id="socialPointsList" class="form-control" onchange="ChangeSocialMediaPoint(this)">
+                <option value="">--Select Profile--</option>
+            </select>
         </div>
     </div>
     <div class="row" style="display:none" id="stdPointProp">
@@ -85,14 +104,68 @@
         $('#EditexampleModalLabel').text("Edit " + '@Model.CustomerPointName');
         ChangePointCat();
     });
-    function ChangePointCat() {
+    $('#customersList').change(function () {
+        $('#selectCustomerError').text('');
+        $('#socialPointsList').empty();
+        var v = "<option value=>--Select Profile--</option>";
+        $("#socialPointsList").html(v);
+    });
+    function ChangePointCat(obj) {
+        //$('#pointDomin').prop('readonly', false);
+        //$('#pointDomin').val('');
+        //$('#pointEmai1').prop('readonly', false);
+        //$('#pointEmai1').val('');
+        //$('#pointEmai2').prop('readonly', false);
+        //$('#pointEmai2').val('');
+        //$('#pointEmai3').prop('readonly', false);
+        //$('#pointEmai3').val('');
+        //$('#SubjectId').prop('readonly', false);
+        //$('#SubjectId').val('');
+        //$('#TextId').prop('readonly', false);
+        //$('#TextId').val('');
+
+        //$('#savePointsDiv').hide();
         var selectedpointCat = $("#pointCatList").val();
-        console.log(selectedpointCat);
-        if (selectedpointCat == 1) {
+        var customerId = $("#customersList").val();
+
+        if (selectedpointCat != "" && selectedpointCat != @AppConstant.TapThatContractPointId) {
+            var v = "<option value=>--Select Point--</option>";
+            $("#savePointsList").html(v);
+            $.ajax({
+                url: "@Url.Action("ListOfSavePoints", "URL")",
+                type: 'GET',
+                contentType: 'application/json',
+                data: { 'pointCategory': selectedpointCat },
+                beforeSend: function () {
+                    $("#logoLoader").fadeIn();
+                },
+                success: function (savePoints) {
+                    if (savePoints != "error") {
+                        $.each(savePoints, function (i, Points) {
+                            v += '<option value="' + Points.value + '">' + Points.text + '</option>';
+                        });
+                        $("#savePointsList").html(v);
+                        $('#savePointsDiv').show();
+                    }
+                },
+                complete: function () {
+                    $("#logoLoader").fadeOut();
+                },
+                error: function (errorMsg) {
+                    console.log(errorMsg);
+                    $("#logoLoader").fadeOut();
+                }
+            });
+        }
+
+        if (selectedpointCat == @AppConstant.StdContractPointId) {
+            //need to enabled
             $("#stdPointProp").show();
             $("#emailPointProp").hide();
             $("#pointDomin").prop('required', true);
+            $('#socialMediaDiv').hide();
 
+            //need to disabled
             $("#SubjectId").val('');
             $("#SubjectId").prop('required', false);
             $("#TextId").val('');
@@ -102,21 +175,133 @@
             $("#pointEmai3").val('');
             $("#pointEmai1").prop('required', false);
         }
-        else if (selectedpointCat == 2) {
+        else if (selectedpointCat == @AppConstant.EmailContractPointId) {
+            //need to enabled
             $("#stdPointProp").hide();
             $("#emailPointProp").show();
             $("#pointDomin").val('');
             $("#pointDomin").prop('required', false);
+            $('#socialMediaDiv').hide();
 
+            //need to disabled
             $("#SubjectId").prop('required', true);
             $("#TextId").prop('required', true);
             $("#pointEmai1").prop('required', true);
+        }
+        else if (selectedpointCat != "" && selectedpointCat == @AppConstant.TapThatContractPointId) {
+            if (customerId == "" || customerId == null) {
+                $('#selectCustomerError').text('Select Customer');
+            }
+            else {
+                $('#selectCustomerError').text('');
+                var v = "<option value=>--Select Profile--</option>";
+                $("#socialPointsList").html(v);
+                $.ajax({
+                    url: "@Url.Action("ListOfSLinksByCustomer", "URL")",
+                    type: 'GET',
+                    contentType: 'application/json',
+                    data: { 'customerId': customerId },
+                    beforeSend: function () {
+                        $("#logoLoader").fadeIn();
+                    },
+                    success: function (profiles) {
+                        debugger;
+                        if (profiles != "error") {
+                            $.each(profiles, function (i, profile) {
+                                v += '<option value="' + profile.text + '">' + profile.value + '</option>';
+                            });
+                            $("#socialPointsList").html(v);
+                            $('#socialMediaDiv').show();
+                        }
+                    },
+                    complete: function () {
+                        $("#logoLoader").fadeOut();
+                    },
+                    error: function (errorMsg) {
+                        console.log(errorMsg);
+                        $("#logoLoader").fadeOut();
+                    }
+                });
+            }
+            //need to enabled
+            $('#savePointDiv').hide();
+            $('#is_pointSave').prop('checked', false);
+            $("#stdPointProp").show();
+            $("#pointDomin").prop('required', true);
+            $('#socialMediaDiv').show();
+
+            //need to disabled
+            $("#emailPointProp").hide();
+            $("#SubjectId").val('');
+            $("#SubjectId").prop('required', false);
+            $("#TextId").val('');
+            $("#TextId").prop('required', false);
+            $("#pointEmai1").val('');
+            $("#pointEmai2").val('');
+            $("#pointEmai3").val('');
+            $("#pointEmai1").prop('required', false);
         }
         else {
             $("#stdPointProp").hide();
             $("#emailPointProp").hide();
         }
     };
+    function ChangeSocialMediaPoint(obj) {
+        var selectedSocialPoint = $("#socialPointsList").val();
+        if (selectedSocialPoint != "") {
+            $('#pointDomin').val(selectedSocialPoint);
+        }
+        else {
+            $('#pointDomin').val('');
+        }
+    }
+    function ChangeLibPoint(obj) {
+        var selectedSavePoint = $("#savePointsList").val();
+        if (selectedSavePoint != "") {
+            $.ajax({
+                url: "@Url.Action("InfoOfSavePoints", "URL")",
+                type: 'GET',
+                contentType: 'application/json',
+                data: { 'savePointId': selectedSavePoint },
+                beforeSend: function () {
+                    $("#logoLoader").fadeIn();
+                },
+                success: function (data) {
+                    $("#logoLoader").fadeOut();
+                    console.table(data);
+                    if (data.pointCategoryId == 1) {
+                        $('#pointDomin').val(data.domainLink);
+                    }
+                    else if (data.pointCategoryId == 2) {
+                        $('#pointEmai1').val(data.email1);
+                        $('#pointEmai2').val(data.email2);
+                        $('#pointEmai3').val(data.email3);
+
+                        $('#SubjectId').val(data.subject);
+
+                        $('#TextId').val(data.text);
+                    }
+                }
+            });
+        }
+        else {
+            $('#pointDomin').prop('readonly', false);
+            $('#pointDomin').val('');
+
+            $('#pointEmai1').prop('readonly', false);
+            $('#pointEmai1').val('');
+            $('#pointEmai2').prop('readonly', false);
+            $('#pointEmai2').val('');
+            $('#pointEmai3').prop('readonly', false);
+            $('#pointEmai3').val('');
+
+            $('#SubjectId').prop('readonly', false);
+            $('#SubjectId').val('');
+
+            $('#TextId').prop('readonly', false);
+            $('#TextId').val('');
+        }
+    }
     $("#updateBtn").click(function() {
         if ($("#updateUrlForm").valid()) {
             $('#ConfirmUpdateAppModal').modal({
