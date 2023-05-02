@@ -113,6 +113,9 @@ namespace URLEntryMVC.Controllers
             bool isLinkExistForCustomer = await urlRepositoryObj.IsPointExistForCustomer(urlVM.CustomerPointName ?? String.Empty, urlVM.CustomerId);
             if (isLinkExistForCustomer)
                 return Json(-1);
+            bool isPointMNExistCustomer = await urlRepositoryObj.IsManagementNameExistForCustomer(urlVM.ManagementName ?? String.Empty, urlVM.CustomerId);
+            if (isPointMNExistCustomer)
+                return Json(-2);
             else
             {
                 SaveUrlVM urlTbl = new SaveUrlVM()
@@ -121,6 +124,7 @@ namespace URLEntryMVC.Controllers
                     DomainLink = urlVM.DomainLink,
                     CustomerId = urlVM.CustomerId,
                     CustomerPointName = urlVM.CustomerPointName,
+                    ManagementName= urlVM.ManagementName,
                     PointCategoryId = urlVM.PointCategoryId,
                     Subject = urlVM.Subject,
                     Text = urlVM.Text,
@@ -167,6 +171,7 @@ namespace URLEntryMVC.Controllers
             editUrlVM.UrlLink = obj.UrlLink;
             editUrlVM.DomainLink = obj.DomainLink;
             editUrlVM.CustomerPointName = obj.CustomerPointName;
+            editUrlVM.ManagementName=obj.ManagementName;
             editUrlVM.CustomerId = obj.CustomerIdFk ?? 0;
             editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
             editUrlVM.Subject = obj.Subject;
@@ -193,6 +198,9 @@ namespace URLEntryMVC.Controllers
             bool isLinkExistForCustomerOnEdit = await urlRepositoryObj.IsPointExistForCustomerOnEdit(urlVM.CustomerPointName ?? String.Empty, urlVM.CustomerId, urlVM.Id);
             if (isLinkExistForCustomerOnEdit)
                 return Json(-1);
+            bool isPointMNExistCustomer = await urlRepositoryObj.IsManagementNameExistOnEditForCustomer(urlVM.ManagementName ?? String.Empty, urlVM.CustomerId, urlVM.Id);
+            if (isPointMNExistCustomer)
+                return Json(-2);
             else
             {
                 SaveUrlVM urlTbl = new SaveUrlVM()
@@ -203,6 +211,7 @@ namespace URLEntryMVC.Controllers
                     DomainLink = urlVM.DomainLink,
                     CustomerId = urlVM.CustomerId,
                     CustomerPointName = urlVM.CustomerPointName,
+                    ManagementName= urlVM.ManagementName,
                     PointCategoryId = urlVM.PointCategoryId,
                     Subject = urlVM.Subject,
                     Text = urlVM.Text
@@ -373,13 +382,13 @@ namespace URLEntryMVC.Controllers
             urlRepositoryObj.DeleteUrl(Id);
             return Json(1);
         }
-        public async Task<ActionResult> ListOfSavePoints(int pointCategory)
+        public async Task<ActionResult> ListOfSavePoints(int pointCategory,int customerId)
         {
             var Links = await urlRepositoryObj.ListOfLinks();
-            var savePoints = Links.Where(x => x.SaveInLibrary == true && x.CategoryId == pointCategory).Select(x => new
+            var savePoints = Links.Where(x => x.SaveInLibrary == true && x.CategoryId == pointCategory && x.CustomerId== customerId).Select(x => new
             {
                 pointId = x.PointId,
-                pointName = x.PointName
+                pointName = x.PointManagementName
             }).ToList();
             return Json(new SelectList(savePoints, "pointId", "pointName"));
         }

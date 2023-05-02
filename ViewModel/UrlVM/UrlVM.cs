@@ -14,6 +14,7 @@ namespace URLEntryMVC.ViewModel.UrlVM
         public string? CustomerName { get; set; }
         public int? CustomerId { get; set; }
         public string? CustomerPointName { get; set; }
+        public string? ManagementName { get; set; }
         public string? CustomerNotes { get; set; }
         public int? TotalClicks { get; set; }
         public int? PointCategoryId { get; set; }

@@ -2,6 +2,7 @@
 using URLEntryMVC.Data;
 using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
+using URLEntryMVC.ViewModel.CustomerVM;
 using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.RepositoryClasses
@@ -28,6 +29,7 @@ namespace URLEntryMVC.RepositoryClasses
                     savePointInfo.DomainLink = PointInfo.DomainLink;
                     savePointInfo.CustomerIdFk = PointInfo.CustomerId;
                     savePointInfo.CustomerPointName = PointInfo.CustomerPointName;
+                    savePointInfo.ManagementName= PointInfo.ManagementName;
                     savePointInfo.PointCategoryIdFk = PointInfo.PointCategoryId;
                     savePointInfo.Subject = PointInfo.Subject;
                     savePointInfo.Body = PointInfo.Text;
@@ -96,6 +98,32 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
+        public async Task<bool> IsManagementNameExistForCustomer(string PointManagementName, int CustomerId)
+        {
+            try
+            {
+                var result = await _db.UrlTbls.Where(x => x.ManagementName == PointManagementName.Trim() && x.CustomerIdFk == CustomerId).FirstOrDefaultAsync();
+                return (result == null ? false : true);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public async Task<bool> IsManagementNameExistOnEditForCustomer(string PointManagementName, int CustomerId, int PointId)
+        {
+            try
+            {
+                var result = await _db.UrlTbls.Where(x => x.ManagementName == PointManagementName.Trim() && x.CustomerIdFk == CustomerId && x.Id != PointId).FirstOrDefaultAsync();
+                return (result == null ? false : true);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         public void SaveLink(SaveUrlVM PointInfo)
         {
             try
@@ -107,6 +135,7 @@ namespace URLEntryMVC.RepositoryClasses
                     DomainLink = PointInfo.DomainLink,
                     CustomerIdFk = PointInfo.CustomerId,
                     CustomerPointName = PointInfo.CustomerPointName,
+                    ManagementName= PointInfo.ManagementName,
                     PointCategoryIdFk = PointInfo.PointCategoryId,
                     Subject = PointInfo.Subject,
                     Body = PointInfo.Text

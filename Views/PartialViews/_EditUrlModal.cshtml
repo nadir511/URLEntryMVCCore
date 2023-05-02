@@ -26,6 +26,13 @@
             </div>
         </div>
     </div>
+    <div class="row" id="managmentNameDiv">
+        <div class="col-sm-12">
+            <label>Management Name</label><span style="color:red"> *</span>
+            @Html.EditorFor(m => m.ManagementName, new { htmlAttributes = new { @class = "form-control",@type="text",@id="managmentName" } })
+            @Html.ValidationMessageFor(m => m.ManagementName, "", new { @class = "text-danger", id="managmentNameError" })
+        </div>
+    </div>
     <div class="row">
         <div class="col-sm-12">
             <label>Select Point Category</label><span style="color:red"> *</span>
@@ -36,6 +43,7 @@
             @Html.ValidationMessageFor(m => m.PointCategoryId, "", new { @class = "text-danger", id="selectPointCatError" })
         </div>
     </div>
+    
     <div class="row" style="display:none" id="savePointsDiv">
         <div class="col-sm-12">
             <label style="display:block">Select From Save Points</label>
@@ -127,7 +135,13 @@
         //$('#savePointsDiv').hide();
         var selectedpointCat = $("#pointCatList").val();
         var customerId = $("#customersList").val();
-
+        if (customerId == "" || customerId == null) {
+            $('#selectCustomerError').text('Select Customer');
+            return;
+        }
+        else {
+            $('#selectCustomerError').text('');
+        }
         if (selectedpointCat != "" && selectedpointCat != @AppConstant.TapThatContractPointId) {
             var v = "<option value=>--Select Point--</option>";
             $("#savePointsList").html(v);
@@ -135,7 +149,7 @@
                 url: "@Url.Action("ListOfSavePoints", "URL")",
                 type: 'GET',
                 contentType: 'application/json',
-                data: { 'pointCategory': selectedpointCat },
+                data: { 'pointCategory': selectedpointCat, 'customerId': customerId },
                 beforeSend: function () {
                     $("#logoLoader").fadeIn();
                 },
@@ -329,6 +343,9 @@
                     }
                     else if (data == -1) {
                         $('#customerPointError').text('Customer point already exist');
+                    }
+                    else if (data == -2) {
+                        $('#managmentNameError').text('This Management name already exist for selected customer.');
                     }
                     else if (data == 1) {
                         location.reload(true);

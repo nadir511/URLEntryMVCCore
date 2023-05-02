@@ -11,6 +11,9 @@ namespace URLEntryMVC.ViewModel.UrlVM
         [Display(Name = "URL Link")]
         public string? UrlLink { get; set; }
         public string? CustomerPointName { get; set; }
+        [Required]
+        [Display(Name = "Management Name")]
+        public string? ManagementName { get; set; }
         [Display(Name = "Domain Link")]
         public string? DomainLink { get; set; }
         public int CustomerId { get; set; }

@@ -16,6 +16,7 @@ public partial class UrlTbl
     public int? CustomerIdFk { get; set; }
 
     public string? CustomerPointName { get; set; }
+    public string? ManagementName { get; set; }
 
     public string? CustomerNotes { get; set; }
 

@@ -89,10 +89,13 @@
         <h5 class="card-header d-flex justify-content-between align-items-center">
             NFC POINTS
             <div class="d-flex">
-                <button type="button" class="btn btn-primary mb-2" id="btnAddNewUrl">
-                    <i class="menu-icon tf-icons bx bx-plus-circle"></i>
-                    Add New Point
-                </button>
+                @if (User.IsInRole(AppConstant.AdminRole))
+                {
+                    <button type="button" class="btn btn-primary mb-2" id="btnAddNewUrl">
+                        <i class="menu-icon tf-icons bx bx-plus-circle"></i>
+                        Add New Point
+                    </button>
+                }
                 <button type="button" class="btn btn-primary mb-2" id="multiEditBtn" style="display:none;margin-left:5px">
                     <i class="bx bxs-edit"></i>
                     Multi-Edit

@@ -10,6 +10,7 @@
         public int? CustomerId { get; set; }
         public string? CustomerName { get; set; }
         public string? PointName { get; set; }
+        public string? PointManagementName { get; set; }
         public string? CustomerNotes { get; set; }
         public int? TotalCliks { get; set; }
         public string? Esubject { get; set; }
