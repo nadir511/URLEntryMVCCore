@@ -1,20 +1,33 @@
-﻿@model URLEntryMVC.ViewModel.UrlVM.SaveUrlVM
+﻿@using URLEntryMVC.ApplicationConstants;
+@model URLEntryMVC.ViewModel.UrlVM.SaveUrlVM
 <form id="editDomainForm">
     <div class="row">
         @Html.HiddenFor(m=>m.Id)
         @Html.HiddenFor(m=>m.PointCategoryId)
-        @if (Model.PointIds!=null)
+        @if (Model.PointIds != null)
         {
             for (int i = 0; i < Model.PointIds.Count; i++)
             {
                 @Html.HiddenFor(model => Model.PointIds[i])
             }
         }
-        @*<div class="col-sm-12">
-        <label>Domain Link</label><span style="color:red"> *</span>
-        @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@required="required",@type="url" } })
-        @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
-        </div>*@
+        <div class="row" id="customerDiv">
+            <div class="col-sm-12">
+                <label style="display:block">Select Customer</label>
+                <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName"))">
+                    <option value="">--Select Customer--</option>
+                </select>
+            </div>
+        </div>
+        <div class="row" id="savePointsDiv">
+            <div class="col-sm-12">
+                <label style="display:block">Select From Save Points</label>
+                <select id="savePointsList" class="form-control" onchange="ChangeLibPoint(this)">
+                    <option value="">--Select Point--</option>
+                </select>
+            </div>
+        </div>
+
         <div class="row" style="display:none" id="stdPointProp">
             <div class="col-sm-12">
                 <label>Domain Link</label><span style="color:red"> *</span>
@@ -56,7 +69,18 @@
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <script>
     $(document).ready(function () {
+        $('#customersList').select2({
+            dropdownAutoWidth: true,
+            dropdownParent: $('#EditAppModal .modal-content')
+        });
+        $('#savePointsList').select2({
+            dropdownAutoWidth: true,
+            dropdownParent: $('#EditAppModal .modal-content')
+        });
         ChangePointCat();
+        if ('@User.IsInRole(AppConstant.CustomerRole)'=='True') {
+            $('#customersList').prop("disabled", true);
+        }
     });
     function ChangePointCat() {
         var selectedpointCat = @Model.PointCategoryId;
@@ -90,10 +114,91 @@
             $("#emailPointProp").hide();
         }
     };
-    $("#updateBtn").click(function () {
+    $('#customersList').change(function () {
+        GetSavePoints(@Model.PointCategoryId, $('#customersList').val());
+    });
+    function GetSavePoints(selectedpointCat, customerId) {
         debugger;
+        
+        $.ajax({
+            url: "@Url.Action("ListOfSavePoints", "URL")",
+            type: 'GET',
+            contentType: 'application/json',
+            data: { 'pointCategory': selectedpointCat, 'customerId': customerId },
+            beforeSend: function () {
+                $("#logoLoader").fadeIn();
+            },
+            success: function (savePoints) {
+                if (savePoints != "error") {
+                    $("#savePointsList").empty();
+                    var v = "<option value=>--Select Point--</option>";
+                    $.each(savePoints, function (i, Points) {
+                      v += '<option value="' + Points.value + '">' + Points.text + '</option>';
+                    });
+                    $("#savePointsList").html(v);
+                    $('#savePointsDiv').show();
+                }
+            },
+            complete: function () {
+                $("#logoLoader").fadeOut();
+            },
+            error: function (errorMsg) {
+                console.log(errorMsg);
+                $("#logoLoader").fadeOut();
+            }
+        });
+    }
+    function ChangeLibPoint(obj) {
+        var selectedSavePoint = $("#savePointsList").val();
+        if (selectedSavePoint != "") {
+            $.ajax({
+                url: "@Url.Action("InfoOfSavePoints", "URL")",
+                type: 'GET',
+                contentType: 'application/json',
+                data: { 'savePointId': selectedSavePoint },
+                beforeSend: function () {
+                    $("#logoLoader").fadeIn();
+                },
+                success: function (data) {
+                    $("#logoLoader").fadeOut();
+                    console.table(data);
+                    if (data.pointCategoryId == 1) {
+                        $('#pointDomin').val(data.domainLink);
+                    }
+                    else if (data.pointCategoryId == 2) {
+                        $('#pointEmai1').val(data.email1);
+                        $('#pointEmai2').val(data.email2);
+                        $('#pointEmai3').val(data.email3);
+
+                        $('#SubjectId').val(data.subject);
+
+                        $('#TextId').val(data.text);
+                    }
+                }
+            });
+        }
+        else {
+            $('#pointDomin').prop('readonly', false);
+            $('#pointDomin').val('');
+
+            $('#pointEmai1').prop('readonly', false);
+            $('#pointEmai1').val('');
+            $('#pointEmai2').prop('readonly', false);
+            $('#pointEmai2').val('');
+            $('#pointEmai3').prop('readonly', false);
+            $('#pointEmai3').val('');
+
+            $('#SubjectId').prop('readonly', false);
+            $('#SubjectId').val('');
+
+            $('#TextId').prop('readonly', false);
+            $('#TextId').val('');
+        }
+    }
+    
+    $("#updateBtn").click(function () {
         var actionMethod = '';
-        if ('@Model.EditType' == 'MultiEdit') {
+        if ('@Model.EditType' == '@AppConstant.MultiEdit') {
             actionMethod = 'UpdateMultiPointInfo';
         }
         else {

@@ -17,6 +17,7 @@ using System.Net.Mime;
 using System.Web;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Org.BouncyCastle.Utilities;
+using URLEntryMVC.ViewModel.CustomerVM;
 
 namespace URLEntryMVC.Controllers
 {
@@ -238,9 +239,21 @@ namespace URLEntryMVC.Controllers
             }
         }
         [HttpGet]
-        public ActionResult UpdateMultiPointInfo(List<string> pointIds, string pointCategory)
+        public async Task<ActionResult> UpdateMultiPointInfo(List<string> pointIds, string pointCategory)
         {
             SaveUrlVM multiEditUrlVM = new SaveUrlVM();
+
+            var customer = await _customerRepository.ListOfCustomers();
+            multiEditUrlVM.CustomerList = customer.Select(x => new CustomerInfo
+            {
+                CustomerId = x.Id,
+                CustomerName = x.CustomerName
+            }).ToList();
+            if (User.IsInRole(AppConstant.CustomerRole))
+            {
+                var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
+                multiEditUrlVM.CustomerId = userInfo.CustomerIdFk ?? 0;
+            }
             if (pointCategory == AppConstant.StdContractPoint)
             {
                 multiEditUrlVM.PointCategoryId = AppConstant.StdContractPointId;
@@ -250,7 +263,7 @@ namespace URLEntryMVC.Controllers
                 multiEditUrlVM.PointCategoryId = AppConstant.EmailContractPointId;
             }
             multiEditUrlVM.PointIds = pointIds;
-            multiEditUrlVM.EditType = "MultiEdit";
+            multiEditUrlVM.EditType = AppConstant.MultiEdit;
             return PartialView("~/Views/PartialViews/_EditDomain.cshtml", multiEditUrlVM);
         }
         [HttpPost]
@@ -294,6 +307,7 @@ namespace URLEntryMVC.Controllers
                                 }
                                 domainLinkObj.allEmailsStr = emails.ToString();
                             }
+                            domainLinkObj.EditType = AppConstant.MultiEdit;
                             urlRepositoryObj.UpdateLink(domainLinkObj);
                         }
                     }

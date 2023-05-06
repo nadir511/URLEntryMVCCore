@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using URLEntryMVC.ApplicationConstants;
 using URLEntryMVC.Data;
 using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
@@ -24,7 +25,10 @@ namespace URLEntryMVC.RepositoryClasses
                 if (savePointInfo != null)
                 {
                     savePointInfo.Id = PointInfo.Id;
-                    savePointInfo.SaveInLibrary = PointInfo.SaveInLibrary;
+                    if (PointInfo.EditType!=AppConstant.MultiEdit)
+                    {
+                        savePointInfo.SaveInLibrary = PointInfo.SaveInLibrary;
+                    }
                     savePointInfo.UrlLink = PointInfo.UrlLink;
                     savePointInfo.DomainLink = PointInfo.DomainLink;
                     savePointInfo.CustomerIdFk = PointInfo.CustomerId;
@@ -89,7 +93,7 @@ namespace URLEntryMVC.RepositoryClasses
         {
             try
             {
-                var result = await _db.UrlTbls.Where(x => x.CustomerPointName == customerPoint.Trim() && x.CustomerIdFk == customerId && x.Id != PointId).FirstOrDefaultAsync();
+                var result = await _db.UrlTbls.Where(x => x.CustomerPointName == customerPoint.Trim() && x.CustomerIdFk != customerId && x.Id != PointId).FirstOrDefaultAsync();
                 return (result == null ? false : true);
             }
             catch (Exception)
@@ -115,7 +119,7 @@ namespace URLEntryMVC.RepositoryClasses
         {
             try
             {
-                var result = await _db.UrlTbls.Where(x => x.ManagementName == PointManagementName.Trim() && x.CustomerIdFk == CustomerId && x.Id != PointId).FirstOrDefaultAsync();
+                var result = await _db.UrlTbls.Where(x => x.ManagementName == PointManagementName.Trim() && x.CustomerIdFk != CustomerId && x.Id != PointId).FirstOrDefaultAsync();
                 return (result == null ? false : true);
             }
             catch (Exception)

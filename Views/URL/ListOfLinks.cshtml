@@ -314,6 +314,11 @@
                 success: function (obj) {
                     $("#logoLoader").fadeOut();
                     $('#EditModalBody').html(obj);
+                    $('#EditAppModal').modal({
+                        backdrop: 'static', // Prevent to close on click outside the modal
+                        keyboard: false, // Prevent to close by ESC
+                        show: true
+                    });
                     $('#EditAppModal').modal('show');
                 },
                 error: (error) => {

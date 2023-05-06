@@ -13,6 +13,8 @@
         public const string EmailContractPoint = "Email Contact";
         public const string TapContractPoint = "TapThat Contact";
 
+        public const string MultiEdit = "MultiEdit";
+
         public const int StdContractPointId = 1;
         public const int EmailContractPointId = 2;
         public const int TapThatContractPointId = 3;
