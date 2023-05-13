@@ -27,13 +27,16 @@
             </div>
         </div>
     </div>
-    <div class="row" id="managmentNameDiv">
-        <div class="col-sm-12">
-            <label>Management Name</label><span style="color:red"> *</span>
-            @Html.EditorFor(m => m.ManagementName, new { htmlAttributes = new { @class = "form-control",@type="text",@id="managmentName" } })
-            @Html.ValidationMessageFor(m => m.ManagementName, "", new { @class = "text-danger", id="managmentNameError" })
+    @if (Model.SaveInLibrary == true)
+    {
+        <div class="row" id="managmentNameDiv">
+            <div class="col-sm-12">
+                <label>Save Point Name</label>
+                @Html.EditorFor(m => m.ManagementName, new { htmlAttributes = new { @class = "form-control",@type="text",@id="managmentName" } })
+                @Html.ValidationMessageFor(m => m.ManagementName, "", new { @class = "text-danger", id="managmentNameError" })
+            </div>
         </div>
-    </div>
+    }
     <div class="row">
         <div class="col-sm-12">
             <label>Select Point Category</label><span style="color:red"> *</span>
@@ -44,7 +47,7 @@
             @Html.ValidationMessageFor(m => m.PointCategoryId, "", new { @class = "text-danger", id="selectPointCatError" })
         </div>
     </div>
-    
+
     <div class="row" style="display:none" id="savePointsDiv">
         <div class="col-sm-12">
             <label style="display:block">Select From Save Points</label>
@@ -88,7 +91,7 @@
             @Html.TextAreaFor(m => m.Text, new { @class = "form-control",@placeholder="Enter Text",@id="TextId" })
             @Html.ValidationMessageFor(m => m.Text, "", new { @class = "text-danger", id="textError" })
         </div>
-        
+
     </div>
 
 </form>
@@ -109,9 +112,18 @@
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#EditexampleModalLabel').text("Edit " + '@Model.CustomerPointName');
         ChangePointCat();
+        $('#is_pointSave').change(function () {
+            $('#managmentNameError').text('');
+            if ($(this).is(':checked')) {
+                $('#managmentNameDiv').show();
+            } else {
+                $('#managmentName').val('');
+                $('#managmentNameDiv').hide();
+            }
+        });
     });
     $('#customersList').change(function () {
         $('#selectCustomerError').text('');
@@ -317,7 +329,7 @@
             $('#TextId').val('');
         }
     }
-    $("#updateBtn").click(function() {
+    $("#updateBtn").click(function () {
         if ($("#updateUrlForm").valid()) {
             $('#ConfirmUpdateAppModal').modal({
                 backdrop: 'static', // Prevent to close on click outside the modal
@@ -327,17 +339,23 @@
             $('#ConfirmUpdateAppModal').modal('show');
         }
     });
-    $("#updateConfirmBtn").click(function() {
+    $("#updateConfirmBtn").click(function () {
+        //custom validations
+        $('#managmentNameError').text('');
+        if ($('#is_pointSave').is(':checked') && $('#managmentName').val() == '') {
+            $('#managmentNameError').text('Enter Save Point Name');
+            return;
+        }
         if ($("#updateUrlForm").valid()) {
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("UpdateLink", "URL")',
                 dataType: 'json',
                 data: $("#updateUrlForm").serializeArray(),
-                beforeSend: function() {
+                beforeSend: function () {
                     $("#logoLoader").fadeIn();
                 },
-                success: function(data) {
+                success: function (data) {
                     $("#logoLoader").fadeOut();
                     if (data == 0) {
                         $('#urlError').text('URL already exist');

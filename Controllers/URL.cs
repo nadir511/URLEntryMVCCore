@@ -18,6 +18,7 @@ using System.Web;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Org.BouncyCastle.Utilities;
 using URLEntryMVC.ViewModel.CustomerVM;
+using Microsoft.VisualBasic;
 
 namespace URLEntryMVC.Controllers
 {
@@ -323,8 +324,13 @@ namespace URLEntryMVC.Controllers
         [HttpGet]
         public async Task<ActionResult> UpdatePointInfo(int id)
         {
+            var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
+            var customerInfo =await _customerRepository.GetCustomerById(userInfo.CustomerIdFk ?? 0);
             var obj = await urlRepositoryObj.GetUrlById(id);
             SaveUrlVM editUrlVM = new SaveUrlVM();
+            editUrlVM.CustomerId = userInfo.CustomerIdFk??0;
+            editUrlVM.CustomerList = new List<CustomerInfo>();
+            editUrlVM.CustomerList.Add(new CustomerInfo { CustomerId = customerInfo.Id, CustomerName = customerInfo.CustomerName }); 
             editUrlVM.Id = obj.Id;
             editUrlVM.DomainLink = obj.DomainLink;
             editUrlVM.CustomerNotes = obj.CustomerNotes;

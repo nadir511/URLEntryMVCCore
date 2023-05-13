@@ -77,10 +77,11 @@
             dropdownAutoWidth: true,
             dropdownParent: $('#EditAppModal .modal-content')
         });
-        ChangePointCat();
-        if ('@User.IsInRole(AppConstant.CustomerRole)'=='True') {
+        if ('@User.IsInRole(AppConstant.CustomerRole)' == 'True') {
             $('#customersList').prop("disabled", true);
         }
+        ChangePointCat();
+        GetSavePoints(@Model.PointCategoryId, $('#customersList').val());
     });
     function ChangePointCat() {
         var selectedpointCat = @Model.PointCategoryId;
@@ -118,8 +119,6 @@
         GetSavePoints(@Model.PointCategoryId, $('#customersList').val());
     });
     function GetSavePoints(selectedpointCat, customerId) {
-        debugger;
-        
         $.ajax({
             url: "@Url.Action("ListOfSavePoints", "URL")",
             type: 'GET',

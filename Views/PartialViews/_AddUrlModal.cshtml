@@ -25,9 +25,9 @@
             </div>
         </div>
     </div>
-    <div class="row" id="managmentNameDiv">
+    <div class="row" style="display:none" id="managmentNameDiv">
         <div class="col-sm-12">
-            <label>Management Name</label><span style="color:red"> *</span>
+            <label>Save Point Name</label>
             @Html.EditorFor(m => m.ManagementName, new { htmlAttributes = new { @class = "form-control",@type="text",@id="managmentName" } })
             @Html.ValidationMessageFor(m => m.ManagementName, "", new { @class = "text-danger", id="managmentNameError" })
         </div>
@@ -102,6 +102,16 @@
         $('#savePointsList').select2({
             dropdownAutoWidth: true,
             dropdownParent: $('#AppModal .modal-content')
+        });
+
+        $('#is_pointSave').change(function () {
+            $('#managmentNameError').text('');
+            if ($(this).is(':checked')) {
+                $('#managmentNameDiv').show();
+            } else {
+                $('#managmentName').val('');
+                $('#managmentNameDiv').hide();
+            }
         });
     });
     $('#customersList').change(function () {
@@ -310,6 +320,12 @@
     }
 
     $("#saveUrlBtn").click(function () {
+        //custom validations
+        $('#managmentNameError').text('');
+        if ($('#is_pointSave').is(':checked') && $('#managmentName').val()=='') {
+            $('#managmentNameError').text('Enter Save Point Name');
+            return;
+        }
         if ($("#addUrlForm").valid()) {
             $.ajax({
                 type: "POST",
