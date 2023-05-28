@@ -37,6 +37,16 @@
             </div>
         </div>
     }
+    else
+    {
+        <div class="row" style="display:none" id="managmentNameDiv">
+            <div class="col-sm-12">
+                <label>Save Point Name</label>
+                @Html.EditorFor(m => m.ManagementName, new { htmlAttributes = new { @class = "form-control",@type="text",@id="managmentName" } })
+                @Html.ValidationMessageFor(m => m.ManagementName, "", new { @class = "text-danger", id="managmentNameError" })
+            </div>
+        </div>
+    }
     <div class="row">
         <div class="col-sm-12">
             <label>Select Point Category</label><span style="color:red"> *</span>
@@ -115,15 +125,15 @@
     $(document).ready(function () {
         $('#EditexampleModalLabel').text("Edit " + '@Model.CustomerPointName');
         ChangePointCat();
-        $('#is_pointSave').change(function () {
-            $('#managmentNameError').text('');
-            if ($(this).is(':checked')) {
-                $('#managmentNameDiv').show();
-            } else {
-                $('#managmentName').val('');
-                $('#managmentNameDiv').hide();
-            }
-        });
+    });
+    $('#is_pointSave').change(function () {
+        $('#managmentNameError').text('');
+        if ($(this).is(':checked')) {
+            $('#managmentNameDiv').show();
+        } else {
+            $('#managmentName').val('');
+            $('#managmentNameDiv').hide();
+        }
     });
     $('#customersList').change(function () {
         $('#selectCustomerError').text('');

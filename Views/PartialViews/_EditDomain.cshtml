@@ -11,7 +11,7 @@
                 @Html.HiddenFor(model => Model.PointIds[i])
             }
         }
-        <div class="row" id="customerDiv">
+        <div class="row" style="display:none" id="customerDiv">
             <div class="col-sm-12">
                 <label style="display:block">Select Customer</label>
                 <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName"))">
@@ -69,6 +69,7 @@
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <script>
     $(document).ready(function () {
+        debugger;
         $('#customersList').select2({
             dropdownAutoWidth: true,
             dropdownParent: $('#EditAppModal .modal-content')
