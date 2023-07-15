@@ -93,7 +93,7 @@ namespace URLEntryMVC.RepositoryClasses
         {
             try
             {
-                var result = await _db.UrlTbls.Where(x => x.CustomerPointName == customerPoint.Trim() && x.CustomerIdFk != customerId && x.Id != PointId).FirstOrDefaultAsync();
+                var result = await _db.UrlTbls.Where(x => x.CustomerPointName == customerPoint.Trim() && x.CustomerIdFk == customerId && x.Id != PointId).FirstOrDefaultAsync();
                 return (result == null ? false : true);
             }
             catch (Exception)
