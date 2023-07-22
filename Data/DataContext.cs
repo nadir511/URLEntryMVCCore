@@ -20,7 +20,7 @@ public partial class DataContext : IdentityDbContext<ApplicationUserExtension>
     public virtual DbSet<PointCategory> PointCategories { get; set; }
 
     public virtual DbSet<PointEmail> PointEmails { get; set; }
-
+    public virtual DbSet<BusinessReviewPoint> BusinessReviewPoints { get; set; }
     public virtual DbSet<UrlTbl> UrlTbls { get; set; }
     public virtual DbSet<getListOfPoints> GetListOfPoints { get; set; } = null!;
 
@@ -39,7 +39,10 @@ public partial class DataContext : IdentityDbContext<ApplicationUserExtension>
 
             entity.ToTable("PointCategory");
         });
-
+        modelBuilder.Entity<BusinessReviewPoint>(entity =>
+        {
+            entity.HasKey(e => e.BusinessPointId).HasName("PK__Business__0A834C5E153F7DF2");
+        });
         modelBuilder.Entity<PointEmail>(entity =>
         {
             entity.HasKey(e => e.EmailId);

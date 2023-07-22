@@ -39,7 +39,9 @@
                                 <a onclick="showCustomerUsers(@item.Id)" href="#" class="link-primary">
                                     @Html.DisplayFor(modelItem => item.CustomerName)
                                 </a>
-
+                                @*<a href="@Url.Action("SaveCustomer","Customers")" class="link-primary">
+                                    @Html.DisplayFor(modelItem => item.CustomerName)
+                                </a>*@
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.ContactNumber)
@@ -103,7 +105,9 @@
             success: function(obj) {
                 $("#logoLoader").fadeOut();
                 $('#MainModalLabel').html('Add Customer');
+                $("#dialogId").addClass("modal-xl");
                 $('#saveBtn').html('Save');
+                $('#saveBtn').show();
                 $('#MainModalBody').html(obj);
                 $('#MainAppModal').modal({
                     backdrop: 'static', // Prevent to close on click outside the modal
@@ -125,6 +129,9 @@
             success: function(obj) {
                 $("#logoLoader").fadeOut();
                 $('#MainModalLabel').html('Update Customer');
+                $("#dialogId").addClass("modal-xl");
+                $('#saveBtn').html('Update');
+                $('#saveBtn').show();
                 $('#MainModalBody').html(obj);
                 $('#MainAppModal').modal({
                     backdrop: 'static', // Prevent to close on click outside the modal

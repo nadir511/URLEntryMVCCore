@@ -26,6 +26,8 @@ public partial class UrlTbl
 
     public string? Body { get; set; }
     public bool ? SaveInLibrary { get; set; }
+    public DateTime? CreationDate { get; set; }
+    public DateTime? UpdationDate { get; set; }
 
     public virtual CustomerTbl? CustomerIdFkNavigation { get; set; }
 

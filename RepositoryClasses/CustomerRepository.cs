@@ -135,12 +135,39 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
-        public bool SaveCustomer(CustomerTbl CustomerInfo)
+        public bool SaveCustomer(CustomerVM customerVM)
         {
             try
             {
-                _db.Entry(CustomerInfo).State = EntityState.Added;
+                var ms = new MemoryStream();
+                if (customerVM.CustomerLogo != null)
+                    customerVM.CustomerLogo.CopyTo(ms);
+                var fileBytes = ms.ToArray();
+                string s = Convert.ToBase64String(fileBytes);
+                var customer = new CustomerTbl()
+                {
+                    CustomerName = customerVM.CustomerName,
+                    ContactNumber = customerVM.ContactNumber,
+                    Address = customerVM.Address,
+                    CustomerEmail = customerVM.CustomerEmail,
+                    CustomerPic = fileBytes,
+                };
+                _db.Entry(customer).State = EntityState.Added;
                 _db.SaveChanges();
+                if (customerVM.businessReviewUrls!=null)
+                {
+                    List<BusinessReviewPoint> PointsObj = new List<BusinessReviewPoint>();
+                    foreach (var item in customerVM.businessReviewUrls)
+                    {
+                        BusinessReviewPoint Obj = new BusinessReviewPoint();
+                        Obj.PointUrl = item.PointUrl;
+                        Obj.IsCurrentlyActive = false;
+                        Obj.CustomerIdFk = customer.Id;
+                        PointsObj.Add(Obj);
+                    }
+                    _db.BusinessReviewPoints.AddRange(PointsObj);
+                    _db.SaveChanges();
+                }
                 return true;
             }
             catch (Exception)
