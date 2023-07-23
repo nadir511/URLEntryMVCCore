@@ -2,6 +2,7 @@
 using System.Reflection.Metadata.Ecma335;
 using URLEntryMVC.Entities;
 using URLEntryMVC.ViewModel.AccountVM;
+using URLEntryMVC.ViewModel.BusinessReviewVM;
 
 namespace URLEntryMVC.ViewModel.CustomerVM
 {
@@ -36,12 +37,5 @@ namespace URLEntryMVC.ViewModel.CustomerVM
         public List<UsersVM>? customerUsers { get; set; }
         public bool ? isDeleted { get; set; }   
     }
-    public class BusinessReviewUrl
-    {
-        public string? UrlName { get; set; }
-        public int? BusinessPointId { get; set; }
-        [Display(Name = "Point URL")]
-        [DataType(DataType.Url)]
-        public string? PointUrl { get; set; }
-    }
+   
 }

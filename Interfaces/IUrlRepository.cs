@@ -1,4 +1,5 @@
 ﻿using URLEntryMVC.Entities;
+using URLEntryMVC.ViewModel.BusinessReviewVM;
 using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.Interfaces
@@ -16,6 +17,7 @@ namespace URLEntryMVC.Interfaces
         Task<List<getListOfPoints>> ListOfLinks();
         Task<UrlTbl?> GetUrlById(int id);
         Task<string?> GetEmailsByPointId(int PointId);
+        Task<List<BusinessReviewPoints>> GetListOfBrPointsByCustomerId(int customerId);
         void DeleteUrl(int Id);
     }
 }

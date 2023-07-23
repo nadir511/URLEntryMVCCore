@@ -3,6 +3,7 @@ using URLEntryMVC.ApplicationConstants;
 using URLEntryMVC.Data;
 using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
+using URLEntryMVC.ViewModel.BusinessReviewVM;
 using URLEntryMVC.ViewModel.CustomerVM;
 using URLEntryMVC.ViewModel.UrlVM;
 
@@ -156,7 +157,6 @@ namespace URLEntryMVC.RepositoryClasses
                     _db.PointEmails.Add(pointEmail);
                     _db.SaveChanges();
                 }
-
             }
             catch (Exception)
             {
@@ -175,6 +175,16 @@ namespace URLEntryMVC.RepositoryClasses
 
                 throw;
             }
+        }
+        public async Task<List<BusinessReviewPoints>> GetListOfBrPointsByCustomerId(int customerId)
+        {
+            List<BusinessReviewPoints> BrPointList =await _db.BusinessReviewPoints.Where(x => x.CustomerIdFk == customerId && x.PointUrl != null).Select(x => new BusinessReviewPoints
+            {
+                BusinessPointId=x.BusinessPointId,
+                PointUrl=x.PointUrl,
+                DelayTimeInMinuts=x.DelayTimeInMinuts,
+            }).ToListAsync();
+            return BrPointList;
         }
         public async Task<UrlTbl?> GetUrlById(int Id)
         {

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using URLEntryMVC.ViewModel.BusinessReviewVM;
 using URLEntryMVC.ViewModel.PointCategoryVM;
 
 namespace URLEntryMVC.ViewModel.UrlVM
@@ -42,6 +43,7 @@ namespace URLEntryMVC.ViewModel.UrlVM
         public List<PointCategoryInfo>? PointCategoryList {get;set;}
         public List<LibraryListPoints>? libraryListPoints { get; set; }
         public string? EditType { get; set; }
+        public List<BusinessReviewPoints>? businessReviewPoints { get; set; }
     }
     public class CustomerInfo
     {

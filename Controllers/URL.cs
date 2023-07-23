@@ -47,179 +47,109 @@ namespace URLEntryMVC.Controllers
         [HttpGet]
         public async Task<ActionResult<List<UrlVM>>> ListOfLinks(string pointCategory)
         {
-            var Links = await urlRepositoryObj.ListOfLinks();
-            ViewBag.TotalPoints = Links.Count();
-            ViewBag.TotalCustomers = _db.CustomerTbls.ToList().Count();
-            ViewBag.pointCategory = pointCategory;
+            try
+            {
+                var Links = await urlRepositoryObj.ListOfLinks();
+                ViewBag.TotalPoints = Links.Count();
+                ViewBag.TotalCustomers = _db.CustomerTbls.ToList().Count();
+                ViewBag.pointCategory = pointCategory;
 
-            List<UrlVM> UrlList = Links.Select(x => new UrlVM
-            {
-                Id = x.PointId,
-                PointCategoryId = x.CategoryId,
-                PointCategoryName = x.CategoryName,
-                UrlLink = x.PointLink,
-                DomainLink = x.DomainLink ?? string.Empty,
-                CustomerName = x.CustomerName,
-                CustomerId = x.CustomerId,
-                CustomerPointName = x.PointName,
-                CustomerNotes = x.CustomerNotes,
-                TotalClicks = x.TotalCliks,
-                Subject = x.Esubject,
-                Body = x.Body,
-                PointEmails = x.Emails
-            }).ToList();
-            if (pointCategory == AppConstant.StdContractPoint)
-            {
-                UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.StdContractPointId).ToList();
+                List<UrlVM> UrlList = Links.Select(x => new UrlVM
+                {
+                    Id = x.PointId,
+                    PointCategoryId = x.CategoryId,
+                    PointCategoryName = x.CategoryName,
+                    UrlLink = x.PointLink,
+                    DomainLink = x.DomainLink ?? string.Empty,
+                    CustomerName = x.CustomerName,
+                    CustomerId = x.CustomerId,
+                    CustomerPointName = x.PointName,
+                    CustomerNotes = x.CustomerNotes,
+                    TotalClicks = x.TotalCliks,
+                    Subject = x.Esubject,
+                    Body = x.Body,
+                    PointEmails = x.Emails
+                }).ToList();
+                if (pointCategory == AppConstant.StdContractPoint)
+                {
+                    UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.StdContractPointId).ToList();
+                }
+                else if (pointCategory == AppConstant.EmailContractPoint)
+                {
+                    UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.EmailContractPointId).ToList();
+                }
+                else if (pointCategory == AppConstant.TapContractPoint)
+                {
+                    UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.TapThatContractPointId).ToList();
+                }
+                if (User.IsInRole(AppConstant.CustomerRole))
+                {
+                    var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
+                    UrlList = UrlList.Where(x => x.CustomerId == userInfo.CustomerIdFk).ToList();
+                    ViewBag.TotalPoints = UrlList.Count();
+                }
+                return View(UrlList);
             }
-            else if (pointCategory == AppConstant.EmailContractPoint)
+            catch (Exception ex)
             {
-                UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.EmailContractPointId).ToList();
+                throw ex;
             }
-            else if (pointCategory == AppConstant.TapContractPoint)
-            {
-                UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.TapThatContractPointId).ToList();
-            }
-            if (User.IsInRole(AppConstant.CustomerRole))
-            {
-                var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
-                UrlList = UrlList.Where(x => x.CustomerId == userInfo.CustomerIdFk).ToList();
-                ViewBag.TotalPoints = UrlList.Count();
-            }
-            return View(UrlList);
+            
         }
         [Authorize]
         [HttpGet]
         public async Task<ActionResult> SaveLink()
         {
-            var customer = await _customerRepository.ListOfCustomers();
-            var pointCategory = await _customerRepository.ListOfPointCategories();
-            SaveUrlVM saveUrlVM = new SaveUrlVM();
-            saveUrlVM.CustomerList = customer.Select(x => new CustomerInfo
+            try
             {
-                CustomerId = x.Id,
-                CustomerName = x.CustomerName
-            }).ToList();
-            saveUrlVM.PointCategoryList = pointCategory.Select(x => new PointCategoryInfo
+                var customer = await _customerRepository.ListOfCustomers();
+                var pointCategory = await _customerRepository.ListOfPointCategories();
+                SaveUrlVM saveUrlVM = new SaveUrlVM();
+                saveUrlVM.CustomerList = customer.Select(x => new CustomerInfo
+                {
+                    CustomerId = x.Id,
+                    CustomerName = x.CustomerName
+                }).ToList();
+                saveUrlVM.PointCategoryList = pointCategory.Select(x => new PointCategoryInfo
+                {
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.CategoryName
+                }).ToList();
+                return PartialView("~/Views/PartialViews/_AddUrlModal.cshtml", saveUrlVM);
+            }
+            catch (Exception ex)
             {
-                CategoryId = x.CategoryId,
-                CategoryName = x.CategoryName
-            }).ToList();
-            return PartialView("~/Views/PartialViews/_AddUrlModal.cshtml", saveUrlVM);
+                throw ex;
+            }
+            
         }
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<SaveUrlVM>> SaveLink(SaveUrlVM urlVM)
         {
-            var customerInfo = await _customerRepository.GetCustomerById(urlVM.CustomerId);
-            bool isLinkExistForCustomer = await urlRepositoryObj.IsPointExistForCustomer(urlVM.CustomerPointName ?? String.Empty, urlVM.CustomerId);
-            if (isLinkExistForCustomer)
-                return Json(-1);
-            bool isPointMNExistCustomer = await urlRepositoryObj.IsManagementNameExistForCustomer(urlVM.ManagementName ?? String.Empty, urlVM.CustomerId);
-            if (isPointMNExistCustomer)
-                return Json(-2);
-            else
+            try
             {
-                SaveUrlVM urlTbl = new SaveUrlVM()
+                var customerInfo = await _customerRepository.GetCustomerById(urlVM.CustomerId);
+                bool isLinkExistForCustomer = await urlRepositoryObj.IsPointExistForCustomer(urlVM.CustomerPointName ?? String.Empty, urlVM.CustomerId);
+                if (isLinkExistForCustomer)
+                    return Json(-1);
+                bool isPointMNExistCustomer = await urlRepositoryObj.IsManagementNameExistForCustomer(urlVM.ManagementName ?? String.Empty, urlVM.CustomerId);
+                if (isPointMNExistCustomer)
+                    return Json(-2);
+                else
                 {
-                    UrlLink = domainLink + '_' + customerInfo.CustomerName + '/' + urlVM.CustomerPointName,
-                    DomainLink = urlVM.DomainLink,
-                    CustomerId = urlVM.CustomerId,
-                    CustomerPointName = urlVM.CustomerPointName,
-                    ManagementName= urlVM.ManagementName,
-                    PointCategoryId = urlVM.PointCategoryId,
-                    Subject = urlVM.Subject,
-                    Text = urlVM.Text,
-                    SaveInLibrary = urlVM.SaveInLibrary
-                };
-                StringBuilder? emails = new StringBuilder();
-                if (!string.IsNullOrWhiteSpace(urlVM.Email1))
-                {
-                    emails.Append(urlVM.Email1);
-                }
-                if (!string.IsNullOrWhiteSpace(urlVM.Email2))
-                {
-                    emails.Append("," + urlVM.Email2);
-                }
-                if (!string.IsNullOrWhiteSpace(urlVM.Email3))
-                {
-                    emails.Append("," + urlVM.Email3);
-                }
-                urlTbl.allEmailsStr = emails.ToString();
-                urlRepositoryObj.SaveLink(urlTbl);
-                return Json(1);
-            }
-        }
-        [Authorize]
-        [HttpGet]
-        public async Task<ActionResult<SaveUrlVM>> UpdateLink(int id)
-        {
-            var obj = await urlRepositoryObj.GetUrlById(id);
-            var customer = await _customerRepository.ListOfCustomers();
-            var pointCategory = await _customerRepository.ListOfPointCategories();
-            SaveUrlVM editUrlVM = new SaveUrlVM();
-            editUrlVM.CustomerList = customer.Select(x => new CustomerInfo
-            {
-                CustomerId = x.Id,
-                CustomerName = x.CustomerName
-            }).ToList();
-            editUrlVM.PointCategoryList = pointCategory.Select(x => new PointCategoryInfo
-            {
-                CategoryId = x.CategoryId,
-                CategoryName = x.CategoryName
-            }).ToList();
-            editUrlVM.Id = obj.Id;
-            editUrlVM.SaveInLibrary = obj.SaveInLibrary ?? false;
-            editUrlVM.UrlLink = obj.UrlLink;
-            editUrlVM.DomainLink = obj.DomainLink;
-            editUrlVM.CustomerPointName = obj.CustomerPointName;
-            editUrlVM.ManagementName=obj.ManagementName;
-            editUrlVM.CustomerId = obj.CustomerIdFk ?? 0;
-            editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
-            editUrlVM.Subject = obj.Subject;
-            editUrlVM.Text = obj.Body;
-            string[] emails = new string[3];
-
-            if (obj.PointCategoryIdFk == AppConstant.EmailContractPointId)
-            {
-                var emailsStr = await urlRepositoryObj.GetEmailsByPointId(id);
-                if (emailsStr != null)
-                    emails = emailsStr.Split(',');
-                editUrlVM.Email1 = emails[0];
-                editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
-                editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
-            }
-
-            return PartialView("~/Views/PartialViews/_EditUrlModal.cshtml", editUrlVM);
-        }
-        [Authorize]
-        [HttpPost]
-        public async Task<ActionResult> UpdateLink(SaveUrlVM urlVM)
-        {
-            var customerInfo = await _customerRepository.GetCustomerById(urlVM.CustomerId);
-            bool isLinkExistForCustomerOnEdit = await urlRepositoryObj.IsPointExistForCustomerOnEdit(urlVM.CustomerPointName ?? String.Empty, urlVM.CustomerId, urlVM.Id);
-            if (isLinkExistForCustomerOnEdit)
-                return Json(-1);
-            bool isPointMNExistCustomer = await urlRepositoryObj.IsManagementNameExistOnEditForCustomer(urlVM.ManagementName ?? String.Empty, urlVM.CustomerId, urlVM.Id);
-            if (isPointMNExistCustomer)
-                return Json(-2);
-            else
-            {
-                SaveUrlVM urlTbl = new SaveUrlVM()
-                {
-                    Id = urlVM.Id,
-                    SaveInLibrary = urlVM.SaveInLibrary,
-                    UrlLink = domainLink + '_' + customerInfo.CustomerName + '/' + urlVM.CustomerPointName,
-                    DomainLink = urlVM.DomainLink,
-                    CustomerId = urlVM.CustomerId,
-                    CustomerPointName = urlVM.CustomerPointName,
-                    ManagementName= urlVM.ManagementName,
-                    PointCategoryId = urlVM.PointCategoryId,
-                    Subject = urlVM.Subject,
-                    Text = urlVM.Text
-                };
-                if (urlVM.PointCategoryId == AppConstant.EmailContractPointId)
-                {
+                    SaveUrlVM urlTbl = new SaveUrlVM()
+                    {
+                        UrlLink = domainLink + '_' + customerInfo.CustomerName + '/' + urlVM.CustomerPointName,
+                        DomainLink = urlVM.DomainLink,
+                        CustomerId = urlVM.CustomerId,
+                        CustomerPointName = urlVM.CustomerPointName,
+                        ManagementName = urlVM.ManagementName,
+                        PointCategoryId = urlVM.PointCategoryId,
+                        Subject = urlVM.Subject,
+                        Text = urlVM.Text,
+                        SaveInLibrary = urlVM.SaveInLibrary
+                    };
                     StringBuilder? emails = new StringBuilder();
                     if (!string.IsNullOrWhiteSpace(urlVM.Email1))
                     {
@@ -234,38 +164,154 @@ namespace URLEntryMVC.Controllers
                         emails.Append("," + urlVM.Email3);
                     }
                     urlTbl.allEmailsStr = emails.ToString();
+                    urlRepositoryObj.SaveLink(urlTbl);
+                    return Json(1);
                 }
-                urlRepositoryObj.UpdateLink(urlTbl);
-                return Json(1);
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<SaveUrlVM>> UpdateLink(int id)
+        {
+            try
+            {
+                var obj = await urlRepositoryObj.GetUrlById(id);
+                var customer = await _customerRepository.ListOfCustomers();
+                var pointCategory = await _customerRepository.ListOfPointCategories();
+                SaveUrlVM editUrlVM = new SaveUrlVM();
+                editUrlVM.CustomerList = customer.Select(x => new CustomerInfo
+                {
+                    CustomerId = x.Id,
+                    CustomerName = x.CustomerName
+                }).ToList();
+                editUrlVM.PointCategoryList = pointCategory.Select(x => new PointCategoryInfo
+                {
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.CategoryName
+                }).ToList();
+                editUrlVM.Id = obj.Id;
+                editUrlVM.SaveInLibrary = obj.SaveInLibrary ?? false;
+                editUrlVM.UrlLink = obj.UrlLink;
+                editUrlVM.DomainLink = obj.DomainLink;
+                editUrlVM.CustomerPointName = obj.CustomerPointName;
+                editUrlVM.ManagementName = obj.ManagementName;
+                editUrlVM.CustomerId = obj.CustomerIdFk ?? 0;
+                editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
+                editUrlVM.Subject = obj.Subject;
+                editUrlVM.Text = obj.Body;
+                string[] emails = new string[3];
+
+                if (obj.PointCategoryIdFk == AppConstant.EmailContractPointId)
+                {
+                    var emailsStr = await urlRepositoryObj.GetEmailsByPointId(id);
+                    if (emailsStr != null)
+                        emails = emailsStr.Split(',');
+                    editUrlVM.Email1 = emails[0];
+                    editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
+                    editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
+                }
+
+                return PartialView("~/Views/PartialViews/_EditUrlModal.cshtml", editUrlVM);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            
+        }
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult> UpdateLink(SaveUrlVM urlVM)
+        {
+            try
+            {
+                var customerInfo = await _customerRepository.GetCustomerById(urlVM.CustomerId);
+                bool isLinkExistForCustomerOnEdit = await urlRepositoryObj.IsPointExistForCustomerOnEdit(urlVM.CustomerPointName ?? String.Empty, urlVM.CustomerId, urlVM.Id);
+                if (isLinkExistForCustomerOnEdit)
+                    return Json(-1);
+                bool isPointMNExistCustomer = await urlRepositoryObj.IsManagementNameExistOnEditForCustomer(urlVM.ManagementName ?? String.Empty, urlVM.CustomerId, urlVM.Id);
+                if (isPointMNExistCustomer)
+                    return Json(-2);
+                else
+                {
+                    SaveUrlVM urlTbl = new SaveUrlVM()
+                    {
+                        Id = urlVM.Id,
+                        SaveInLibrary = urlVM.SaveInLibrary,
+                        UrlLink = domainLink + '_' + customerInfo.CustomerName + '/' + urlVM.CustomerPointName,
+                        DomainLink = urlVM.DomainLink,
+                        CustomerId = urlVM.CustomerId,
+                        CustomerPointName = urlVM.CustomerPointName,
+                        ManagementName = urlVM.ManagementName,
+                        PointCategoryId = urlVM.PointCategoryId,
+                        Subject = urlVM.Subject,
+                        Text = urlVM.Text
+                    };
+                    if (urlVM.PointCategoryId == AppConstant.EmailContractPointId)
+                    {
+                        StringBuilder? emails = new StringBuilder();
+                        if (!string.IsNullOrWhiteSpace(urlVM.Email1))
+                        {
+                            emails.Append(urlVM.Email1);
+                        }
+                        if (!string.IsNullOrWhiteSpace(urlVM.Email2))
+                        {
+                            emails.Append("," + urlVM.Email2);
+                        }
+                        if (!string.IsNullOrWhiteSpace(urlVM.Email3))
+                        {
+                            emails.Append("," + urlVM.Email3);
+                        }
+                        urlTbl.allEmailsStr = emails.ToString();
+                    }
+                    urlRepositoryObj.UpdateLink(urlTbl);
+                    return Json(1);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
         [HttpGet]
         public async Task<ActionResult> UpdateMultiPointInfo(List<string> pointIds, string pointCategory)
         {
-            SaveUrlVM multiEditUrlVM = new SaveUrlVM();
-
-            var customer = await _customerRepository.ListOfCustomers();
-            multiEditUrlVM.CustomerList = customer.Select(x => new CustomerInfo
+            try
             {
-                CustomerId = x.Id,
-                CustomerName = x.CustomerName
-            }).ToList();
-            if (User.IsInRole(AppConstant.CustomerRole))
-            {
-                var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
-                multiEditUrlVM.CustomerId = userInfo.CustomerIdFk ?? 0;
+                SaveUrlVM multiEditUrlVM = new SaveUrlVM();
+                var customer = await _customerRepository.ListOfCustomers();
+                multiEditUrlVM.CustomerList = customer.Select(x => new CustomerInfo
+                {
+                    CustomerId = x.Id,
+                    CustomerName = x.CustomerName
+                }).ToList();
+                if (User.IsInRole(AppConstant.CustomerRole))
+                {
+                    var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
+                    multiEditUrlVM.CustomerId = userInfo.CustomerIdFk ?? 0;
+                }
+                if (pointCategory == AppConstant.StdContractPoint)
+                {
+                    multiEditUrlVM.PointCategoryId = AppConstant.StdContractPointId;
+                }
+                else if (pointCategory == AppConstant.EmailContractPoint)
+                {
+                    multiEditUrlVM.PointCategoryId = AppConstant.EmailContractPointId;
+                }
+                multiEditUrlVM.PointIds = pointIds;
+                multiEditUrlVM.EditType = AppConstant.MultiEdit;
+                return PartialView("~/Views/PartialViews/_EditDomain.cshtml", multiEditUrlVM);
             }
-            if (pointCategory == AppConstant.StdContractPoint)
+            catch (Exception ex)
             {
-                multiEditUrlVM.PointCategoryId = AppConstant.StdContractPointId;
+                throw ex;
             }
-            else if (pointCategory == AppConstant.EmailContractPoint)
-            {
-                multiEditUrlVM.PointCategoryId = AppConstant.EmailContractPointId;
-            }
-            multiEditUrlVM.PointIds = pointIds;
-            multiEditUrlVM.EditType = AppConstant.MultiEdit;
-            return PartialView("~/Views/PartialViews/_EditDomain.cshtml", multiEditUrlVM);
         }
         [HttpPost]
         public async Task<ActionResult> UpdateMultiPointInfo(SaveUrlVM urlVM)
@@ -324,31 +370,38 @@ namespace URLEntryMVC.Controllers
         [HttpGet]
         public async Task<ActionResult> UpdatePointInfo(int id)
         {
-            var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
-            var customerInfo =await _customerRepository.GetCustomerById(userInfo.CustomerIdFk ?? 0);
-            var obj = await urlRepositoryObj.GetUrlById(id);
-            SaveUrlVM editUrlVM = new SaveUrlVM();
-            editUrlVM.CustomerId = userInfo.CustomerIdFk??0;
-            editUrlVM.CustomerList = new List<CustomerInfo>();
-            editUrlVM.CustomerList.Add(new CustomerInfo { CustomerId = customerInfo.Id, CustomerName = customerInfo.CustomerName }); 
-            editUrlVM.Id = obj.Id;
-            editUrlVM.DomainLink = obj.DomainLink;
-            editUrlVM.CustomerNotes = obj.CustomerNotes;
-            editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
-            editUrlVM.Subject = obj.Subject;
-            editUrlVM.Text = obj.Body;
-
-            string[] emails = new string[3];
-            if (obj.PointCategoryIdFk == 2)
+            try
             {
-                var emailsStr = await urlRepositoryObj.GetEmailsByPointId(id);
-                if (emailsStr != null)
-                    emails = emailsStr.Split(',');
-                editUrlVM.Email1 = emails[0];
-                editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
-                editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
+                var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
+                var customerInfo = await _customerRepository.GetCustomerById(userInfo.CustomerIdFk ?? 0);
+                var obj = await urlRepositoryObj.GetUrlById(id);
+                SaveUrlVM editUrlVM = new SaveUrlVM();
+                editUrlVM.CustomerId = userInfo.CustomerIdFk ?? 0;
+                editUrlVM.CustomerList = new List<CustomerInfo>();
+                editUrlVM.CustomerList.Add(new CustomerInfo { CustomerId = customerInfo.Id, CustomerName = customerInfo.CustomerName });
+                editUrlVM.Id = obj.Id;
+                editUrlVM.DomainLink = obj.DomainLink;
+                editUrlVM.CustomerNotes = obj.CustomerNotes;
+                editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
+                editUrlVM.Subject = obj.Subject;
+                editUrlVM.Text = obj.Body;
+
+                string[] emails = new string[3];
+                if (obj.PointCategoryIdFk == 2)
+                {
+                    var emailsStr = await urlRepositoryObj.GetEmailsByPointId(id);
+                    if (emailsStr != null)
+                        emails = emailsStr.Split(',');
+                    editUrlVM.Email1 = emails[0];
+                    editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
+                    editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
+                }
+                return PartialView("~/Views/PartialViews/_EditDomain.cshtml", editUrlVM);
             }
-            return PartialView("~/Views/PartialViews/_EditDomain.cshtml", editUrlVM);
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         [Authorize]
         [HttpPost]
@@ -399,48 +452,89 @@ namespace URLEntryMVC.Controllers
         [Authorize]
         public ActionResult DeletLink(int Id)
         {
-            urlRepositoryObj.DeleteUrl(Id);
-            return Json(1);
+            try
+            {
+                urlRepositoryObj.DeleteUrl(Id);
+                return Json(1);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         public async Task<ActionResult> ListOfSavePoints(int pointCategory,int customerId)
         {
-            var Links = await urlRepositoryObj.ListOfLinks();
-            var savePoints = Links.Where(x => x.SaveInLibrary == true && x.CategoryId == pointCategory && x.CustomerId== customerId).Select(x => new
+            try
             {
-                pointId = x.PointId,
-                pointName = x.PointManagementName
-            }).ToList();
-            return Json(new SelectList(savePoints, "pointId", "pointName"));
+                var Links = await urlRepositoryObj.ListOfLinks();
+                var savePoints = Links.Where(x => x.SaveInLibrary == true && x.CategoryId == pointCategory && x.CustomerId == customerId).Select(x => new
+                {
+                    pointId = x.PointId,
+                    pointName = x.PointManagementName
+                }).ToList();
+                return Json(new SelectList(savePoints, "pointId", "pointName"));
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         public async Task<ActionResult> ListOfSLinksByCustomer(int customerId)
         {
-            var profiles =await _customerRepository.ListOfSocialProfByCustomer(customerId);
-            var profilesObj = profiles.Select(x => new {x.text,x.value }).ToList();
-            return Json(new SelectList(profilesObj, "value", "text"));
+            try
+            {
+                var profiles = await _customerRepository.ListOfSocialProfByCustomer(customerId);
+                var profilesObj = profiles.Select(x => new { x.text, x.value }).ToList();
+                return Json(new SelectList(profilesObj, "value", "text"));
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         public async Task<ActionResult> InfoOfSavePoints(int savePointId)
         {
-            var obj = await urlRepositoryObj.GetUrlById(savePointId);
-            SaveUrlVM editUrlVM = new SaveUrlVM();
-            editUrlVM.Id = obj.Id;
-            editUrlVM.DomainLink = obj.DomainLink;
-            editUrlVM.CustomerNotes = obj.CustomerNotes;
-            editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
-            editUrlVM.Subject = obj.Subject;
-            editUrlVM.Text = obj.Body;
-            editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
-
-            string[] emails = new string[3];
-            if (obj.PointCategoryIdFk == 2)
+            try
             {
-                var emailsStr = await urlRepositoryObj.GetEmailsByPointId(savePointId);
-                if (emailsStr != null)
-                    emails = emailsStr.Split(',');
-                editUrlVM.Email1 = emails[0];
-                editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
-                editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
+                var obj = await urlRepositoryObj.GetUrlById(savePointId);
+                SaveUrlVM editUrlVM = new SaveUrlVM();
+                editUrlVM.Id = obj.Id;
+                editUrlVM.DomainLink = obj.DomainLink;
+                editUrlVM.CustomerNotes = obj.CustomerNotes;
+                editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
+                editUrlVM.Subject = obj.Subject;
+                editUrlVM.Text = obj.Body;
+                editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
+
+                string[] emails = new string[3];
+                if (obj.PointCategoryIdFk == 2)
+                {
+                    var emailsStr = await urlRepositoryObj.GetEmailsByPointId(savePointId);
+                    if (emailsStr != null)
+                        emails = emailsStr.Split(',');
+                    editUrlVM.Email1 = emails[0];
+                    editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
+                    editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
+                }
+                return Json(editUrlVM);
             }
-            return Json(editUrlVM);
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            
+        }
+        public async Task<ActionResult> ListOfPrPointsByCustomerId(int customerId)
+        {
+            try
+            {
+                return PartialView("", await urlRepositoryObj.GetListOfBrPointsByCustomerId(customerId));
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         [AllowAnonymous]
         public async Task<IActionResult> checkRawUrl()
