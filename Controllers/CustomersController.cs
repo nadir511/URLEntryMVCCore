@@ -63,22 +63,9 @@ namespace URLEntryMVC.Controllers
                 {
                     cstmrId = (Int32)userInfo.CustomerIdFk;
                 }
-                CustomerTbl customerInfo = await _customerRepository.GetCustomerById(cstmrId);
-                if (customerInfo != null)
+                customerVM = await _customerRepository.GetCustomerById(cstmrId);
+                if (customerVM != null)
                 {
-                    customerVM.Id = customerInfo.Id;
-                    customerVM.CustomerName = customerInfo.CustomerName;
-                    customerVM.Address = customerInfo.Address;
-                    customerVM.ContactNumber = customerInfo.ContactNumber;
-                    customerVM.CustomerEmail = customerInfo.CustomerEmail;
-                    customerVM.CustomerPic = customerInfo.CustomerPic;
-                    customerVM.Instagram = customerInfo.Instagram;
-                    customerVM.Facebook = customerInfo.Facebook;
-                    customerVM.Twitter = customerInfo.Twitter;
-                    customerVM.LinkedIn = customerInfo.LinkedIn;
-                    customerVM.TikTok = customerInfo.TikTok;
-                    customerVM.Youtube = customerInfo.Youtube;
-                    customerVM.Snapchat = customerInfo.Snapchat;
                     customerVM.isProfileDisabled = disableProfile ?? false;
                 }
                 if (disableProfile == true)
@@ -97,31 +84,11 @@ namespace URLEntryMVC.Controllers
             
         }
         [HttpPost]
-        public ActionResult customerProfile(CustomerVM customerVM)
+        public async Task<ActionResult> customerProfile(CustomerVM customerVM)
         {
             try
             {
-                var fileBytes = new byte[] { };
-                var ms = new MemoryStream();
-                var picByte = _db.CustomerTbls.Where(x => x.Id == customerVM.Id).Select(x => x.CustomerPic).FirstOrDefault();
-                fileBytes = picByte;
-                var customerObj = new CustomerTbl()
-                {
-                    Id = customerVM.Id,
-                    CustomerName = customerVM.CustomerName,
-                    ContactNumber = customerVM.ContactNumber,
-                    Address = customerVM.Address,
-                    CustomerEmail = customerVM.CustomerEmail,
-                    CustomerPic = fileBytes,
-                    Instagram = customerVM.Instagram,
-                    Facebook = customerVM.Facebook,
-                    Twitter = customerVM.Twitter,
-                    LinkedIn = customerVM.LinkedIn,
-                    TikTok = customerVM.TikTok,
-                    Youtube = customerVM.Youtube,
-                    Snapchat = customerVM.Snapchat,
-                };
-                bool IsCustomerSave = _customerRepository.UpdateCustomer(customerObj);
+                bool IsCustomerSave =await _customerRepository.UpdateCustomer(customerVM);
                 return RedirectToAction("customerProfile");
             }
             catch (Exception)
@@ -174,14 +141,9 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                var customerInfo = await _customerRepository.GetCustomerById(Id);
                 CustomerVM customerVM = new CustomerVM();
-                customerVM.Id = customerInfo.Id;
-                customerVM.CustomerName = customerInfo.CustomerName;
-                customerVM.ContactNumber = customerInfo.ContactNumber;
-                customerVM.CustomerEmail = customerInfo.CustomerEmail;
-                customerVM.Address = customerInfo.Address;
-                customerVM.CustomerPic = customerInfo.CustomerPic;
+                customerVM = await _customerRepository.GetCustomerById(Id);
+                
                 return PartialView("~/Views/Customers/_EditCustomer.cshtml", customerVM);
             }
             catch (Exception)
@@ -195,31 +157,12 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                var fileBytes = new byte[] { };
+                
                 bool IsCustomerExist = await _customerRepository.IsCustomerExistOnEdit(customerVM.CustomerName, customerVM.Id);
                 if (IsCustomerExist)
                     return Json(0);
-                var ms = new MemoryStream();
-                if (customerVM.CustomerLogo != null)
-                {
-                    customerVM.CustomerLogo.CopyTo(ms);
-                    fileBytes = ms.ToArray();
-                }
-                else
-                {
-                    var picByte = _db.CustomerTbls.Where(x => x.Id == customerVM.Id).Select(x => x.CustomerPic).FirstOrDefault();
-                    fileBytes = picByte;
-                }
-                var customer = new CustomerTbl()
-                {
-                    Id = customerVM.Id,
-                    CustomerName = customerVM.CustomerName,
-                    ContactNumber = customerVM.ContactNumber,
-                    CustomerEmail = customerVM.CustomerEmail,
-                    Address = customerVM.Address,
-                    CustomerPic = fileBytes,
-                };
-                bool IsCustomerSave = _customerRepository.UpdateCustomer(customer);
+                
+                bool IsCustomerSave =await _customerRepository.UpdateCustomer(customerVM);
                 return Json(1);
             }
             catch (Exception)

@@ -1,95 +1,104 @@
 ﻿@using URLEntryMVC.ApplicationConstants;
 @model URLEntryMVC.ViewModel.UrlVM.SaveUrlVM
-<form id="addUrlForm">
+<div class="container-xxl flex-grow-1 container-p-y">
     <div class="row">
-        <div class="col-sm-12">
-            <label style="display:block">Select Customer<span style="color:red"> *</span></label>
-            <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName"))" required>
-                <option value="">--Select Customer--</option>
-            </select>
-            <input type="hidden" asp-for="CustomerId" />
-            @Html.ValidationMessageFor(m => m.CustomerId, "", new { @class = "text-danger", id="selectCustomerError" })
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-10">
-            <label>Customer Point</label><span style="color:red"> *</span>
-            @Html.EditorFor(m => m.CustomerPointName, new { htmlAttributes = new { @class = "form-control",@required="required"} })
-            @Html.ValidationMessageFor(model => model.CustomerPointName, "", new { @class = "text-danger",id="customerPointError" })
-        </div>
-        <div class="col-sm-2" id="savePointDiv">
-            <label class="custom-control-label" for="is_pointSave">Save P.</label>
-            <div class="form-check form-switch">
-                @Html.CheckBoxFor(m => m.SaveInLibrary, new { @class = "form-check-input", id = "is_pointSave" })
-                @Html.ValidationMessageFor(m => m.SaveInLibrary, "", new { @class = "text-danger" })
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <form id="addUrlForm">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label style="display:block">Select Customer<span style="color:red"> *</span></label>
+                            <select id="customersList" class="form-control" asp-for="CustomerId" asp-items="@(new SelectList(Model.CustomerList, "CustomerId", "CustomerName"))" required>
+                                <option value="">--Select Customer--</option>
+                            </select>
+                            <input type="hidden" asp-for="CustomerId" />
+                            @Html.ValidationMessageFor(m => m.CustomerId, "", new { @class = "text-danger", id="selectCustomerError" })
+                        </div>
+                        <div class="row col-md-8">
+                            <div class="col-sm-10">
+                                <label>Customer Point</label><span style="color:red"> *</span>
+                                @Html.EditorFor(m => m.CustomerPointName, new { htmlAttributes = new { @class = "form-control",@required="required"} })
+                                @Html.ValidationMessageFor(model => model.CustomerPointName, "", new { @class = "text-danger",id="customerPointError" })
+                            </div>
+                            <div class="col-sm-2" id="savePointDiv">
+                                <label class="custom-control-label" for="is_pointSave">Save P.</label>
+                                <div class="form-check form-switch">
+                                    @Html.CheckBoxFor(m => m.SaveInLibrary, new { @class = "form-check-input", id = "is_pointSave" })
+                                    @Html.ValidationMessageFor(m => m.SaveInLibrary, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row" style="display:none" id="managmentNameDiv">
+                        <div class="col-sm-12">
+                            <label>Save Point Name</label>
+                            @Html.EditorFor(m => m.ManagementName, new { htmlAttributes = new { @class = "form-control",@type="text",@id="managmentName" } })
+                            @Html.ValidationMessageFor(m => m.ManagementName, "", new { @class = "text-danger", id="managmentNameError" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <label>Select Point Category</label><span style="color:red"> *</span>
+                            <select id="pointCatList" class="form-control" asp-for="PointCategoryId" asp-items="@(new SelectList(Model.PointCategoryList, "CategoryId", "CategoryName"))" onchange="ChangePointCat(this)" required>
+                                <option value="">--Select Point Category--</option>
+                            </select>
+                            <input type="hidden" asp-for="PointCategoryId" />
+                            @Html.ValidationMessageFor(m => m.PointCategoryId, "", new { @class = "text-danger", id="selectPointCatError" })
+                        </div>
+                    </div>
+
+                    <div class="row" style="display:none" id="savePointsDiv">
+                        <div class="col-sm-12">
+                            <label style="display:block">Select From Save Points</label>
+                            <select id="savePointsList" class="form-control" onchange="ChangeLibPoint(this)">
+                                <option value="">--Select Point--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="display:none" id="socialMediaDiv">
+                        <div class="col-sm-12">
+                            <label style="display:block">Select From Social Media Profiles</label>
+                            <select id="socialPointsList" class="form-control" onchange="ChangeSocialMediaPoint(this)">
+                                <option value="">--Select Profile--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="display:none" id="stdPointProp">
+                        <div class="col-sm-12">
+                            <label>Domain Link</label><span style="color:red"> *</span>
+                            @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@type="url",@id="pointDomin" } })
+                            @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
+                        </div>
+                    </div>
+                    <div class="row" style="display:none" id="emailPointProp">
+                        <div class="col-sm-12">
+                            <label>Recipient Email Address (Max 3)</label><span style="color:red"> *</span>
+                            @Html.EditorFor(m => m.Email1, new { htmlAttributes = new { @class = "form-control mb-1",@id="pointEmai1",@placeholder="Enter 1st Email",@type="email" } })
+                            @Html.ValidationMessageFor(m => m.Email1, "", new { @class = "text-danger", id="email1Error" })
+                            @Html.EditorFor(m => m.Email2, new { htmlAttributes = new { @class = "form-control mb-1",@id="pointEmai2",@placeholder="Enter 2nd Email",@autocomplete="off",@type="email" } })
+                            @Html.ValidationMessageFor(m => m.Email2, "", new { @class = "text-danger", id="email2Error" })
+                            @Html.EditorFor(m => m.Email3, new { htmlAttributes = new { @class = "form-control",@id="pointEmai3",@placeholder="Enter 3rd Email",@autocomplete="off",@type="email" } })
+                            @Html.ValidationMessageFor(m => m.Email3, "", new { @class = "text-danger", id="email3Error" })
+                        </div>
+                        <div class="col-sm-6">
+                            <label>Subject</label><span style="color:red"> *</span>
+                            @Html.EditorFor(m => m.Subject, new { htmlAttributes = new { @class = "form-control",@placeholder="Enter Subject",@id="SubjectId" } })
+                            @Html.ValidationMessageFor(m => m.Subject, "", new { @class = "text-danger", id="subjectError" })
+                        </div>
+                        <div class="col-sm-12">
+                            <label>Text</label><span style="color:red"> *</span>
+                            @Html.TextAreaFor(m => m.Text, new { @class = "form-control",@placeholder="Enter Text",@id="TextId" })
+                            @Html.ValidationMessageFor(m => m.Text, "", new { @class = "text-danger", id="textError" })
+                        </div>
+
+                    </div>
+
+                </form>
             </div>
         </div>
     </div>
-    <div class="row" style="display:none" id="managmentNameDiv">
-        <div class="col-sm-12">
-            <label>Save Point Name</label>
-            @Html.EditorFor(m => m.ManagementName, new { htmlAttributes = new { @class = "form-control",@type="text",@id="managmentName" } })
-            @Html.ValidationMessageFor(m => m.ManagementName, "", new { @class = "text-danger", id="managmentNameError" })
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <label>Select Point Category</label><span style="color:red"> *</span>
-            <select id="pointCatList" class="form-control" asp-for="PointCategoryId" asp-items="@(new SelectList(Model.PointCategoryList, "CategoryId", "CategoryName"))" onchange="ChangePointCat(this)" required>
-                <option value="">--Select Point Category--</option>
-            </select>
-            <input type="hidden" asp-for="PointCategoryId" />
-            @Html.ValidationMessageFor(m => m.PointCategoryId, "", new { @class = "text-danger", id="selectPointCatError" })
-        </div>
-    </div>
-    
-    <div class="row" style="display:none" id="savePointsDiv">
-        <div class="col-sm-12">
-            <label style="display:block">Select From Save Points</label>
-            <select id="savePointsList" class="form-control" onchange="ChangeLibPoint(this)">
-                <option value="">--Select Point--</option>
-            </select>
-        </div>
-    </div>
-    <div class="row" style="display:none" id="socialMediaDiv">
-        <div class="col-sm-12">
-            <label style="display:block">Select From Social Media Profiles</label>
-            <select id="socialPointsList" class="form-control" onchange="ChangeSocialMediaPoint(this)">
-                <option value="">--Select Profile--</option>
-            </select>
-        </div>
-    </div>
-    <div class="row" style="display:none" id="stdPointProp">
-        <div class="col-sm-12">
-            <label>Domain Link</label><span style="color:red"> *</span>
-            @Html.EditorFor(m => m.DomainLink, new { htmlAttributes = new { @class = "form-control",@type="url",@id="pointDomin" } })
-            @Html.ValidationMessageFor(m => m.DomainLink, "", new { @class = "text-danger", id="domainError" })
-        </div>
-    </div>
-    <div class="row" style="display:none" id="emailPointProp">
-        <div class="col-sm-12">
-            <label>Recipient Email Address (Max 3)</label><span style="color:red"> *</span>
-            @Html.EditorFor(m => m.Email1, new { htmlAttributes = new { @class = "form-control mb-1",@id="pointEmai1",@placeholder="Enter 1st Email",@type="email" } })
-            @Html.ValidationMessageFor(m => m.Email1, "", new { @class = "text-danger", id="email1Error" })
-            @Html.EditorFor(m => m.Email2, new { htmlAttributes = new { @class = "form-control mb-1",@id="pointEmai2",@placeholder="Enter 2nd Email",@autocomplete="off",@type="email" } })
-            @Html.ValidationMessageFor(m => m.Email2, "", new { @class = "text-danger", id="email2Error" })
-            @Html.EditorFor(m => m.Email3, new { htmlAttributes = new { @class = "form-control",@id="pointEmai3",@placeholder="Enter 3rd Email",@autocomplete="off",@type="email" } })
-            @Html.ValidationMessageFor(m => m.Email3, "", new { @class = "text-danger", id="email3Error" })
-        </div>
-        <div class="col-sm-6">
-            <label>Subject</label><span style="color:red"> *</span>
-            @Html.EditorFor(m => m.Subject, new { htmlAttributes = new { @class = "form-control",@placeholder="Enter Subject",@id="SubjectId" } })
-            @Html.ValidationMessageFor(m => m.Subject, "", new { @class = "text-danger", id="subjectError" })
-        </div>
-        <div class="col-sm-12">
-            <label>Text</label><span style="color:red"> *</span>
-            @Html.TextAreaFor(m => m.Text, new { @class = "form-control",@placeholder="Enter Text",@id="TextId" })
-            @Html.ValidationMessageFor(m => m.Text, "", new { @class = "text-danger", id="textError" })
-        </div>
-
-    </div>
-
-</form>
+</div>
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 
@@ -136,6 +145,7 @@
 
         $('#savePointsDiv').hide();
         var selectedpointCat = $("#pointCatList").val();
+        console.log(selectedpointCat);
         var customerId = $("#customersList").val();
         if (customerId == "" || customerId == null) {
             $('#selectCustomerError').text('Select Customer');
@@ -221,7 +231,6 @@
                         $("#logoLoader").fadeIn();
                     },
                     success: function (profiles) {
-                        debugger;
                         if (profiles != "error") {
                             $.each(profiles, function (i, profile) {
                                 v += '<option value="' + profile.text + '">' + profile.value + '</option>';
@@ -257,17 +266,21 @@
             $("#pointEmai3").val('');
             $("#pointEmai1").prop('required', false);
         }
+        else if (selectedpointCat != "" && selectedpointCat == @AppConstant.BusinessReviewPointId) {
+            debugger;
+            console.log('inside BR point');
+        }
         else {
             $("#stdPointProp").hide();
             $("#emailPointProp").hide();
         }
     };
-    function ChangeSocialMediaPoint(obj){
+    function ChangeSocialMediaPoint(obj) {
         var selectedSocialPoint = $("#socialPointsList").val();
         if (selectedSocialPoint != "") {
-             $('#pointDomin').val(selectedSocialPoint);
+            $('#pointDomin').val(selectedSocialPoint);
         }
-        else{
+        else {
             $('#pointDomin').val('');
         }
     }
@@ -322,7 +335,7 @@
     $("#saveUrlBtn").click(function () {
         //custom validations
         $('#managmentNameError').text('');
-        if ($('#is_pointSave').is(':checked') && $('#managmentName').val()=='') {
+        if ($('#is_pointSave').is(':checked') && $('#managmentName').val() == '') {
             $('#managmentNameError').text('Enter Save Point Name');
             return;
         }

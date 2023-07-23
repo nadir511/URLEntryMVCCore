@@ -7,13 +7,13 @@ namespace URLEntryMVC.Interfaces
 {
     public interface ICustomerRepository
     {
-        bool UpdateCustomer(CustomerTbl CustomerInfo);
+        Task<bool> UpdateCustomer(CustomerVM CustomerInfo);
         Task<bool> IsCustomerExist(string CustomerName);
         Task<bool> IsCustomerExistOnEdit(string CustomerName, int Id);
         bool SaveCustomer(CustomerVM CustomerInfo);
         Task<List<CustomerTbl>> ListOfCustomers();
         Task<List<PointCategory>> ListOfPointCategories();
-        Task<CustomerTbl> GetCustomerById(int id);
+        Task<CustomerVM> GetCustomerById(int id);
         Task<bool> DeleteCustomer(int Id);
         Task<List<UsersVM>> GetUsersByCustomerId(int CustomerId);
         Task<List<UrlVM>> ListOfPointsAgainstCustomer(int customerId);
