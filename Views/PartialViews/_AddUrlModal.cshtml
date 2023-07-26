@@ -48,7 +48,7 @@
                         </div>
                     </div>
 
-                    <div class="row" style="display:none" id="savePointsDiv">
+                    <div class="row" style="display:none" id="savePointListDiv">
                         <div class="col-sm-12">
                             <label style="display:block">Select From Save Points</label>
                             <select id="savePointsList" class="form-control" onchange="ChangeLibPoint(this)">
@@ -93,7 +93,9 @@
                         </div>
 
                     </div>
+                    <div id="businessRevPointProp" style="margin-top:25px">
 
+                    </div>
                 </form>
             </div>
         </div>
@@ -142,8 +144,9 @@
         $('#SubjectId').val('');
         $('#TextId').prop('readonly', false);
         $('#TextId').val('');
+        $('#businessRevPointProp').empty();
+        $('#savePointListDiv').hide();
 
-        $('#savePointsDiv').hide();
         var selectedpointCat = $("#pointCatList").val();
         console.log(selectedpointCat);
         var customerId = $("#customersList").val();
@@ -154,7 +157,7 @@
         else {
             $('#selectCustomerError').text('');
         }
-        if (selectedpointCat != "" && selectedpointCat != @AppConstant.TapThatContractPointId) {
+        if (selectedpointCat != "" && (selectedpointCat != @AppConstant.TapThatContractPointId && selectedpointCat != @AppConstant.BusinessReviewPointId)) {
             var v = "<option value=>--Select Point--</option>";
             $("#savePointsList").html(v);
             $.ajax({
@@ -171,7 +174,8 @@
                             v += '<option value="' + Points.value + '">' + Points.text + '</option>';
                         });
                         $("#savePointsList").html(v);
-                        $('#savePointsDiv').show();
+                        $('#savePointListDiv').show();
+                        $('#savePointDiv').show();
                     }
                 },
                 complete: function () {
@@ -267,8 +271,48 @@
             $("#pointEmai1").prop('required', false);
         }
         else if (selectedpointCat != "" && selectedpointCat == @AppConstant.BusinessReviewPointId) {
-            debugger;
-            console.log('inside BR point');
+            if (customerId == "" || customerId == null) {
+                $('#selectCustomerError').text('Select Customer');
+            }
+            else {
+                $('#selectCustomerError').text('');
+                $.ajax({
+                    url: "@Url.Action("ListOfPrPointsByCustomerId", "URL")",
+                    type: 'GET',
+                    contentType: 'application/json',
+                    data: { 'customerId': customerId },
+                    beforeSend: function () {
+                        $("#logoLoader").fadeIn();
+                    },
+                    success: function (data) {
+                        $('#businessRevPointProp').html(data);
+                    },
+                    complete: function () {
+                        $("#logoLoader").fadeOut();
+                    },
+                    error: function (errorMsg) {
+                        console.log(errorMsg);
+                        $("#logoLoader").fadeOut();
+                    }
+                });
+            }
+
+            //need to disabled
+            $("#emailPointProp").hide();
+            $("#SubjectId").val('');
+            $("#SubjectId").prop('required', false);
+            $("#TextId").val('');
+            $("#TextId").prop('required', false);
+            $("#pointEmai1").val('');
+            $("#pointEmai2").val('');
+            $("#pointEmai3").val('');
+            $("#pointEmai1").prop('required', false);
+            $('#savePointListDiv').hide();
+            $('#savePointDiv').hide();
+            $('#is_pointSave').prop('checked', false);
+            $("#stdPointProp").hide();
+            $("#pointDomin").prop('required', false);
+            $('#socialMediaDiv').hide();
         }
         else {
             $("#stdPointProp").hide();
@@ -339,31 +383,40 @@
             $('#managmentNameError').text('Enter Save Point Name');
             return;
         }
-        if ($("#addUrlForm").valid()) {
-            $.ajax({
-                type: "POST",
-                url: '@Url.Action("SaveLink", "URL")',
-                dataType: 'json',
-                data: $("#addUrlForm").serializeArray(),
-                beforeSend: function () {
-                    $("#logoLoader").fadeIn();
-                },
-                success: function (data) {
-                    $("#logoLoader").fadeOut();
-                    if (data == 0) {
-                        $('#urlError').text('URL already exist');
-                    }
-                    else if (data == -1) {
-                        $('#customerPointError').text('Customer point already exist');
-                    }
-                    else if (data == -2) {
-                        $('#managmentNameError').text('This Management name already exist for selected customer.');
-                    }
-                    else if (data == 1) {
-                        location.reload(true);
-                    }
-                }
-            })
+        var t = ValidateBusinessRpoint();
+        var t1=$("#pointCatList").val();
+        if ($("#pointCatList").val() === 4 && ValidateBusinessRpoint() && $("#addUrlForm").valid()) {
+            debugger;
+            SubmitForm();
+        }
+        else if ($("#pointCatList").val() !== 4 && $("#addUrlForm").valid()) {
+            SubmitForm();
         }
     });
+    function SubmitForm(){
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveLink", "URL")',
+            dataType: 'json',
+            data: $("#addUrlForm").serializeArray(),
+            beforeSend: function () {
+                $("#logoLoader").fadeIn();
+            },
+            success: function (data) {
+                $("#logoLoader").fadeOut();
+                if (data == 0) {
+                    $('#urlError').text('URL already exist');
+                }
+                else if (data == -1) {
+                    $('#customerPointError').text('Customer point already exist');
+                }
+                else if (data == -2) {
+                    $('#managmentNameError').text('This Management name already exist for selected customer.');
+                }
+                else if (data == 1) {
+                    location.reload(true);
+                }
+            }
+        });
+    }
 </script>

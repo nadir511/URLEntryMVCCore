@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Org.BouncyCastle.Utilities;
 using URLEntryMVC.ViewModel.CustomerVM;
 using Microsoft.VisualBasic;
+using URLEntryMVC.ViewModel.BusinessReviewVM;
 
 namespace URLEntryMVC.Controllers
 {
@@ -115,6 +116,7 @@ namespace URLEntryMVC.Controllers
                     CategoryId = x.CategoryId,
                     CategoryName = x.CategoryName
                 }).ToList();
+                saveUrlVM.businessReviewPoints = new List<BusinessReviewPoints>();
                 return PartialView("~/Views/PartialViews/_AddUrlModal.cshtml", saveUrlVM);
             }
             catch (Exception ex)
@@ -528,7 +530,9 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                return PartialView("", await urlRepositoryObj.GetListOfBrPointsByCustomerId(customerId));
+                SaveUrlVM saveUrlVM = new SaveUrlVM();
+                saveUrlVM.businessReviewPoints = await urlRepositoryObj.GetListOfBrPointsByCustomerId(customerId);
+                return PartialView("~/Views/PartialViews/_BusinessPoints.cshtml", saveUrlVM);
             }
             catch (Exception)
             {

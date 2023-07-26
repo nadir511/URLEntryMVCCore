@@ -58,9 +58,9 @@
                                             <span asp-validation-for="@Model.businessReviewUrls[i].PointUrl" class="text-danger" id="errorUrl_@i"></span>
                                         </td>
                                         @*<td>
-                                            @Html.EditorFor(m=>m.businessReviewUrls[i].DelayTimeInMinuts,new { htmlAttributes = new { @class = "form-control", @id = "timeDelay_" + i } })
-                                            <span asp-validation-for="@Model.businessReviewUrls[i].DelayTimeInMinuts" class="text-danger" id="errortimeDelay_@i"></span>
-                                        </td>*@
+                                    @Html.EditorFor(m=>m.businessReviewUrls[i].DelayTimeInMinuts,new { htmlAttributes = new { @class = "form-control", @id = "timeDelay_" + i } })
+                                    <span asp-validation-for="@Model.businessReviewUrls[i].DelayTimeInMinuts" class="text-danger" id="errortimeDelay_@i"></span>
+                                    </td>*@
                                     </tr>
                                 }
                             </tbody>
@@ -93,6 +93,7 @@
             fileData.append('CustomerEmail', $("#CustomerEmail").val());
             //binding the review points data
             var rowCount = @Model.businessReviewUrls.Count(); // Get the number of rows
+            var urlsSet = new Set(); // Use Set to store unique pointUrl values
             for (var i = 0; i < rowCount; i++) {
                 var pointUrl = $("#url_" + i).val().trim();
                 //var delayTime = $("#timeDelay_" + i).val();
@@ -111,6 +112,12 @@
                 //    $("#errorUrl_" + i).text("");
                 //    $("#errortimeDelay_" + i).text("");
                 //}
+                if (urlsSet.has(pointUrl)) {
+                    $("#errorUrl_" + i).text("Duplicate Point URL. Please enter a unique URL.");
+                    return false; // Prevent form submission
+                } else {
+                    urlsSet.add(pointUrl);
+                };
                 fileData.append('businessReviewUrls[' + i + '].PointUrl', pointUrl);
                 //fileData.append('businessReviewUrls[' + i + '].DelayTimeInHours', delayTime);
             };

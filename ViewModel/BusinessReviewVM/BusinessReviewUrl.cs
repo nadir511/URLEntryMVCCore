@@ -15,7 +15,8 @@ namespace URLEntryMVC.ViewModel.BusinessReviewVM
         public int BusinessPointId { get; set; }
 
         public string? PointUrl { get; set; }
-
+        [Display(Name = "Delay Time")]
+        [Range(1, int.MaxValue, ErrorMessage = "Only positive number allowed")]
         public int? DelayTimeInMinuts { get; set; }
 
         public int? DelayTimeInHours { get; set; }

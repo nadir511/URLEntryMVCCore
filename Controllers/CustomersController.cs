@@ -6,6 +6,7 @@ using URLEntryMVC.Entities;
 using URLEntryMVC.Extensions;
 using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModel.AccountVM;
+using URLEntryMVC.ViewModel.BusinessReviewVM;
 using URLEntryMVC.ViewModel.CustomerVM;
 using URLEntryMVC.ViewModel.UrlVM;
 

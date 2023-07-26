@@ -16,18 +16,17 @@
                     @for (int i = 0; i < Model.businessReviewPoints.Count(); i++)
                     {
                         <tr>
-                            
+
                             @*@Html.EditorFor(m=>m.businessReviewPoints[i].BusinessPointId,new { htmlAttributes = new { @class = "form-control", @id = "BrPointId_" + i,@style="display:none" } })*@
                             @*<td>
-                                @Model.businessReviewPoints[i].UrlName
-                            </td>*@
+                    @Model.businessReviewPoints[i].UrlName
+                    </td>*@
                             <td>
-                                <select id="customersList" class="form-control" asp-for="@Model.businessReviewPoints[i]" asp-items="@(new SelectList(Model.businessReviewPoints, "CustomerId", "CustomerName"))" required>
-                                    <option value="">--Select Business Review Point--</option>
-                                </select>
+                                @Html.DropDownListFor(model => model.businessReviewPoints[i].selectedBRpointId, new SelectList(Model.businessReviewPoints, "BusinessPointId", "PointUrl"), "Select Business Point URL", new { @class = "form-control",@id="url_"+i })
+                                <span asp-validation-for="@Model.businessReviewPoints[i].selectedBRpointId" class="text-danger" id="errorUrl_@i"></span>
                             </td>
                             <td>
-                                @Html.EditorFor(m=>m.businessReviewPoints[i].DelayTimeInMinuts,new { htmlAttributes = new { @class = "form-control", @id = "timeDelay_" + i } })
+                                @Html.EditorFor(m=>m.businessReviewPoints[i].DelayTimeInMinuts,new { htmlAttributes = new { @class = "form-control",@min="1", @id = "timeDelay_" + i } })
                                 <span asp-validation-for="@Model.businessReviewPoints[i].DelayTimeInMinuts" class="text-danger" id="errortimeDelay_@i"></span>
                             </td>
                         </tr>
@@ -37,3 +36,45 @@
         </table>
     </div>
 </div>
+<script>
+    function ValidateBusinessRpoint() {
+        debugger;
+        if ($("#pointCatList").val() == 4) {
+            var rowCount = 0;
+            if ('@Model.businessReviewPoints' != null) {
+                rowCount = parseInt('@Model.businessReviewPoints.Count()');
+            };
+            var urlsSet = new Set(); // Use Set to store unique pointUrl values
+            for (var i = 0; i < rowCount; i++) {
+                var pointUrl = $("#url_" + i).val(); // Trim leading and trailing spaces
+                var delayTime = $("#timeDelay_" + i).val();
+                var pointUrlText = '';
+                // Check if pointUrl is not empty, then delayTime should also not be empty
+                // and vice versa
+                if (pointUrl === "" && delayTime !== "") {
+                    $("#errorUrl_" + i).text("Please enter a valid Point URL.");
+                    $("#errortimeDelay_" + i).text(""); // Clear the error message for timeDelay
+                    return false; // Prevent form submission
+                } else if (pointUrl !== "" && delayTime === "") {
+                    $("#errorUrl_" + i).text(""); // Clear the error message for Point URL
+                    $("#errortimeDelay_" + i).text("Please enter a valid Delay Time.");
+                    return false; // Prevent form submission
+                } else {
+                    // Clear the error messages if both fields are valid
+                    $("#errorUrl_" + i).text("");
+                    $("#errortimeDelay_" + i).text("");
+                    pointUrlText = $('#url_' + i + ' option:selected').text();
+                }
+                // Check for duplicate pointUrl values
+                if (urlsSet.has(pointUrlText)) {
+                    $("#errorUrl_" + i).text("Duplicate Point URL. Please enter a unique URL.");
+                    return false; // Prevent form submission
+                } else {
+                    urlsSet.add(pointUrlText);
+                }
+            }
+            return true;
+        }
+    }
+
+</script>

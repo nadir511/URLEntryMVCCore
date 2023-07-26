@@ -5,6 +5,7 @@ using URLEntryMVC.Entities;
 using URLEntryMVC.Extensions;
 using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModel.AccountVM;
+using URLEntryMVC.ViewModel.BusinessReviewVM;
 using URLEntryMVC.ViewModel.CustomerVM;
 using URLEntryMVC.ViewModel.UrlVM;
 
@@ -75,8 +76,8 @@ namespace URLEntryMVC.RepositoryClasses
         {
             try
             {
-                CustomerVM customerVM=new CustomerVM();
-                var customerInfo =await _db.CustomerTbls.Where(x => x.Id == Id).FirstOrDefaultAsync();
+                CustomerVM customerVM = new CustomerVM();
+                var customerInfo = await _db.CustomerTbls.Where(x => x.Id == Id).FirstOrDefaultAsync();
                 customerVM.Id = Id;
                 customerVM.CustomerName = customerInfo.CustomerName;
                 customerVM.ContactNumber = customerInfo.ContactNumber;
@@ -91,10 +92,10 @@ namespace URLEntryMVC.RepositoryClasses
                 customerVM.Youtube = customerInfo.Youtube;
                 customerVM.Snapchat = customerInfo.Snapchat;
 
-                customerVM.businessReviewUrls=await _db.BusinessReviewPoints.Where(x=>x.CustomerIdFk==Id).Select(x=>new BusinessReviewUrl
+                customerVM.businessReviewUrls = await _db.BusinessReviewPoints.Where(x => x.CustomerIdFk == Id).Select(x => new BusinessReviewUrl
                 {
                     BusinessPointId = x.BusinessPointId,
-                    PointUrl=x.PointUrl,
+                    PointUrl = x.PointUrl,
                 }).ToListAsync();
                 if (customerVM.businessReviewUrls.Count < 1)
                 {
@@ -190,7 +191,7 @@ namespace URLEntryMVC.RepositoryClasses
                 };
                 _db.Entry(customer).State = EntityState.Added;
                 _db.SaveChanges();
-                if (customerVM.businessReviewUrls!=null && customerVM.businessReviewUrls.Count>0)
+                if (customerVM.businessReviewUrls != null && customerVM.businessReviewUrls.Count > 0)
                 {
                     List<BusinessReviewPoint> PointsObj = new List<BusinessReviewPoint>();
                     foreach (var item in customerVM.businessReviewUrls)
@@ -225,7 +226,7 @@ namespace URLEntryMVC.RepositoryClasses
                 }
                 else
                 {
-                    var picByte =await _db.CustomerTbls.Where(x => x.Id == customerVM.Id).Select(x => x.CustomerPic).FirstOrDefaultAsync();
+                    var picByte = await _db.CustomerTbls.Where(x => x.Id == customerVM.Id).Select(x => x.CustomerPic).FirstOrDefaultAsync();
                     fileBytes = picByte;
                 }
                 var customer = new CustomerTbl()
@@ -246,15 +247,15 @@ namespace URLEntryMVC.RepositoryClasses
                 };
                 _db.Entry(customer).State = EntityState.Modified;
                 _db.SaveChanges();
-                if (customerVM.businessReviewUrls!=null && customerVM.businessReviewUrls.Count>0)
+                if (customerVM.businessReviewUrls != null && customerVM.businessReviewUrls.Count > 0)
                 {
                     foreach (var item in customerVM.businessReviewUrls)
                     {
-                        if (item.BusinessPointId!=null && item.BusinessPointId>0)
+                        if (item.BusinessPointId != null && item.BusinessPointId > 0)
                         {
                             //It means record is alreday in DB and we have to update that record
-                            var urlInfo=await _db.BusinessReviewPoints.Where(x=>x.BusinessPointId==item.BusinessPointId && x.CustomerIdFk== customerVM.Id).FirstOrDefaultAsync();
-                            if (urlInfo!=null)
+                            var urlInfo = await _db.BusinessReviewPoints.Where(x => x.BusinessPointId == item.BusinessPointId && x.CustomerIdFk == customerVM.Id).FirstOrDefaultAsync();
+                            if (urlInfo != null)
                             {
                                 urlInfo.PointUrl = item.PointUrl;
                                 await _db.SaveChangesAsync();
@@ -271,7 +272,7 @@ namespace URLEntryMVC.RepositoryClasses
                         }
                     }
                 }
-                
+
                 return true;
             }
             catch (Exception)
@@ -310,7 +311,7 @@ namespace URLEntryMVC.RepositoryClasses
                     Youtube = x.Youtube,
                     Snapchat = x.Snapchat
                 }).FirstOrDefaultAsync();
-                List<(string? text,string? value)> profilesList = new List<(string? text, string? value)>
+                List<(string? text, string? value)> profilesList = new List<(string? text, string? value)>
                     {
                         ("Facebook",customerProfiles.Facebook),
                         ("Instagram",customerProfiles.Instagram),
