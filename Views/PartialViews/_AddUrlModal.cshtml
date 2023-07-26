@@ -385,11 +385,11 @@
         }
         var t = ValidateBusinessRpoint();
         var t1=$("#pointCatList").val();
-        if ($("#pointCatList").val() === 4 && ValidateBusinessRpoint() && $("#addUrlForm").valid()) {
+        if ($("#pointCatList").val() == 4 && ValidateBusinessRpoint() && $("#addUrlForm").valid()) {
             debugger;
             SubmitForm();
         }
-        else if ($("#pointCatList").val() !== 4 && $("#addUrlForm").valid()) {
+        else if ($("#pointCatList").val() != 4 && $("#addUrlForm").valid()) {
             SubmitForm();
         }
     });

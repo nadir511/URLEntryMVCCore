@@ -150,7 +150,8 @@ namespace URLEntryMVC.Controllers
                         PointCategoryId = urlVM.PointCategoryId,
                         Subject = urlVM.Subject,
                         Text = urlVM.Text,
-                        SaveInLibrary = urlVM.SaveInLibrary
+                        SaveInLibrary = urlVM.SaveInLibrary,
+                        businessReviewPoints=urlVM.businessReviewPoints,
                     };
                     StringBuilder? emails = new StringBuilder();
                     if (!string.IsNullOrWhiteSpace(urlVM.Email1))

@@ -143,7 +143,8 @@ namespace URLEntryMVC.RepositoryClasses
                     ManagementName= PointInfo.ManagementName,
                     PointCategoryIdFk = PointInfo.PointCategoryId,
                     Subject = PointInfo.Subject,
-                    Body = PointInfo.Text
+                    Body = PointInfo.Text,
+                    CreationDate=DateTime.UtcNow
                 };
                 _db.UrlTbls.Add(savePointInfo);
                 _db.SaveChanges();
@@ -156,6 +157,21 @@ namespace URLEntryMVC.RepositoryClasses
                     };
                     _db.PointEmails.Add(pointEmail);
                     _db.SaveChanges();
+                }
+                if (PointInfo.PointCategoryId==AppConstant.BusinessReviewPointId && PointInfo.businessReviewPoints!=null)
+                {
+                    foreach (var item in PointInfo.businessReviewPoints)
+                    {
+                        if (item.selectedBRpointId!=null && item.DelayTimeInMinuts!=null)
+                        {
+                            var BpInfo = _db.BusinessReviewPoints.Where(x => x.BusinessPointId == item.selectedBRpointId && x.CustomerIdFk == PointInfo.CustomerId).FirstOrDefault();
+                            if (BpInfo!=null)
+                            {
+                                BpInfo.DelayTimeInMinuts = item.DelayTimeInMinuts;
+                                _db.SaveChanges();
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception)

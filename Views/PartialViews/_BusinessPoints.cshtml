@@ -59,19 +59,21 @@
                     $("#errorUrl_" + i).text(""); // Clear the error message for Point URL
                     $("#errortimeDelay_" + i).text("Please enter a valid Delay Time.");
                     return false; // Prevent form submission
-                } else {
+                } else if (pointUrl !== "" && delayTime !== "") {
                     // Clear the error messages if both fields are valid
                     $("#errorUrl_" + i).text("");
                     $("#errortimeDelay_" + i).text("");
                     pointUrlText = $('#url_' + i + ' option:selected').text();
+                    // Check for duplicate pointUrl values
+                    if (urlsSet.has(pointUrlText)) {
+                        $("#errorUrl_" + i).text("Duplicate Point URL. Please enter a unique URL.");
+                        return false; // Prevent form submission
+                    } else {
+                        urlsSet.add(pointUrlText);
+                    }
                 }
-                // Check for duplicate pointUrl values
-                if (urlsSet.has(pointUrlText)) {
-                    $("#errorUrl_" + i).text("Duplicate Point URL. Please enter a unique URL.");
-                    return false; // Prevent form submission
-                } else {
-                    urlsSet.add(pointUrlText);
-                }
+
+
             }
             return true;
         }
