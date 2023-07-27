@@ -167,6 +167,7 @@ namespace URLEntryMVC.RepositoryClasses
                             var BpInfo = _db.BusinessReviewPoints.Where(x => x.BusinessPointId == item.selectedBRpointId && x.CustomerIdFk == PointInfo.CustomerId).FirstOrDefault();
                             if (BpInfo!=null)
                             {
+                                BpInfo.UrlIdFk= savePointInfo.Id;
                                 BpInfo.DelayTimeInMinuts = item.DelayTimeInMinuts;
                                 _db.SaveChanges();
                             }
@@ -237,6 +238,11 @@ namespace URLEntryMVC.RepositoryClasses
                     if (pointEmail != null)
                         _db.PointEmails.Remove(pointEmail);
                     _db.UrlTbls.Remove(UrlInfo);
+                    var BrPoints=_db.BusinessReviewPoints.Where(x=>x.UrlIdFk==Id).ToList();
+                    BrPoints.ForEach(x =>
+                    {
+                        x.UrlIdFk = null;
+                    });
                 }
                 _db.SaveChanges();
             }

@@ -109,7 +109,7 @@
                         <th>
                             @Html.DisplayNameFor(model => model.UrlLink)
                         </th>
-                        @if (ViewBag.pointCategory != AppConstant.StdContractPoint && ViewBag.pointCategory != AppConstant.EmailContractPoint && ViewBag.pointCategory != AppConstant.TapContractPoint)
+                        @if (ViewBag.pointCategory != AppConstant.StdContractPoint && ViewBag.pointCategory != AppConstant.EmailContractPoint && ViewBag.pointCategory != AppConstant.TapContractPoint && ViewBag.pointCategory != AppConstant.BusinessRevPoint)
                         {
                             <th>Category</th>
                         }
@@ -139,11 +139,11 @@
                                 @Html.HiddenFor(modelItem => item.Id)
                                 @if (User.IsInRole(AppConstant.AdminRole))
                                 {
-                                    if (item.PointCategoryId == 1 || item.PointCategoryId == 3)
+                                    if (item.PointCategoryId == AppConstant.StdContractPointId || item.PointCategoryId == AppConstant.TapThatContractPointId || item.PointCategoryId == AppConstant.BusinessReviewPointId)
                                     {
                                         <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.UrlLink)</a>
                                     }
-                                    else if (item.PointCategoryId == 2)
+                                    else if (item.PointCategoryId == AppConstant.EmailContractPointId)
                                     {
                                         <a href="mailto:@item.PointEmails?subject=@item.Subject&body=@item.Body">@Html.DisplayFor(modelItem => item.UrlLink)</a>
                                     }
@@ -151,17 +151,17 @@
                                 }
                                 else
                                 {
-                                    if (item.PointCategoryId == 1 || item.PointCategoryId == 3)
+                                    if (item.PointCategoryId == AppConstant.StdContractPointId || item.PointCategoryId == AppConstant.TapThatContractPointId || item.PointCategoryId == AppConstant.BusinessReviewPointId)
                                     {
                                         <a href="@item.DomainLink" class="link-primary" target="_blank">@Html.DisplayFor(modelItem => item.CustomerPointName)</a>
                                     }
-                                    else if (item.PointCategoryId == 2)
+                                    else if (item.PointCategoryId == AppConstant.EmailContractPointId)
                                     {
                                         <a href="mailto:@item.PointEmails?subject=@item.Subject&body=@item.Body">@Html.DisplayFor(modelItem => item.CustomerPointName)</a>
                                     }
                                 }
                             </td>
-                            @if (ViewBag.pointCategory != AppConstant.StdContractPoint && ViewBag.pointCategory != AppConstant.EmailContractPoint && ViewBag.pointCategory != AppConstant.TapContractPoint)
+                            @if (ViewBag.pointCategory != AppConstant.StdContractPoint && ViewBag.pointCategory != AppConstant.EmailContractPoint && ViewBag.pointCategory != AppConstant.TapContractPoint && ViewBag.pointCategory != AppConstant.BusinessRevPoint )
                             {
                                 <td>
                                     <input class="form-control" value="@item.PointCategoryName" readonly />
@@ -171,7 +171,7 @@
                                 <input class="form-control" value="@item.CustomerNotes" readonly />
                                 @*@Html.EditorFor(m=>item.CustomerNotes, new { htmlAttributes = new { @class = "form-control",@readonly="readonly" } })*@
                             </td>
-                            @if (ViewBag.pointCategory == AppConstant.StdContractPoint || ViewBag.pointCategory == AppConstant.TapContractPoint)
+                            @if (ViewBag.pointCategory == AppConstant.StdContractPoint || ViewBag.pointCategory == AppConstant.TapContractPoint )
                             {
                                 <td>
                                     <input class="form-control" value="@item.DomainLink" readonly />

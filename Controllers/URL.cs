@@ -83,6 +83,10 @@ namespace URLEntryMVC.Controllers
                 {
                     UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.TapThatContractPointId).ToList();
                 }
+                else if (pointCategory == AppConstant.BusinessRevPoint)
+                {
+                    UrlList = UrlList.Where(x => x.PointCategoryId == AppConstant.BusinessReviewPointId).ToList();
+                }
                 if (User.IsInRole(AppConstant.CustomerRole))
                 {
                     var userInfo = await _userManager.FindByNameAsync(User.Identity.Name);
@@ -572,6 +576,14 @@ namespace URLEntryMVC.Controllers
                     //string mailtoLink = string.Format("mailto:{0}?Content-Type={1}&subject={2}&body={3}", emails, "text/plain; charset=utf-8", HttpUtility.UrlEncode(encodedSubjectText), HttpUtility.UrlEncode(encodedBodyText));
                     //string mailtoLink = "mailto:recipient@example.com?subject=Example%20Subject&body=%3D%3Futf-8%3FB%3F44GT44KT44Gr44Gh44Gv%3F%3D%0D%0AContent-Type%3A%20text%2Fplain%3B%20charset%3Dutf-8";
                     return Redirect(mailToStr);
+                }
+                else if (domainLinkObj.PointCategoryIdFk == AppConstant.BusinessReviewPointId)
+                {
+                    var BrPointUrl=_db.BusinessReviewPoints.Where(x=>x.UrlIdFk== domainLinkObj.Id && x.IsCurrentlyActive==true).FirstOrDefault();
+                    if (BrPointUrl!=null)
+                    {
+                        return Redirect(BrPointUrl.PointUrl ?? "");
+                    }
                 }
             }
             return StatusCode(statusCode);
