@@ -39,6 +39,10 @@ namespace URLEntryMVC.Controllers
         }
         public async Task<ActionResult> UsersList()
         {
+
+            //KingCoderUKs
+
+
             List<UsersVM> UsersList = _userManager.Users.Select(x => new UsersVM
             {
                 Id = x.Id,
