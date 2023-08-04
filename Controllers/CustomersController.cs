@@ -1,14 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using URLEntryMVC.Data;
-using URLEntryMVC.Entities;
 using URLEntryMVC.Extensions;
 using URLEntryMVC.Interfaces;
-using URLEntryMVC.ViewModel.AccountVM;
 using URLEntryMVC.ViewModel.BusinessReviewVM;
 using URLEntryMVC.ViewModel.CustomerVM;
-using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.Controllers
 {
@@ -49,7 +45,7 @@ namespace URLEntryMVC.Controllers
             }
         }
         [HttpGet]
-        public async Task<ActionResult> customerProfile(int? customerId,bool? disableProfile)
+        public async Task<ActionResult> customerProfile(int? customerId, bool? disableProfile)
         {
             try
             {
@@ -82,14 +78,14 @@ namespace URLEntryMVC.Controllers
             {
                 throw ex;
             }
-            
+
         }
         [HttpPost]
         public async Task<ActionResult> customerProfile(CustomerVM customerVM)
         {
             try
             {
-                bool IsCustomerSave =await _customerRepository.UpdateCustomer(customerVM);
+                bool IsCustomerSave = await _customerRepository.UpdateCustomer(customerVM);
                 return RedirectToAction("customerProfile");
             }
             catch (Exception)
@@ -97,7 +93,7 @@ namespace URLEntryMVC.Controllers
 
                 throw;
             }
-            
+
         }
         [HttpGet]
         public ActionResult SaveCustomer()
@@ -105,20 +101,13 @@ namespace URLEntryMVC.Controllers
             try
             {
                 CustomerVM customerVM = new CustomerVM();
-                customerVM.businessReviewUrls = new List<BusinessReviewUrl>();
-                for (int i = 1; i < 7; i++)
-                {
-                    BusinessReviewUrl businessReviewUrl = new BusinessReviewUrl();
-                    businessReviewUrl.UrlName = "URL-" + i;
-                    customerVM.businessReviewUrls.Add(businessReviewUrl);
-                }
                 return PartialView("~/Views/PartialViews/_AddCustomerModal.cshtml", customerVM);
             }
             catch (Exception)
             {
                 throw;
             }
-            
+
         }
         [HttpPost]
         public async Task<ActionResult> SaveCustomer(CustomerVM customerVM)
@@ -144,7 +133,7 @@ namespace URLEntryMVC.Controllers
             {
                 CustomerVM customerVM = new CustomerVM();
                 customerVM = await _customerRepository.GetCustomerById(Id);
-                
+
                 return PartialView("~/Views/Customers/_EditCustomer.cshtml", customerVM);
             }
             catch (Exception)
@@ -158,12 +147,12 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                
+
                 bool IsCustomerExist = await _customerRepository.IsCustomerExistOnEdit(customerVM.CustomerName, customerVM.Id);
                 if (IsCustomerExist)
                     return Json(0);
-                
-                bool IsCustomerSave =await _customerRepository.UpdateCustomer(customerVM);
+
+                bool IsCustomerSave = await _customerRepository.UpdateCustomer(customerVM);
                 return Json(1);
             }
             catch (Exception)
@@ -195,7 +184,7 @@ namespace URLEntryMVC.Controllers
 
                 throw;
             }
-            
+
         }
         [HttpPost]
         public async Task<ActionResult> ConfirmDeleteCustomer(int Id)

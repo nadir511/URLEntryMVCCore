@@ -54,7 +54,7 @@
                                     @*<th>TIME DELAY(In Minutes)</th>*@
                                 </tr>
                             </thead>
-                            <tbody>
+                           @* <tbody>
                                 @for (int i = 0; i < Model.businessReviewUrls.Count(); i++)
                                 {
                                     <tr>
@@ -69,7 +69,7 @@
                                         </td>
                                     </tr>
                                 }
-                            </tbody>
+                            </tbody>*@
                         </table>
                     </div>
                 </div>
@@ -98,23 +98,7 @@
             fileData.append('ContactNumber', $("#ContactNumber").val());
             fileData.append('CustomerEmail', $("#CustomerEmail").val());
             fileData.append('Id', @Model.Id);
-            //binding the review points data
-            var rowCount = @Model.businessReviewUrls.Count(); // Get the number of rows
-            var urlsSet = new Set(); // Use Set to store unique pointUrl values
-            for (var i = 0; i < rowCount; i++) {
-                var pointId = $("#BrPointId_" + i).val();
-                var pointUrl = $("#url_" + i).val().trim();
-                if (urlsSet.has(pointUrl)) {
-                    $("#errorUrl_" + i).text("Duplicate Point URL. Please enter a unique URL.");
-                    return false; // Prevent form submission
-                } else {
-                    urlsSet.add(pointUrl);
-                };
-
-                fileData.append('businessReviewUrls[' + i + '].BusinessPointId', pointId);
-                fileData.append('businessReviewUrls[' + i + '].PointUrl', pointUrl);
-                
-            };
+            
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("EditCustomer", "Customers")',

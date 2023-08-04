@@ -9,6 +9,7 @@
         public int? DelayTimeInMinuts { get; set; }
 
         public int? DelayTimeInHours { get; set; }
+        public DateTime? DatePointer { get; set; }
 
         public bool? IsCurrentlyActive { get; set; }
 

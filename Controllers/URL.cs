@@ -1,25 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using URLEntryMVC.Entities;
-using URLEntryMVC.Interfaces;
-using URLEntryMVC.Data;
-using URLEntryMVC.ViewModel.UrlVM;
-using Microsoft.EntityFrameworkCore;
-using URLEntryMVC.Extensions;
 using Microsoft.AspNetCore.Identity;
-using URLEntryMVC.ApplicationConstants;
-using URLEntryMVC.ViewModel.PointCategoryVM;
-using System.Text;
-using Microsoft.AspNetCore.Http.Extensions;
-using System.Net;
-using System.Net.Mime;
-using System.Web;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Org.BouncyCastle.Utilities;
-using URLEntryMVC.ViewModel.CustomerVM;
-using Microsoft.VisualBasic;
+using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Web;
+using URLEntryMVC.ApplicationConstants;
+using URLEntryMVC.Data;
+using URLEntryMVC.Extensions;
+using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModel.BusinessReviewVM;
+using URLEntryMVC.ViewModel.PointCategoryVM;
+using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.Controllers
 {
@@ -99,7 +92,7 @@ namespace URLEntryMVC.Controllers
             {
                 throw ex;
             }
-            
+
         }
         [Authorize]
         [HttpGet]
@@ -127,7 +120,7 @@ namespace URLEntryMVC.Controllers
             {
                 throw ex;
             }
-            
+
         }
         [Authorize]
         [HttpPost]
@@ -155,7 +148,7 @@ namespace URLEntryMVC.Controllers
                         Subject = urlVM.Subject,
                         Text = urlVM.Text,
                         SaveInLibrary = urlVM.SaveInLibrary,
-                        businessReviewPoints=urlVM.businessReviewPoints,
+                        businessReviewPoints = urlVM.businessReviewPoints,
                     };
                     StringBuilder? emails = new StringBuilder();
                     if (!string.IsNullOrWhiteSpace(urlVM.Email1))
@@ -229,7 +222,7 @@ namespace URLEntryMVC.Controllers
 
                 throw ex;
             }
-            
+
         }
         [Authorize]
         [HttpPost]
@@ -325,11 +318,11 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                if (urlVM.PointIds!=null)
+                if (urlVM.PointIds != null)
                 {
                     foreach (var item in urlVM.PointIds)
                     {
-                        int pointId =Convert.ToInt32(item);
+                        int pointId = Convert.ToInt32(item);
                         SaveUrlVM? domainLinkObj = await _db.UrlTbls.Where(x => x.Id == pointId).Select(x => new SaveUrlVM
                         {
                             Id = x.Id,
@@ -469,7 +462,7 @@ namespace URLEntryMVC.Controllers
                 throw ex;
             }
         }
-        public async Task<ActionResult> ListOfSavePoints(int pointCategory,int customerId)
+        public async Task<ActionResult> ListOfSavePoints(int pointCategory, int customerId)
         {
             try
             {
@@ -529,14 +522,14 @@ namespace URLEntryMVC.Controllers
             {
                 throw ex;
             }
-            
+
         }
-        public async Task<ActionResult> ListOfPrPointsByCustomerId(int customerId)
+        public ActionResult ListOfPrPointsByCustomerId(int customerId)
         {
             try
             {
                 SaveUrlVM saveUrlVM = new SaveUrlVM();
-                saveUrlVM.businessReviewPoints = await urlRepositoryObj.GetListOfBrPointsByCustomerId(customerId);
+                saveUrlVM.businessReviewPoints =urlRepositoryObj.GetListOfDummyBrPoints();
                 return PartialView("~/Views/PartialViews/_BusinessPoints.cshtml", saveUrlVM);
             }
             catch (Exception)
@@ -579,8 +572,8 @@ namespace URLEntryMVC.Controllers
                 }
                 else if (domainLinkObj.PointCategoryIdFk == AppConstant.BusinessReviewPointId)
                 {
-                    var BrPointUrl=_db.BusinessReviewPoints.Where(x=>x.UrlIdFk== domainLinkObj.Id && x.IsCurrentlyActive==true).FirstOrDefault();
-                    if (BrPointUrl!=null)
+                    var BrPointUrl = _db.BusinessReviewPoints.Where(x => x.UrlIdFk == domainLinkObj.Id && x.IsCurrentlyActive == true).FirstOrDefault();
+                    if (BrPointUrl != null)
                     {
                         return Redirect(BrPointUrl.PointUrl ?? "");
                     }

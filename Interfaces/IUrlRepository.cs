@@ -17,7 +17,7 @@ namespace URLEntryMVC.Interfaces
         Task<List<getListOfPoints>> ListOfLinks();
         Task<UrlTbl?> GetUrlById(int id);
         Task<string?> GetEmailsByPointId(int PointId);
-        Task<List<BusinessReviewPoints>> GetListOfBrPointsByCustomerId(int customerId);
+        List<BusinessReviewPoints> GetListOfDummyBrPoints();
         void DeleteUrl(int Id);
     }
 }

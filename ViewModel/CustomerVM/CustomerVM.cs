@@ -29,7 +29,7 @@ namespace URLEntryMVC.ViewModel.CustomerVM
         public string? TikTok { get; set; }
         public string? Youtube { get; set; }
         public string? Snapchat { get; set; }
-        public List<BusinessReviewUrl>? businessReviewUrls { get; set; }
+        
     }
     public class DeleteCustomerVM
     {

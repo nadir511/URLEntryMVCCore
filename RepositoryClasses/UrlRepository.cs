@@ -160,6 +160,7 @@ namespace URLEntryMVC.RepositoryClasses
                 }
                 if (PointInfo.PointCategoryId==AppConstant.BusinessReviewPointId && PointInfo.businessReviewPoints!=null)
                 {
+                    bool isFirstIteration = true; // Flag to track the first iteration
                     foreach (var item in PointInfo.businessReviewPoints)
                     {
                         if (item.selectedBRpointId!=null && item.DelayTimeInMinuts!=null)
@@ -167,11 +168,14 @@ namespace URLEntryMVC.RepositoryClasses
                             var BpInfo = _db.BusinessReviewPoints.Where(x => x.BusinessPointId == item.selectedBRpointId && x.CustomerIdFk == PointInfo.CustomerId).FirstOrDefault();
                             if (BpInfo!=null)
                             {
+                                BpInfo.IsCurrentlyActive = isFirstIteration==true? true:false;
                                 BpInfo.UrlIdFk= savePointInfo.Id;
                                 BpInfo.DelayTimeInMinuts = item.DelayTimeInMinuts;
+                                BpInfo.DatePointer = isFirstIteration == true? savePointInfo.CreationDate.Value.AddMinutes(Convert.ToDouble(item.DelayTimeInMinuts)):null;
                                 _db.SaveChanges();
                             }
                         }
+                        isFirstIteration = false; // Set the flag to false for subsequent iterations
                     }
                 }
             }
@@ -193,15 +197,16 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
-        public async Task<List<BusinessReviewPoints>> GetListOfBrPointsByCustomerId(int customerId)
+        public List<BusinessReviewPoints> GetListOfDummyBrPoints()
         {
-            List<BusinessReviewPoints> BrPointList =await _db.BusinessReviewPoints.Where(x => x.CustomerIdFk == customerId && x.PointUrl != null).Select(x => new BusinessReviewPoints
+            List<BusinessReviewPoints> businessReviewUrls = new List<BusinessReviewPoints>();
+            for (int i = 1; i < 7; i++)
             {
-                BusinessPointId=x.BusinessPointId,
-                PointUrl=x.PointUrl,
-                DelayTimeInMinuts=x.DelayTimeInMinuts,
-            }).ToListAsync();
-            return BrPointList;
+                BusinessReviewPoints businessReviewUrl = new BusinessReviewPoints();
+                businessReviewUrl.UrlName = "URL-" + i;
+                businessReviewUrls.Add(businessReviewUrl);
+            }
+            return businessReviewUrls;
         }
         public async Task<UrlTbl?> GetUrlById(int Id)
         {
@@ -252,5 +257,6 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
+
     }
 }

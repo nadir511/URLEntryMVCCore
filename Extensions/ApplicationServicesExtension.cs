@@ -29,8 +29,10 @@ public static class ApplicationServicesExtension
         })
         .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
         
-        _services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         _services.AddSession();
+
+        //Configure Backgroud servies
+        _services.AddHostedService<BusinessPointDelaySettingService>();
         return _services;
     }
 }
