@@ -58,7 +58,7 @@
         </div>
     </div>
 
-    <div class="row" style="display:none" id="savePointsDiv">
+    <div class="row" style="display:none" id="savePointsListDiv">
         <div class="col-sm-12">
             <label style="display:block">Select From Save Points</label>
             <select id="savePointsList" class="form-control" onchange="ChangeLibPoint(this)">
@@ -144,20 +144,7 @@
         $("#socialPointsList").html(v);
     });
     function ChangePointCat(obj) {
-        //$('#pointDomin').prop('readonly', false);
-        //$('#pointDomin').val('');
-        //$('#pointEmai1').prop('readonly', false);
-        //$('#pointEmai1').val('');
-        //$('#pointEmai2').prop('readonly', false);
-        //$('#pointEmai2').val('');
-        //$('#pointEmai3').prop('readonly', false);
-        //$('#pointEmai3').val('');
-        //$('#SubjectId').prop('readonly', false);
-        //$('#SubjectId').val('');
-        //$('#TextId').prop('readonly', false);
-        //$('#TextId').val('');
 
-        //$('#savePointsDiv').hide();
         var selectedpointCat = $("#pointCatList").val();
         var customerId = $("#customersList").val();
         if (customerId == "" || customerId == null) {
@@ -167,7 +154,7 @@
         else {
             $('#selectCustomerError').text('');
         }
-        if (selectedpointCat != "" && selectedpointCat != @AppConstant.TapThatContractPointId) {
+        if (selectedpointCat != "" && selectedpointCat != @AppConstant.TapThatContractPointId && selectedpointCat != @AppConstant.BusinessReviewPointId) {
             var v = "<option value=>--Select Point--</option>";
             $("#savePointsList").html(v);
             $.ajax({
@@ -184,7 +171,7 @@
                             v += '<option value="' + Points.value + '">' + Points.text + '</option>';
                         });
                         $("#savePointsList").html(v);
-                        $('#savePointsDiv').show();
+                        $('#savePointsListDiv').show();
                     }
                 },
                 complete: function () {
@@ -196,7 +183,6 @@
                 }
             });
         }
-
         if (selectedpointCat == @AppConstant.StdContractPointId) {
             //need to enabled
             $("#stdPointProp").show();
@@ -244,7 +230,6 @@
                         $("#logoLoader").fadeIn();
                     },
                     success: function (profiles) {
-                        debugger;
                         if (profiles != "error") {
                             $.each(profiles, function (i, profile) {
                                 v += '<option value="' + profile.text + '">' + profile.value + '</option>';
@@ -281,7 +266,13 @@
             $("#pointEmai1").prop('required', false);
         }
         else if (selectedpointCat != "" && selectedpointCat == @AppConstant.BusinessReviewPointId) {
-            debugger;
+            // To make the dropdown read-only
+            $('#pointCatList').on('mousedown', function (event) {
+                event.preventDefault();
+                this.blur();
+                window.focus();
+            });
+
             if (customerId == "" || customerId == null) {
                 $('#selectCustomerError').text('Select Customer');
             }
@@ -291,7 +282,7 @@
                     url: "@Url.Action("ListOfBrPointsByCustomerId", "URL")",
                     type: 'GET',
                     contentType: 'application/json',
-                    data: { 'isEdit': true },
+                    data: { 'pointId': @Model.Id },
                     beforeSend: function () {
                         $("#logoLoader").fadeIn();
                     },
@@ -318,9 +309,8 @@
             $("#pointEmai2").val('');
             $("#pointEmai3").val('');
             $("#pointEmai1").prop('required', false);
-            $('#savePointListDiv').hide();
             $('#savePointDiv').hide();
-            $('#savePointsDiv').hide();
+            $('#savePointsListDiv').hide();
             $('#is_pointSave').prop('checked', false);
             $("#stdPointProp").hide();
             $("#pointDomin").prop('required', false);

@@ -280,7 +280,7 @@
                     url: "@Url.Action("ListOfBrPointsByCustomerId", "URL")",
                     type: 'GET',
                     contentType: 'application/json',
-                    data: { 'isEdit': false },
+                    data: { 'pointId': 0 },
                     beforeSend: function () {
                         $("#logoLoader").fadeIn();
                     },

@@ -6,7 +6,7 @@ namespace URLEntryMVC.Interfaces
 {
     public interface IUrlRepository
     {
-        void UpdateLink(SaveUrlVM UrlInfo);
+        Task<bool> UpdateLink(SaveUrlVM UrlInfo);
         Task<bool> IsLinkExist(string url);
         Task<bool> IsPointExistForCustomer(string CustomerPointName,int CustomerId);
         Task<bool> IsManagementNameExistForCustomer(string PointManagementName, int CustomerId);
@@ -17,7 +17,7 @@ namespace URLEntryMVC.Interfaces
         Task<List<getListOfPoints>> ListOfLinks();
         Task<UrlTbl?> GetUrlById(int id);
         Task<string?> GetEmailsByPointId(int PointId);
-        Task<List<BusinessReviewPoints>> GetListOfDummyBrPoints();
+        Task<List<BusinessReviewPoints>> GetListOfDummyBrPoints(int pointId);
         Task<SaveUrlVM> getPointInfoOnEdit(int PointId);
         void DeleteUrl(int Id);
     }

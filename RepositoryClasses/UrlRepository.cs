@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text;
 using URLEntryMVC.ApplicationConstants;
 using URLEntryMVC.Data;
 using URLEntryMVC.Entities;
@@ -14,16 +15,18 @@ namespace URLEntryMVC.RepositoryClasses
     {
         private readonly DataContext _db;
         private readonly ICustomerRepository _customerRepository;
+        private string domainLink = "https://tapthat.online/";
 
         public UrlRepository(DataContext _dataContext, ICustomerRepository customerRepository)
         {
             _db = _dataContext;
             _customerRepository = customerRepository;
         }
-        public void UpdateLink(SaveUrlVM PointInfo)
+        public async Task<bool> UpdateLink(SaveUrlVM PointInfo)
         {
             try
             {
+                var customerInfo = await _customerRepository.GetCustomerById(PointInfo.CustomerId);
                 var savePointInfo = _db.UrlTbls.Where(x => x.Id == PointInfo.Id).FirstOrDefault();
 
                 if (savePointInfo != null)
@@ -33,7 +36,7 @@ namespace URLEntryMVC.RepositoryClasses
                     {
                         savePointInfo.SaveInLibrary = PointInfo.SaveInLibrary;
                     }
-                    savePointInfo.UrlLink = PointInfo.UrlLink;
+                    savePointInfo.UrlLink = domainLink + '_' + customerInfo.CustomerName + '/' + PointInfo.CustomerPointName;
                     savePointInfo.DomainLink = PointInfo.DomainLink;
                     savePointInfo.CustomerIdFk = PointInfo.CustomerId;
                     savePointInfo.CustomerPointName = PointInfo.CustomerPointName;
@@ -42,11 +45,52 @@ namespace URLEntryMVC.RepositoryClasses
                     savePointInfo.Subject = PointInfo.Subject;
                     savePointInfo.Body = PointInfo.Text;
                     savePointInfo.CustomerNotes = PointInfo.CustomerNotes;
+                    savePointInfo.UpdationDate = DateTime.UtcNow;
                 }
-                var EmailInfo = _db.PointEmails.Where(x => x.PointIdFk == PointInfo.Id).FirstOrDefault();
-                if (EmailInfo != null)
-                    EmailInfo.Email = PointInfo.allEmailsStr;
+                if (PointInfo.PointCategoryId == AppConstant.EmailContractPointId)
+                {
+                    StringBuilder? emails = new StringBuilder();
+                    if (!string.IsNullOrWhiteSpace(PointInfo.Email1))
+                    {
+                        emails.Append(PointInfo.Email1);
+                    }
+                    if (!string.IsNullOrWhiteSpace(PointInfo.Email2))
+                    {
+                        emails.Append("," + PointInfo.Email2);
+                    }
+                    if (!string.IsNullOrWhiteSpace(PointInfo.Email3))
+                    {
+                        emails.Append("," + PointInfo.Email3);
+                    }
+                    PointInfo.allEmailsStr = emails.ToString();
+                    var EmailInfo = _db.PointEmails.Where(x => x.PointIdFk == PointInfo.Id).FirstOrDefault();
+                    if (EmailInfo != null)
+                        EmailInfo.Email = PointInfo.allEmailsStr;
+                }
+                else if (PointInfo.PointCategoryId == AppConstant.BusinessReviewPointId)
+                {
+                    if (PointInfo.businessReviewPoints != null && PointInfo.businessReviewPoints.Count > 0)
+                    {
+                        bool isFirstIteration = true; // Flag to track the first iteration
+                        foreach (var item in PointInfo.businessReviewPoints)
+                        {
+                            //It means record is alreday in DB and we have to update that record
+                            var businessPointUrlInfo = await _db.BusinessReviewPoints.Where(x => x.BusinessPointId == item.BusinessPointId).FirstOrDefaultAsync();
+                            if (businessPointUrlInfo != null)
+                            {
+                                businessPointUrlInfo.PointUrl = item.PointUrl;
+                                businessPointUrlInfo.IsCurrentlyActive = isFirstIteration == true ? true : false;
+                                businessPointUrlInfo.DelayTimeInMinuts=item.DelayTimeInMinuts;
+                                businessPointUrlInfo.DelayTimeInHours=item.DelayTimeInHours;
+                                businessPointUrlInfo.DatePointer = isFirstIteration == true ? savePointInfo.UpdationDate.Value.AddMinutes(Convert.ToDouble(item.DelayTimeInMinuts)) : null;
+                                await _db.SaveChangesAsync();
+                            }
+                            isFirstIteration = false; // Set the flag to false for subsequent iterations
+                        }
+                    }
+                }
                 _db.SaveChanges();
+                return true;
             }
             catch (Exception)
             {
@@ -204,7 +248,7 @@ namespace URLEntryMVC.RepositoryClasses
         }
         public async Task<List<BusinessReviewPoints>> GetListOfDummyBrPoints(int pointId)
         {
-            if (pointId<=0)
+            if (pointId <= 0)
             {
                 List<BusinessReviewPoints> businessReviewUrls = new List<BusinessReviewPoints>();
                 for (int i = 1; i < 7; i++)
@@ -265,10 +309,7 @@ namespace URLEntryMVC.RepositoryClasses
                         _db.PointEmails.Remove(pointEmail);
                     _db.UrlTbls.Remove(UrlInfo);
                     var BrPoints = _db.BusinessReviewPoints.Where(x => x.UrlIdFk == Id).ToList();
-                    BrPoints.ForEach(x =>
-                    {
-                        x.UrlIdFk = null;
-                    });
+                    _db.BusinessReviewPoints.RemoveRange(BrPoints);
                 }
                 _db.SaveChanges();
             }
@@ -326,5 +367,6 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
+
     }
 }

@@ -211,32 +211,6 @@ namespace URLEntryMVC.RepositoryClasses
                 };
                 _db.Entry(customer).State = EntityState.Modified;
                 _db.SaveChanges();
-                //if (customerVM.businessReviewUrls != null && customerVM.businessReviewUrls.Count > 0)
-                //{
-                //    foreach (var item in customerVM.businessReviewUrls)
-                //    {
-                //        if (item.BusinessPointId != null && item.BusinessPointId > 0)
-                //        {
-                //            //It means record is alreday in DB and we have to update that record
-                //            var urlInfo = await _db.BusinessReviewPoints.Where(x => x.BusinessPointId == item.BusinessPointId && x.CustomerIdFk == customerVM.Id).FirstOrDefaultAsync();
-                //            if (urlInfo != null)
-                //            {
-                //                urlInfo.PointUrl = item.PointUrl;
-                //                await _db.SaveChangesAsync();
-                //            }
-                //        }
-                //        else
-                //        {
-                //            BusinessReviewPoint Obj = new BusinessReviewPoint();
-                //            Obj.PointUrl = item.PointUrl;
-                //            Obj.IsCurrentlyActive = false;
-                //            Obj.CustomerIdFk = customer.Id;
-                //            _db.BusinessReviewPoints.Add(Obj);
-                //            await _db.SaveChangesAsync();
-                //        }
-                //    }
-                //}
-
                 return true;
             }
             catch (Exception)
