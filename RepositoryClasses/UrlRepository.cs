@@ -21,12 +21,12 @@ namespace URLEntryMVC.RepositoryClasses
         {
             try
             {
-                var savePointInfo= _db.UrlTbls.Where(x => x.Id == PointInfo.Id).FirstOrDefault();
+                var savePointInfo = _db.UrlTbls.Where(x => x.Id == PointInfo.Id).FirstOrDefault();
 
                 if (savePointInfo != null)
                 {
                     savePointInfo.Id = PointInfo.Id;
-                    if (PointInfo.EditType!=AppConstant.MultiEdit)
+                    if (PointInfo.EditType != AppConstant.MultiEdit)
                     {
                         savePointInfo.SaveInLibrary = PointInfo.SaveInLibrary;
                     }
@@ -34,7 +34,7 @@ namespace URLEntryMVC.RepositoryClasses
                     savePointInfo.DomainLink = PointInfo.DomainLink;
                     savePointInfo.CustomerIdFk = PointInfo.CustomerId;
                     savePointInfo.CustomerPointName = PointInfo.CustomerPointName;
-                    savePointInfo.ManagementName= PointInfo.ManagementName;
+                    savePointInfo.ManagementName = PointInfo.ManagementName;
                     savePointInfo.PointCategoryIdFk = PointInfo.PointCategoryId;
                     savePointInfo.Subject = PointInfo.Subject;
                     savePointInfo.Body = PointInfo.Text;
@@ -135,16 +135,16 @@ namespace URLEntryMVC.RepositoryClasses
             {
                 var savePointInfo = new UrlTbl()
                 {
-                    SaveInLibrary= PointInfo.SaveInLibrary,
+                    SaveInLibrary = PointInfo.SaveInLibrary,
                     UrlLink = PointInfo.UrlLink,
                     DomainLink = PointInfo.DomainLink,
                     CustomerIdFk = PointInfo.CustomerId,
                     CustomerPointName = PointInfo.CustomerPointName,
-                    ManagementName= PointInfo.ManagementName,
+                    ManagementName = PointInfo.ManagementName,
                     PointCategoryIdFk = PointInfo.PointCategoryId,
                     Subject = PointInfo.Subject,
                     Body = PointInfo.Text,
-                    CreationDate=DateTime.UtcNow
+                    CreationDate = DateTime.UtcNow
                 };
                 _db.UrlTbls.Add(savePointInfo);
                 _db.SaveChanges();
@@ -158,22 +158,24 @@ namespace URLEntryMVC.RepositoryClasses
                     _db.PointEmails.Add(pointEmail);
                     _db.SaveChanges();
                 }
-                if (PointInfo.PointCategoryId==AppConstant.BusinessReviewPointId && PointInfo.businessReviewPoints!=null)
+                if (PointInfo.PointCategoryId == AppConstant.BusinessReviewPointId && PointInfo.businessReviewPoints != null)
                 {
                     bool isFirstIteration = true; // Flag to track the first iteration
                     foreach (var item in PointInfo.businessReviewPoints)
                     {
-                        if (item.selectedBRpointId!=null && item.DelayTimeInMinuts!=null)
+                        if (item.PointUrl != null && item.DelayTimeInMinuts != null)
                         {
-                            var BpInfo = _db.BusinessReviewPoints.Where(x => x.BusinessPointId == item.selectedBRpointId && x.CustomerIdFk == PointInfo.CustomerId).FirstOrDefault();
-                            if (BpInfo!=null)
+                            var addBusinessPoint = new BusinessReviewPoint()
                             {
-                                BpInfo.IsCurrentlyActive = isFirstIteration==true? true:false;
-                                BpInfo.UrlIdFk= savePointInfo.Id;
-                                BpInfo.DelayTimeInMinuts = item.DelayTimeInMinuts;
-                                BpInfo.DatePointer = isFirstIteration == true? savePointInfo.CreationDate.Value.AddMinutes(Convert.ToDouble(item.DelayTimeInMinuts)):null;
-                                _db.SaveChanges();
-                            }
+                                PointUrl = item.PointUrl,
+                                CustomerIdFk = PointInfo.CustomerId,
+                                IsCurrentlyActive = isFirstIteration == true ? true : false,
+                                UrlIdFk = savePointInfo.Id,
+                                DelayTimeInMinuts = item.DelayTimeInMinuts,
+                                DatePointer = isFirstIteration == true ? savePointInfo.CreationDate.Value.AddMinutes(Convert.ToDouble(item.DelayTimeInMinuts)) : null
+                            };
+                            _db.BusinessReviewPoints.Add(addBusinessPoint);
+                            _db.SaveChanges();
                         }
                         isFirstIteration = false; // Set the flag to false for subsequent iterations
                     }
@@ -243,7 +245,7 @@ namespace URLEntryMVC.RepositoryClasses
                     if (pointEmail != null)
                         _db.PointEmails.Remove(pointEmail);
                     _db.UrlTbls.Remove(UrlInfo);
-                    var BrPoints=_db.BusinessReviewPoints.Where(x=>x.UrlIdFk==Id).ToList();
+                    var BrPoints = _db.BusinessReviewPoints.Where(x => x.UrlIdFk == Id).ToList();
                     BrPoints.ForEach(x =>
                     {
                         x.UrlIdFk = null;

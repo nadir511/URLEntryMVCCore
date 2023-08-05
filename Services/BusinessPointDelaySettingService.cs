@@ -14,8 +14,10 @@ public class BusinessPointDelaySettingService : BackgroundService
     }
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        
         while (!stoppingToken.IsCancellationRequested)
         {
+            Console.WriteLine("Service Start At Time:" + DateTime.UtcNow);
             // Your database update logic here...
             using (var scope = _serviceScopeFactory.CreateScope())
             {
@@ -36,7 +38,8 @@ public class BusinessPointDelaySettingService : BackgroundService
                                 listOfBrPoints[i].IsCurrentlyActive =false;
                                 listOfBrPoints[i].DatePointer = null;
                                 listOfBrPoints[i+1].IsCurrentlyActive = true;
-                                listOfBrPoints[i+1].DatePointer = DateTime.UtcNow.AddMinutes(Convert.ToDouble(listOfBrPoints[i].DelayTimeInMinuts));
+                                listOfBrPoints[i+1].DatePointer = DateTime.UtcNow.AddMinutes(Convert.ToDouble(listOfBrPoints[i+1].DelayTimeInMinuts));
+                                Console.WriteLine("Activating the Link{0} with Id {1} and with delayTime {2} and DatePointer:", listOfBrPoints[i].PointUrl, listOfBrPoints[i].BusinessPointId, listOfBrPoints[i].DelayTimeInMinuts, listOfBrPoints[i].DatePointer);
                             }
                             else
                             {
@@ -44,7 +47,8 @@ public class BusinessPointDelaySettingService : BackgroundService
                                 listOfBrPoints[i].IsCurrentlyActive = false;
                                 listOfBrPoints[i].DatePointer = null;
                                 listOfBrPoints[0].IsCurrentlyActive = true;
-                                listOfBrPoints[0].DatePointer = DateTime.UtcNow.AddMinutes(Convert.ToDouble(listOfBrPoints[i].DelayTimeInMinuts));
+                                listOfBrPoints[0].DatePointer = DateTime.UtcNow.AddMinutes(Convert.ToDouble(listOfBrPoints[0].DelayTimeInMinuts));
+                                Console.WriteLine("Activating the Link{0} with Id {1} and with delayTime {2} and DatePointer:", listOfBrPoints[i].PointUrl, listOfBrPoints[i].BusinessPointId, listOfBrPoints[i].DelayTimeInMinuts, listOfBrPoints[i].DatePointer);
                             }
                         }
                     }
@@ -53,7 +57,7 @@ public class BusinessPointDelaySettingService : BackgroundService
                 }
             }
             // Example: _dbContext.SaveChanges();
-            Console.WriteLine("Running Background service at:" + DateTime.UtcNow);
+            
             await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken); // Delay between updates
         }
     }
