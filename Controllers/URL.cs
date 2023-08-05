@@ -179,43 +179,8 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                var obj = await urlRepositoryObj.GetUrlById(id);
-                var customer = await _customerRepository.ListOfCustomers();
-                var pointCategory = await _customerRepository.ListOfPointCategories();
-                SaveUrlVM editUrlVM = new SaveUrlVM();
-                editUrlVM.CustomerList = customer.Select(x => new CustomerInfo
-                {
-                    CustomerId = x.Id,
-                    CustomerName = x.CustomerName
-                }).ToList();
-                editUrlVM.PointCategoryList = pointCategory.Select(x => new PointCategoryInfo
-                {
-                    CategoryId = x.CategoryId,
-                    CategoryName = x.CategoryName
-                }).ToList();
-                editUrlVM.Id = obj.Id;
-                editUrlVM.SaveInLibrary = obj.SaveInLibrary ?? false;
-                editUrlVM.UrlLink = obj.UrlLink;
-                editUrlVM.DomainLink = obj.DomainLink;
-                editUrlVM.CustomerPointName = obj.CustomerPointName;
-                editUrlVM.ManagementName = obj.ManagementName;
-                editUrlVM.CustomerId = obj.CustomerIdFk ?? 0;
-                editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
-                editUrlVM.Subject = obj.Subject;
-                editUrlVM.Text = obj.Body;
-                string[] emails = new string[3];
-
-                if (obj.PointCategoryIdFk == AppConstant.EmailContractPointId)
-                {
-                    var emailsStr = await urlRepositoryObj.GetEmailsByPointId(id);
-                    if (emailsStr != null)
-                        emails = emailsStr.Split(',');
-                    editUrlVM.Email1 = emails[0];
-                    editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
-                    editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
-                }
-
-                return PartialView("~/Views/PartialViews/_EditUrlModal.cshtml", editUrlVM);
+                
+                return PartialView("~/Views/PartialViews/_EditUrlModal.cshtml",await urlRepositoryObj.getPointInfoOnEdit(id));
             }
             catch (Exception ex)
             {
@@ -524,12 +489,12 @@ namespace URLEntryMVC.Controllers
             }
 
         }
-        public ActionResult ListOfPrPointsByCustomerId(int customerId)
+        public ActionResult ListOfBrPointsByCustomerId(int pointId)
         {
             try
             {
                 SaveUrlVM saveUrlVM = new SaveUrlVM();
-                saveUrlVM.businessReviewPoints =urlRepositoryObj.GetListOfDummyBrPoints();
+                saveUrlVM.businessReviewPoints =urlRepositoryObj.GetListOfDummyBrPoints(isEdit);
                 return PartialView("~/Views/PartialViews/_BusinessPoints.cshtml", saveUrlVM);
             }
             catch (Exception)

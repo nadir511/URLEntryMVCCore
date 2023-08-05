@@ -277,10 +277,10 @@
             else {
                 $('#selectCustomerError').text('');
                 $.ajax({
-                    url: "@Url.Action("ListOfPrPointsByCustomerId", "URL")",
+                    url: "@Url.Action("ListOfBrPointsByCustomerId", "URL")",
                     type: 'GET',
                     contentType: 'application/json',
-                    data: { 'customerId': customerId },
+                    data: { 'isEdit': false },
                     beforeSend: function () {
                         $("#logoLoader").fadeIn();
                     },

@@ -91,28 +91,6 @@ namespace URLEntryMVC.RepositoryClasses
                 customerVM.TikTok = customerInfo.TikTok;
                 customerVM.Youtube = customerInfo.Youtube;
                 customerVM.Snapchat = customerInfo.Snapchat;
-
-                //customerVM.businessReviewUrls = await _db.BusinessReviewPoints.Where(x => x.CustomerIdFk == Id).Select(x => new BusinessReviewUrl
-                //{
-                //    BusinessPointId = x.BusinessPointId,
-                //    PointUrl = x.PointUrl,
-                //}).ToListAsync();
-                //if (customerVM.businessReviewUrls.Count < 1)
-                //{
-                //    for (int i = 1; i < 7; i++)
-                //    {
-                //        BusinessReviewUrl businessReviewUrl = new BusinessReviewUrl();
-                //        businessReviewUrl.UrlName = "URL-" + i;
-                //        customerVM.businessReviewUrls.Add(businessReviewUrl);
-                //    }
-                //}
-                //else
-                //{
-                //    for (int i = 0; i < customerVM.businessReviewUrls.Count; i++)
-                //    {
-                //        customerVM.businessReviewUrls[i].UrlName = "URL-" + i;
-                //    }
-                //}
                 return customerVM;
             }
             catch (Exception)
@@ -191,20 +169,6 @@ namespace URLEntryMVC.RepositoryClasses
                 };
                 _db.Entry(customer).State = EntityState.Added;
                 _db.SaveChanges();
-                //if (customerVM.businessReviewUrls != null && customerVM.businessReviewUrls.Count > 0)
-                //{
-                //    List<BusinessReviewPoint> PointsObj = new List<BusinessReviewPoint>();
-                //    foreach (var item in customerVM.businessReviewUrls)
-                //    {
-                //        BusinessReviewPoint Obj = new BusinessReviewPoint();
-                //        Obj.PointUrl = item.PointUrl;
-                //        Obj.IsCurrentlyActive = false;
-                //        Obj.CustomerIdFk = customer.Id;
-                //        PointsObj.Add(Obj);
-                //    }
-                //    _db.BusinessReviewPoints.AddRange(PointsObj);
-                //    _db.SaveChanges();
-                //}
                 return true;
             }
             catch (Exception)

@@ -103,6 +103,8 @@
         </div>
 
     </div>
+    <div id="businessRevPointProp" style="margin-top:25px">
+    </div>
 
 </form>
 @*Sure Message Modal*@
@@ -278,11 +280,58 @@
             $("#pointEmai3").val('');
             $("#pointEmai1").prop('required', false);
         }
+        else if (selectedpointCat != "" && selectedpointCat == @AppConstant.BusinessReviewPointId) {
+            debugger;
+            if (customerId == "" || customerId == null) {
+                $('#selectCustomerError').text('Select Customer');
+            }
+            else {
+                $('#selectCustomerError').text('');
+                $.ajax({
+                    url: "@Url.Action("ListOfBrPointsByCustomerId", "URL")",
+                    type: 'GET',
+                    contentType: 'application/json',
+                    data: { 'isEdit': true },
+                    beforeSend: function () {
+                        $("#logoLoader").fadeIn();
+                    },
+                    success: function (data) {
+                        $('#businessRevPointProp').html(data);
+                    },
+                    complete: function () {
+                        $("#logoLoader").fadeOut();
+                    },
+                    error: function (errorMsg) {
+                        console.log(errorMsg);
+                        $("#logoLoader").fadeOut();
+                    }
+                });
+            }
+
+            //need to disabled
+            $("#emailPointProp").hide();
+            $("#SubjectId").val('');
+            $("#SubjectId").prop('required', false);
+            $("#TextId").val('');
+            $("#TextId").prop('required', false);
+            $("#pointEmai1").val('');
+            $("#pointEmai2").val('');
+            $("#pointEmai3").val('');
+            $("#pointEmai1").prop('required', false);
+            $('#savePointListDiv').hide();
+            $('#savePointDiv').hide();
+            $('#savePointsDiv').hide();
+            $('#is_pointSave').prop('checked', false);
+            $("#stdPointProp").hide();
+            $("#pointDomin").prop('required', false);
+            $('#socialMediaDiv').hide();
+        }
         else {
             $("#stdPointProp").hide();
             $("#emailPointProp").hide();
         }
     };
+
     function ChangeSocialMediaPoint(obj) {
         var selectedSocialPoint = $("#socialPointsList").val();
         if (selectedSocialPoint != "") {

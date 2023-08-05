@@ -5,6 +5,7 @@ using URLEntryMVC.Entities;
 using URLEntryMVC.Interfaces;
 using URLEntryMVC.ViewModel.BusinessReviewVM;
 using URLEntryMVC.ViewModel.CustomerVM;
+using URLEntryMVC.ViewModel.PointCategoryVM;
 using URLEntryMVC.ViewModel.UrlVM;
 
 namespace URLEntryMVC.RepositoryClasses
@@ -12,10 +13,12 @@ namespace URLEntryMVC.RepositoryClasses
     public class UrlRepository : IUrlRepository
     {
         private readonly DataContext _db;
+        private readonly ICustomerRepository _customerRepository;
 
-        public UrlRepository(DataContext _dataContext)
+        public UrlRepository(DataContext _dataContext, ICustomerRepository customerRepository)
         {
             _db = _dataContext;
+            _customerRepository = customerRepository;
         }
         public void UpdateLink(SaveUrlVM PointInfo)
         {
@@ -199,16 +202,32 @@ namespace URLEntryMVC.RepositoryClasses
                 throw;
             }
         }
-        public List<BusinessReviewPoints> GetListOfDummyBrPoints()
+        public async Task<List<BusinessReviewPoints>> GetListOfDummyBrPoints(int pointId)
         {
-            List<BusinessReviewPoints> businessReviewUrls = new List<BusinessReviewPoints>();
-            for (int i = 1; i < 7; i++)
+            if (pointId<=0)
             {
-                BusinessReviewPoints businessReviewUrl = new BusinessReviewPoints();
-                businessReviewUrl.UrlName = "URL-" + i;
-                businessReviewUrls.Add(businessReviewUrl);
+                List<BusinessReviewPoints> businessReviewUrls = new List<BusinessReviewPoints>();
+                for (int i = 1; i < 7; i++)
+                {
+                    BusinessReviewPoints businessReviewUrl = new BusinessReviewPoints();
+                    businessReviewUrl.UrlName = "URL-" + i;
+                    businessReviewUrls.Add(businessReviewUrl);
+                }
+                return businessReviewUrls;
             }
-            return businessReviewUrls;
+            else
+            {
+                List<BusinessReviewPoints> businessReviewUrls = await _db.BusinessReviewPoints.Where(x => x.UrlIdFk == pointId).Select(x => new BusinessReviewPoints
+                {
+                    BusinessPointId = x.BusinessPointId,
+                    PointUrl = x.PointUrl,
+                    DelayTimeInMinuts = x.DelayTimeInMinuts,
+                    DelayTimeInHours = x.DelayTimeInHours,
+                    DatePointer = x.DatePointer,
+                    IsCurrentlyActive = x.IsCurrentlyActive
+                }).ToListAsync();
+                return businessReviewUrls;
+            }
         }
         public async Task<UrlTbl?> GetUrlById(int Id)
         {
@@ -260,5 +279,52 @@ namespace URLEntryMVC.RepositoryClasses
             }
         }
 
+        public async Task<SaveUrlVM> getPointInfoOnEdit(int PointId)
+        {
+            try
+            {
+                var obj = await GetUrlById(PointId);
+                var customer = await _customerRepository.ListOfCustomers();
+                var pointCategory = await _customerRepository.ListOfPointCategories();
+                SaveUrlVM editUrlVM = new SaveUrlVM();
+                editUrlVM.CustomerList = customer.Select(x => new CustomerInfo
+                {
+                    CustomerId = x.Id,
+                    CustomerName = x.CustomerName
+                }).ToList();
+                editUrlVM.PointCategoryList = pointCategory.Select(x => new PointCategoryInfo
+                {
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.CategoryName
+                }).ToList();
+                editUrlVM.Id = obj.Id;
+                editUrlVM.SaveInLibrary = obj.SaveInLibrary ?? false;
+                editUrlVM.UrlLink = obj.UrlLink;
+                editUrlVM.DomainLink = obj.DomainLink;
+                editUrlVM.CustomerPointName = obj.CustomerPointName;
+                editUrlVM.ManagementName = obj.ManagementName;
+                editUrlVM.CustomerId = obj.CustomerIdFk ?? 0;
+                editUrlVM.PointCategoryId = obj.PointCategoryIdFk;
+                editUrlVM.Subject = obj.Subject;
+                editUrlVM.Text = obj.Body;
+                string[] emails = new string[3];
+
+                if (obj.PointCategoryIdFk == AppConstant.EmailContractPointId)
+                {
+                    var emailsStr = await GetEmailsByPointId(PointId);
+                    if (emailsStr != null)
+                        emails = emailsStr.Split(',');
+                    editUrlVM.Email1 = emails[0];
+                    editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
+                    editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
+                }
+
+                return editUrlVM;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }
