@@ -104,6 +104,8 @@
                 },
                 success: function(data) {
                     var obj = JSON.parse(data);
+                    console.table(obj);
+                    debugger;
                     $("#logoLoader").fadeOut();
                     if (obj.isSuccessfull == 0) {
                         $('#errorUl').show();

@@ -42,37 +42,6 @@
                         </div>
                     </div>
                 </div>
-                @*Business Review Points Starts here*@
-                <div class="card mb-4">
-                    <h5 class="card-header">Business Review Points</h5>
-                    <div class="card-body">
-                        <table class="table table-bordered" id="reviewPtTbl">
-                            <thead>
-                                <tr class="fw-bolder text-muted bb-none" style="background-color: var(--bg-200)">
-                                    <th>TITLE</th>
-                                    <th>POINT URL</th>
-                                    @*<th>TIME DELAY(In Minutes)</th>*@
-                                </tr>
-                            </thead>
-                           @* <tbody>
-                                @for (int i = 0; i < Model.businessReviewUrls.Count(); i++)
-                                {
-                                    <tr>
-                                        
-                                        @Html.EditorFor(m=>m.businessReviewUrls[i].BusinessPointId,new { htmlAttributes = new { @class = "form-control", @id = "BrPointId_" + i,@style="display:none" } })
-                                        <td>
-                                            @Model.businessReviewUrls[i].UrlName
-                                        </td>
-                                        <td>
-                                            @Html.EditorFor(m=>m.businessReviewUrls[i].PointUrl,new { htmlAttributes = new { @class = "form-control", @id = "url_" + i } })
-                                            <span asp-validation-for="@Model.businessReviewUrls[i].PointUrl" class="text-danger" id="errorUrl_@i"></span>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>*@
-                        </table>
-                    </div>
-                </div>
             </form>
         </div>
     </div>

@@ -53,68 +53,83 @@ namespace URLEntryMVC.Services
         }
         private void Send(MimeMessage mailMessage)
         {
-            using (var client = new SmtpClient())
+            try
             {
-                try
+                using (var client = new SmtpClient())
                 {
-                    client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, SecureSocketOptions.Auto);
-                    client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
-                    client.Send(mailMessage);
+                    try
+                    {
+                        client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, SecureSocketOptions.Auto);
+                        client.AuthenticationMechanisms.Remove("XOAUTH2");
+                        client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
+                        client.Send(mailMessage);
+                    }
+                    catch
+                    {
+                        //log an error message or throw an exception or both.
+                        throw;
+                    }
+                    finally
+                    {
+                        client.Disconnect(true);
+                        client.Dispose();
+                    }
                 }
-                catch
-                {
-                    //log an error message or throw an exception or both.
-                    throw;
-                }
-                finally
-                {
-                    client.Disconnect(true);
-                    client.Dispose();
-                }
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
         public string settingUpTheEmailTemplate(string userName,string password,string callBackURL,string? emialType)
         {
-            #region|Setting Up the Email Template|
-            string accountForgetPassText = string.Empty;
-            if (emialType== "forgetPassword")
+            try
             {
-                var FilePath = _environment.WebRootPath
-                            + Path.DirectorySeparatorChar.ToString()
-                            + "EmailTemplates"
-                            + Path.DirectorySeparatorChar.ToString()
-                            + "ForgetPassword.cshtml";
-                accountForgetPassText = System.IO.File.ReadAllText(FilePath);
-                accountForgetPassText = accountForgetPassText.Replace("{user}", userName);
-                accountForgetPassText = accountForgetPassText.Replace("{Url}", callBackURL);
+                #region|Setting Up the Email Template|
+                string accountForgetPassText = string.Empty;
+                if (emialType == "forgetPassword")
+                {
+                    var FilePath = _environment.WebRootPath
+                                + Path.DirectorySeparatorChar.ToString()
+                                + "EmailTemplates"
+                                + Path.DirectorySeparatorChar.ToString()
+                                + "ForgetPassword.cshtml";
+                    accountForgetPassText = System.IO.File.ReadAllText(FilePath);
+                    accountForgetPassText = accountForgetPassText.Replace("{user}", userName);
+                    accountForgetPassText = accountForgetPassText.Replace("{Url}", callBackURL);
+                }
+                else
+                {
+                    var FilePath = _environment.WebRootPath
+                                + Path.DirectorySeparatorChar.ToString()
+                                + "EmailTemplates"
+                                + Path.DirectorySeparatorChar.ToString()
+                                + "ActivateAccountAndResetPassword.cshtml";
+                    accountForgetPassText = System.IO.File.ReadAllText(FilePath);
+                    accountForgetPassText = accountForgetPassText.Replace("{user}", userName);
+                    accountForgetPassText = accountForgetPassText.Replace("{password}", password);
+                    accountForgetPassText = accountForgetPassText.Replace("{Url}", callBackURL);
+
+                }
+                var MasterEmailTemplateFilePath = _environment.WebRootPath
+                                                  + Path.DirectorySeparatorChar.ToString()
+                                                  + "EmailTemplates"
+                                                  + Path.DirectorySeparatorChar.ToString()
+                                                  + "MasterEmailTemplate.cshtml";
+
+                string MasterEmailText = System.IO.File.ReadAllText(MasterEmailTemplateFilePath);
+                MasterEmailText = MasterEmailText.Replace("{body}", accountForgetPassText);
+                MasterEmailText = MasterEmailText.Replace("{Year}", DateTime.Now.Year.ToString());
+                string body = MasterEmailText;
+                body = body.Trim();
+                #endregion
+                return body;
             }
-            else
+            catch (Exception)
             {
-                var FilePath = _environment.WebRootPath
-                            + Path.DirectorySeparatorChar.ToString()
-                            + "EmailTemplates"
-                            + Path.DirectorySeparatorChar.ToString()
-                            + "ActivateAccountAndResetPassword.cshtml";
-                accountForgetPassText = System.IO.File.ReadAllText(FilePath);
-                accountForgetPassText = accountForgetPassText.Replace("{user}", userName);
-                accountForgetPassText = accountForgetPassText.Replace("{password}", password);
-                accountForgetPassText = accountForgetPassText.Replace("{Url}", callBackURL);
 
+                throw;
             }
-            var MasterEmailTemplateFilePath = _environment.WebRootPath
-                                              + Path.DirectorySeparatorChar.ToString()
-                                              + "EmailTemplates"
-                                              + Path.DirectorySeparatorChar.ToString()
-                                              + "MasterEmailTemplate.cshtml";
-
-            string MasterEmailText = System.IO.File.ReadAllText(MasterEmailTemplateFilePath);
-            MasterEmailText = MasterEmailText.Replace("{body}", accountForgetPassText);
-            MasterEmailText = MasterEmailText.Replace("{Year}", DateTime.Now.Year.ToString());
-            string body = MasterEmailText;
-            body = body.Trim();
-            #endregion
-            return body;
         }
     }
 }

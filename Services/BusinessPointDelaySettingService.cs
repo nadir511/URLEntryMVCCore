@@ -30,7 +30,7 @@ public class BusinessPointDelaySettingService : BackgroundService
                                                                 Where(x => x.UrlIdFk == pointId && x.PointUrl != null).ToList();
                     for (int i = 0; i < listOfBrPoints.Count; i++)
                     {
-                        if (listOfBrPoints[i].IsCurrentlyActive==true && listOfBrPoints[i].DatePointer<=DateTime.UtcNow)
+                        if (listOfBrPoints[i].IsCurrentlyActive==true && listOfBrPoints[i].DatePointer<=DateTime.UtcNow && listOfBrPoints[i].PointUrl != null)
                         {
                             if (i + 1 < listOfBrPoints.Count)
                             {
@@ -58,7 +58,7 @@ public class BusinessPointDelaySettingService : BackgroundService
             }
             // Example: _dbContext.SaveChanges();
             
-            await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken); // Delay between updates
+            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // Delay between updates
         }
     }
 }

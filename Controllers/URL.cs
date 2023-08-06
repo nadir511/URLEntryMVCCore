@@ -26,7 +26,7 @@ namespace URLEntryMVC.Controllers
         private readonly DataContext _db;
         private readonly ICustomerRepository _customerRepository;
         private readonly UserManager<ApplicationUserExtension> _userManager;
-        private string domainLink = "https://tapthat.online/";
+        private string domainLink = "https://tapthat.azurewebsites.net/";
 
         public URL(IUrlRepository urlRepository, IWebHostEnvironment environment, DataContext db, ICustomerRepository customerRepository, UserManager<ApplicationUserExtension> userManager)
         {

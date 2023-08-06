@@ -15,7 +15,7 @@ namespace URLEntryMVC.RepositoryClasses
     {
         private readonly DataContext _db;
         private readonly ICustomerRepository _customerRepository;
-        private string domainLink = "https://tapthat.online/";
+        private string domainLink = "https://tapthat.azurewebsites.net/";
 
         public UrlRepository(DataContext _dataContext, ICustomerRepository customerRepository)
         {
@@ -80,8 +80,8 @@ namespace URLEntryMVC.RepositoryClasses
                             {
                                 businessPointUrlInfo.PointUrl = item.PointUrl;
                                 businessPointUrlInfo.IsCurrentlyActive = isFirstIteration == true ? true : false;
-                                businessPointUrlInfo.DelayTimeInMinuts=item.DelayTimeInMinuts;
-                                businessPointUrlInfo.DelayTimeInHours=item.DelayTimeInHours;
+                                businessPointUrlInfo.DelayTimeInMinuts = item.DelayTimeInMinuts;
+                                businessPointUrlInfo.DelayTimeInHours = item.DelayTimeInHours;
                                 businessPointUrlInfo.DatePointer = isFirstIteration == true ? savePointInfo.UpdationDate.Value.AddMinutes(Convert.ToDouble(item.DelayTimeInMinuts)) : null;
                                 await _db.SaveChangesAsync();
                             }
@@ -210,20 +210,20 @@ namespace URLEntryMVC.RepositoryClasses
                     bool isFirstIteration = true; // Flag to track the first iteration
                     foreach (var item in PointInfo.businessReviewPoints)
                     {
-                        if (item.PointUrl != null && item.DelayTimeInMinuts != null)
+                        //if (item.PointUrl != null && item.DelayTimeInMinuts != null)
+                        //{
+                        var addBusinessPoint = new BusinessReviewPoint()
                         {
-                            var addBusinessPoint = new BusinessReviewPoint()
-                            {
-                                PointUrl = item.PointUrl,
-                                CustomerIdFk = PointInfo.CustomerId,
-                                IsCurrentlyActive = isFirstIteration == true ? true : false,
-                                UrlIdFk = savePointInfo.Id,
-                                DelayTimeInMinuts = item.DelayTimeInMinuts,
-                                DatePointer = isFirstIteration == true ? savePointInfo.CreationDate.Value.AddMinutes(Convert.ToDouble(item.DelayTimeInMinuts)) : null
-                            };
-                            _db.BusinessReviewPoints.Add(addBusinessPoint);
-                            _db.SaveChanges();
-                        }
+                            PointUrl = item.PointUrl,
+                            CustomerIdFk = PointInfo.CustomerId,
+                            IsCurrentlyActive = isFirstIteration == true ? true : false,
+                            UrlIdFk = savePointInfo.Id,
+                            DelayTimeInMinuts = item.DelayTimeInMinuts,
+                            DatePointer = isFirstIteration == true ? savePointInfo.CreationDate.Value.AddMinutes(Convert.ToDouble(item.DelayTimeInMinuts)) : null
+                        };
+                        _db.BusinessReviewPoints.Add(addBusinessPoint);
+                        _db.SaveChanges();
+                        //}
                         isFirstIteration = false; // Set the flag to false for subsequent iterations
                     }
                 }
