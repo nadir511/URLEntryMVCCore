@@ -277,7 +277,7 @@
             else {
                 $('#selectCustomerError').text('');
                 $.ajax({
-                    url: "@Url.Action("ListOfBrPointsByCustomerId", "URL")",
+                    url: "@Url.Action("ListOfBrPointsByPointId", "URL")",
                     type: 'GET',
                     contentType: 'application/json',
                     data: { 'pointId': 0 },
@@ -383,8 +383,6 @@
             $('#managmentNameError').text('Enter Save Point Name');
             return;
         }
-        var t = ValidateBusinessRpoint();
-        var t1=$("#pointCatList").val();
         if ($("#pointCatList").val() == 4 && ValidateBusinessRpoint() && $("#addUrlForm").valid()) {
             debugger;
             SubmitForm();

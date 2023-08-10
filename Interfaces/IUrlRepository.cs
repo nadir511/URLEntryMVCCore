@@ -6,7 +6,7 @@ namespace URLEntryMVC.Interfaces
 {
     public interface IUrlRepository
     {
-        Task<bool> UpdateLink(SaveUrlVM UrlInfo);
+        Task<bool> UpdateLink(SaveUrlVM UrlInfo, bool isCustomerRoleUpdate);
         Task<bool> IsLinkExist(string url);
         Task<bool> IsPointExistForCustomer(string CustomerPointName,int CustomerId);
         Task<bool> IsManagementNameExistForCustomer(string PointManagementName, int CustomerId);

@@ -22,7 +22,7 @@ namespace URLEntryMVC.RepositoryClasses
             _db = _dataContext;
             _customerRepository = customerRepository;
         }
-        public async Task<bool> UpdateLink(SaveUrlVM PointInfo)
+        public async Task<bool> UpdateLink(SaveUrlVM PointInfo,bool isCustomerRoleUpdate)
         {
             try
             {
@@ -36,12 +36,12 @@ namespace URLEntryMVC.RepositoryClasses
                     {
                         savePointInfo.SaveInLibrary = PointInfo.SaveInLibrary;
                     }
-                    savePointInfo.UrlLink = domainLink + '_' + customerInfo.CustomerName + '/' + PointInfo.CustomerPointName;
-                    savePointInfo.DomainLink = PointInfo.DomainLink;
-                    savePointInfo.CustomerIdFk = PointInfo.CustomerId;
-                    savePointInfo.CustomerPointName = PointInfo.CustomerPointName;
-                    savePointInfo.ManagementName = PointInfo.ManagementName;
-                    savePointInfo.PointCategoryIdFk = PointInfo.PointCategoryId;
+                    savePointInfo.UrlLink =isCustomerRoleUpdate == true ? savePointInfo.UrlLink: domainLink + '_' + customerInfo.CustomerName + '/' + PointInfo.CustomerPointName;
+                    savePointInfo.DomainLink = isCustomerRoleUpdate == true ? savePointInfo.DomainLink: PointInfo.DomainLink;
+                    savePointInfo.CustomerIdFk = isCustomerRoleUpdate == true ? savePointInfo.CustomerIdFk : PointInfo.CustomerId;
+                    savePointInfo.CustomerPointName = isCustomerRoleUpdate == true ? savePointInfo.CustomerPointName : PointInfo.CustomerPointName;
+                    savePointInfo.ManagementName = isCustomerRoleUpdate == true ? savePointInfo.ManagementName : PointInfo.ManagementName;
+                    savePointInfo.PointCategoryIdFk = isCustomerRoleUpdate == true ? savePointInfo.PointCategoryIdFk : PointInfo.PointCategoryId;
                     savePointInfo.Subject = PointInfo.Subject;
                     savePointInfo.Body = PointInfo.Text;
                     savePointInfo.CustomerNotes = PointInfo.CustomerNotes;

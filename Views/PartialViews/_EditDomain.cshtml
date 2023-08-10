@@ -4,6 +4,7 @@
     <div class="row">
         @Html.HiddenFor(m=>m.Id)
         @Html.HiddenFor(m=>m.PointCategoryId)
+        @Html.HiddenFor(m=>m.CustomerId)
         @if (Model.PointIds != null)
         {
             for (int i = 0; i < Model.PointIds.Count; i++)
@@ -57,7 +58,8 @@
             </div>
 
         </div>
-
+        <div id="businessRevPointProp" style="margin-top:25px">
+        </div>
         <div class="col-sm-12">
             <label class="form-label" for="CustomerNotes">Customer Notes</label>
             <textarea id="customerNotes" asp-for="CustomerNotes" class="form-control" placeholder="Add Notes"></textarea>
@@ -82,7 +84,9 @@
             $('#customersList').prop("disabled", true);
         }
         ChangePointCat();
-        GetSavePoints(@Model.PointCategoryId, $('#customersList').val());
+        if (selectedpointCat != @AppConstant.BusinessReviewPointId) {
+            GetSavePoints(@Model.PointCategoryId, $('#customersList').val());
+        }
     });
     function ChangePointCat() {
         var selectedpointCat = @Model.PointCategoryId;
@@ -111,6 +115,45 @@
             $("#TextId").prop('required', true);
             $("#pointEmai1").prop('required', true);
         }
+        else if (selectedpointCat == @AppConstant.BusinessReviewPointId) {
+            $.ajax({
+                url: "@Url.Action("ListOfBrPointsByPointId", "URL")",
+                type: 'GET',
+                contentType: 'application/json',
+                data: { 'pointId': '@Model.Id' },
+                beforeSend: function () {
+                    $("#logoLoader").fadeIn();
+                },
+                success: function (data) {
+                    $('#businessRevPointProp').html(data);
+                },
+                complete: function () {
+                    $("#logoLoader").fadeOut();
+                },
+                error: function (errorMsg) {
+                    console.log(errorMsg);
+                    $("#logoLoader").fadeOut();
+                }
+            });
+
+            //need to disabled
+
+            $("#emailPointProp").hide();
+            $("#SubjectId").val('');
+            $("#SubjectId").prop('required', false);
+            $("#TextId").val('');
+            $("#TextId").prop('required', false);
+            $("#pointEmai1").val('');
+            $("#pointEmai2").val('');
+            $("#pointEmai3").val('');
+            $("#pointEmai1").prop('required', false);
+            $('#savePointListDiv').hide();
+            $('#savePointsDiv').hide();
+            $('#is_pointSave').prop('checked', false);
+            $("#stdPointProp").hide();
+            $("#pointDomin").prop('required', false);
+            $('#socialMediaDiv').hide();
+        }
         else {
             $("#stdPointProp").hide();
             $("#emailPointProp").hide();
@@ -133,7 +176,7 @@
                     $("#savePointsList").empty();
                     var v = "<option value=>--Select Point--</option>";
                     $.each(savePoints, function (i, Points) {
-                      v += '<option value="' + Points.value + '">' + Points.text + '</option>';
+                        v += '<option value="' + Points.value + '">' + Points.text + '</option>';
                     });
                     $("#savePointsList").html(v);
                     $('#savePointsDiv').show();
@@ -195,7 +238,7 @@
             $('#TextId').val('');
         }
     }
-    
+
     $("#updateBtn").click(function () {
         var actionMethod = '';
         if ('@Model.EditType' == '@AppConstant.MultiEdit') {

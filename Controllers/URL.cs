@@ -204,7 +204,7 @@ namespace URLEntryMVC.Controllers
                     return Json(-2);
                 else
                 {
-                   var isSave=await urlRepositoryObj.UpdateLink(urlVM);
+                   var isSave=await urlRepositoryObj.UpdateLink(urlVM,false);
                     return Json(1);
                 }
             }
@@ -290,7 +290,7 @@ namespace URLEntryMVC.Controllers
                                 domainLinkObj.allEmailsStr = emails.ToString();
                             }
                             domainLinkObj.EditType = AppConstant.MultiEdit;
-                            urlRepositoryObj.UpdateLink(domainLinkObj);
+                            await urlRepositoryObj.UpdateLink(domainLinkObj,false);
                         }
                     }
                 }
@@ -312,8 +312,10 @@ namespace URLEntryMVC.Controllers
                 var obj = await urlRepositoryObj.GetUrlById(id);
                 SaveUrlVM editUrlVM = new SaveUrlVM();
                 editUrlVM.CustomerId = userInfo.CustomerIdFk ?? 0;
-                editUrlVM.CustomerList = new List<CustomerInfo>();
-                editUrlVM.CustomerList.Add(new CustomerInfo { CustomerId = customerInfo.Id, CustomerName = customerInfo.CustomerName });
+                editUrlVM.CustomerList = new List<CustomerInfo>
+                {
+                    new CustomerInfo { CustomerId = customerInfo.Id, CustomerName = customerInfo.CustomerName }
+                };
                 editUrlVM.Id = obj.Id;
                 editUrlVM.DomainLink = obj.DomainLink;
                 editUrlVM.CustomerNotes = obj.CustomerNotes;
@@ -321,15 +323,19 @@ namespace URLEntryMVC.Controllers
                 editUrlVM.Subject = obj.Subject;
                 editUrlVM.Text = obj.Body;
 
-                string[] emails = new string[3];
                 if (obj.PointCategoryIdFk == 2)
                 {
+                    string[] emails = new string[3];
                     var emailsStr = await urlRepositoryObj.GetEmailsByPointId(id);
                     if (emailsStr != null)
                         emails = emailsStr.Split(',');
                     editUrlVM.Email1 = emails[0];
                     editUrlVM.Email2 = emails.ElementAtOrDefault(1) != null ? emails[1] : null;
                     editUrlVM.Email3 = emails.ElementAtOrDefault(2) != null ? emails[2] : null;
+                }
+                else if (obj.PointCategoryIdFk == AppConstant.BusinessReviewPointId)
+                {
+                    editUrlVM.businessReviewPoints = await urlRepositoryObj.GetListOfDummyBrPoints(id);
                 }
                 return PartialView("~/Views/PartialViews/_EditDomain.cshtml", editUrlVM);
             }
@@ -344,39 +350,40 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                SaveUrlVM? domainLinkObj = await _db.UrlTbls.Where(x => x.Id == urlVM.Id).Select(x => new SaveUrlVM
-                {
-                    Id = x.Id,
-                    DomainLink = urlVM.DomainLink ?? x.DomainLink,
-                    UrlLink = x.UrlLink,
-                    CustomerId = x.CustomerIdFk ?? 0,
-                    CustomerPointName = x.CustomerPointName,
-                    PointCategoryId = x.PointCategoryIdFk,
-                    CustomerNotes = urlVM.CustomerNotes,
-                    Subject = urlVM.Subject ?? x.Subject,
-                    Text = urlVM.Text ?? x.Body,
-                }).FirstOrDefaultAsync();
-                if (domainLinkObj != null)
-                {
-                    if (domainLinkObj.PointCategoryId == AppConstant.EmailContractPointId)
-                    {
-                        StringBuilder? emails = new StringBuilder();
-                        if (!string.IsNullOrWhiteSpace(urlVM.Email1))
-                        {
-                            emails.Append(urlVM.Email1);
-                        }
-                        if (!string.IsNullOrWhiteSpace(urlVM.Email2))
-                        {
-                            emails.Append("," + urlVM.Email2);
-                        }
-                        if (!string.IsNullOrWhiteSpace(urlVM.Email3))
-                        {
-                            emails.Append("," + urlVM.Email3);
-                        }
-                        domainLinkObj.allEmailsStr = emails.ToString();
-                    }
-                    urlRepositoryObj.UpdateLink(domainLinkObj);
-                }
+                //SaveUrlVM? domainLinkObj = await _db.UrlTbls.Where(x => x.Id == urlVM.Id).Select(x => new SaveUrlVM
+                //{
+                //    Id = x.Id,
+                //    DomainLink = urlVM.DomainLink ?? x.DomainLink,
+                //    UrlLink = x.UrlLink,
+                //    CustomerId = x.CustomerIdFk ?? 0,
+                //    CustomerPointName = x.CustomerPointName,
+                //    PointCategoryId = x.PointCategoryIdFk,
+                //    CustomerNotes = urlVM.CustomerNotes,
+                //    Subject = urlVM.Subject ?? x.Subject,
+                //    Text = urlVM.Text ?? x.Body,
+                //}).FirstOrDefaultAsync();
+                //if (domainLinkObj != null)
+                //{
+                //    if (domainLinkObj.PointCategoryId == AppConstant.EmailContractPointId)
+                //    {
+                //        StringBuilder? emails = new StringBuilder();
+                //        if (!string.IsNullOrWhiteSpace(urlVM.Email1))
+                //        {
+                //            emails.Append(urlVM.Email1);
+                //        }
+                //        if (!string.IsNullOrWhiteSpace(urlVM.Email2))
+                //        {
+                //            emails.Append("," + urlVM.Email2);
+                //        }
+                //        if (!string.IsNullOrWhiteSpace(urlVM.Email3))
+                //        {
+                //            emails.Append("," + urlVM.Email3);
+                //        }
+                //        domainLinkObj.allEmailsStr = emails.ToString();
+                //    }
+                //    await urlRepositoryObj.UpdateLink(domainLinkObj);
+                //}
+                var isSave = await urlRepositoryObj.UpdateLink(urlVM,true);
                 return Json(1);
             }
             catch (Exception ex)
@@ -459,7 +466,7 @@ namespace URLEntryMVC.Controllers
             }
 
         }
-        public async Task<ActionResult> ListOfBrPointsByCustomerId(int pointId)
+        public async Task<ActionResult> ListOfBrPointsByPointId(int pointId)
         {
             try
             {
