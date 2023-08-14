@@ -179,8 +179,8 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                
-                return PartialView("~/Views/PartialViews/_EditUrlModal.cshtml",await urlRepositoryObj.getPointInfoOnEdit(id));
+
+                return PartialView("~/Views/PartialViews/_EditUrlModal.cshtml", await urlRepositoryObj.getPointInfoOnEdit(id));
             }
             catch (Exception ex)
             {
@@ -195,7 +195,7 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                
+
                 bool isLinkExistForCustomerOnEdit = await urlRepositoryObj.IsPointExistForCustomerOnEdit(urlVM.CustomerPointName ?? String.Empty, urlVM.CustomerId, urlVM.Id);
                 if (isLinkExistForCustomerOnEdit)
                     return Json(-1);
@@ -204,7 +204,7 @@ namespace URLEntryMVC.Controllers
                     return Json(-2);
                 else
                 {
-                   var isSave=await urlRepositoryObj.UpdateLink(urlVM,false);
+                    var isSave = await urlRepositoryObj.UpdateLink(urlVM, false);
                     return Json(1);
                 }
             }
@@ -258,40 +258,9 @@ namespace URLEntryMVC.Controllers
                     foreach (var item in urlVM.PointIds)
                     {
                         int pointId = Convert.ToInt32(item);
-                        SaveUrlVM? domainLinkObj = await _db.UrlTbls.Where(x => x.Id == pointId).Select(x => new SaveUrlVM
-                        {
-                            Id = x.Id,
-                            DomainLink = urlVM.DomainLink ?? x.DomainLink,
-                            UrlLink = x.UrlLink,
-                            CustomerId = x.CustomerIdFk ?? 0,
-                            CustomerPointName = x.CustomerPointName,
-                            PointCategoryId = x.PointCategoryIdFk,
-                            CustomerNotes = urlVM.CustomerNotes,
-                            Subject = urlVM.Subject ?? x.Subject,
-                            Text = urlVM.Text ?? x.Body,
-                        }).FirstOrDefaultAsync();
-                        if (domainLinkObj != null)
-                        {
-                            if (domainLinkObj.PointCategoryId == AppConstant.EmailContractPointId)
-                            {
-                                StringBuilder? emails = new StringBuilder();
-                                if (!string.IsNullOrWhiteSpace(urlVM.Email1))
-                                {
-                                    emails.Append(urlVM.Email1);
-                                }
-                                if (!string.IsNullOrWhiteSpace(urlVM.Email2))
-                                {
-                                    emails.Append("," + urlVM.Email2);
-                                }
-                                if (!string.IsNullOrWhiteSpace(urlVM.Email3))
-                                {
-                                    emails.Append("," + urlVM.Email3);
-                                }
-                                domainLinkObj.allEmailsStr = emails.ToString();
-                            }
-                            domainLinkObj.EditType = AppConstant.MultiEdit;
-                            await urlRepositoryObj.UpdateLink(domainLinkObj,false);
-                        }
+                        urlVM.Id = pointId;
+                        urlVM.EditType = AppConstant.MultiEdit;
+                        await urlRepositoryObj.UpdateLink(urlVM, false);
                     }
                 }
                 return Json(1);
@@ -350,40 +319,7 @@ namespace URLEntryMVC.Controllers
         {
             try
             {
-                //SaveUrlVM? domainLinkObj = await _db.UrlTbls.Where(x => x.Id == urlVM.Id).Select(x => new SaveUrlVM
-                //{
-                //    Id = x.Id,
-                //    DomainLink = urlVM.DomainLink ?? x.DomainLink,
-                //    UrlLink = x.UrlLink,
-                //    CustomerId = x.CustomerIdFk ?? 0,
-                //    CustomerPointName = x.CustomerPointName,
-                //    PointCategoryId = x.PointCategoryIdFk,
-                //    CustomerNotes = urlVM.CustomerNotes,
-                //    Subject = urlVM.Subject ?? x.Subject,
-                //    Text = urlVM.Text ?? x.Body,
-                //}).FirstOrDefaultAsync();
-                //if (domainLinkObj != null)
-                //{
-                //    if (domainLinkObj.PointCategoryId == AppConstant.EmailContractPointId)
-                //    {
-                //        StringBuilder? emails = new StringBuilder();
-                //        if (!string.IsNullOrWhiteSpace(urlVM.Email1))
-                //        {
-                //            emails.Append(urlVM.Email1);
-                //        }
-                //        if (!string.IsNullOrWhiteSpace(urlVM.Email2))
-                //        {
-                //            emails.Append("," + urlVM.Email2);
-                //        }
-                //        if (!string.IsNullOrWhiteSpace(urlVM.Email3))
-                //        {
-                //            emails.Append("," + urlVM.Email3);
-                //        }
-                //        domainLinkObj.allEmailsStr = emails.ToString();
-                //    }
-                //    await urlRepositoryObj.UpdateLink(domainLinkObj);
-                //}
-                var isSave = await urlRepositoryObj.UpdateLink(urlVM,true);
+                var isSave = await urlRepositoryObj.UpdateLink(urlVM, true);
                 return Json(1);
             }
             catch (Exception ex)
@@ -471,7 +407,7 @@ namespace URLEntryMVC.Controllers
             try
             {
                 SaveUrlVM saveUrlVM = new SaveUrlVM();
-                saveUrlVM.businessReviewPoints =await urlRepositoryObj.GetListOfDummyBrPoints(pointId);
+                saveUrlVM.businessReviewPoints = await urlRepositoryObj.GetListOfDummyBrPoints(pointId);
                 return PartialView("~/Views/PartialViews/_BusinessPoints.cshtml", saveUrlVM);
             }
             catch (Exception)
