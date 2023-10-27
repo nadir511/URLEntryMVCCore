@@ -15,7 +15,7 @@ namespace URLEntryMVC.RepositoryClasses
     {
         private readonly DataContext _db;
         private readonly ICustomerRepository _customerRepository;
-        private string domainLink = "https://tapthat.azurewebsites.net/";
+        private string domainLink = "https://tapthat.online/";
 
         public UrlRepository(DataContext _dataContext, ICustomerRepository customerRepository)
         {
